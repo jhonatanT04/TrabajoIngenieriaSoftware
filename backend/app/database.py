@@ -14,7 +14,23 @@ engine = create_engine(DATABASE_URL, echo=False)
 def init_db() -> None:
     """Create database tables. If the DB is unreachable, raise an informative error."""
     try:
+        # Import models so SQLModel metadata is populated (necessary for create_all to see tables)
+        try:
+            import app.models as _models  # noqa: F401
+        except Exception:
+            # If models cannot be imported, still attempt create_all (useful in some test setups)
+            pass
+
         SQLModel.metadata.create_all(engine)
+        # Log which tables exist in metadata (helpful for debugging)
+        try:
+            import logging
+
+            logger = logging.getLogger("app.database")
+            tables = sorted(SQLModel.metadata.tables.keys())
+            logger.info("Tablas disponibles en metadata: %s", tables)
+        except Exception:
+            pass
     except Exception as exc:
         # Provide a clear error message to help with configuration
         raise RuntimeError(

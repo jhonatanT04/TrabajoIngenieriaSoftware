@@ -68,18 +68,36 @@ def adjust_stock(payload: schemas.InventoryMovementCreate, session: Session = De
 
 @app.post("/sales/", tags=["sales"])
 def create_sale(payload: schemas.SaleCreate, session: Session = Depends(get_session)):
-    # Simple sale implementation: validate products and decrement stock
+    # Simple sale implementation: validate products, record movements and sale items, and decrement stock
     total = 0.0
+
+    # Validate all items first
     for item in payload.items:
         product = crud.get_product(session, item.product_id)
         if not product:
             raise HTTPException(status_code=404, detail=f"Producto {item.product_id} no encontrado")
         if product.stock < item.quantity:
             raise HTTPException(status_code=400, detail=f"Stock insuficiente para producto {product.sku}")
+
+    # Create sale (id generated) and create associated records in the same transaction
+    sale = models.Sale(customer_id=payload.customer_id, total=0.0)
+    session.add(sale)
+
+    for item in payload.items:
+        product = crud.get_product(session, item.product_id)
+        # decrement stock and record movement
         product.stock -= item.quantity
-        total += item.quantity * item.price
+        movement = models.InventoryMovement(product_id=product.id, quantity=-item.quantity, reason="venta")
         session.add(product)
-    sale = models.Sale(customer_id=payload.customer_id, total=total)
+        session.add(movement)
+
+        # create sale item
+        sale_item = models.SaleItem(sale_id=sale.id, product_id=product.id, quantity=item.quantity, price=item.price)
+        session.add(sale_item)
+
+        total += item.quantity * item.price
+
+    sale.total = total
     session.add(sale)
     session.commit()
     session.refresh(sale)

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from typing import Optional, List
 from enum import Enum
 from sqlmodel import SQLModel, Field, Relationship
@@ -64,10 +66,14 @@ class Customer(SQLModel, table=True):
     contact: Optional[str]
 
 
-class SaleItem(SQLModel):
-    product_id: UUID
+class SaleItem(SQLModel, table=True):
+    id: Optional[UUID] = Field(default_factory=uuid4, primary_key=True)
+    sale_id: Optional[UUID] = Field(default=None, foreign_key="sale.id")
+    product_id: UUID = Field(foreign_key="product.id")
     quantity: float
     price: float
+    # Relationship back to Sale
+    sale: Optional["Sale"] = Relationship(back_populates="items")
 
 
 class Sale(SQLModel, table=True):
@@ -75,4 +81,4 @@ class Sale(SQLModel, table=True):
     customer_id: Optional[UUID] = Field(default=None, foreign_key="customer.id")
     total: float
     created_at: datetime = Field(default_factory=datetime.utcnow)
-    items: Optional[List[SaleItem]] = None
+    items: List[SaleItem] = Relationship(back_populates="sale")
