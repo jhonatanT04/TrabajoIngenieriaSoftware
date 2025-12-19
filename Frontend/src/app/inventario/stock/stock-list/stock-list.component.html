@@ -1,0 +1,19 @@
+<h2>Stock</h2>
+
+<table>
+  <tr>
+    <th>Producto</th>
+    <th>Precio</th>
+    <th>Stock</th>
+    <th></th>
+  </tr>
+
+  <tr *ngFor="let p of productos">
+    <td>{{ p.nombre }}</td>
+    <td>${{ p.precio }}</td>
+    <td>{{ p.stock }}</td>
+    <td>
+      <a [routerLink]="['/inventario/stock/ajuste', p.id]">Ajustar</a>
+    </td>
+  </tr>
+</table>

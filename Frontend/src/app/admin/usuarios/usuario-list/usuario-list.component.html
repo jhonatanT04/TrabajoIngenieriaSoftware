@@ -1,0 +1,9 @@
+<h2>Usuarios</h2>
+<a routerLink="/admin/usuarios/create">Nuevo Usuario</a>
+
+<ul>
+  <li *ngFor="let u of usuarios">
+    {{ u.nombre }} - {{ u.rol }}
+    <a [routerLink]="['/admin/usuarios', u.id]">Ver</a>
+  </li>
+</ul>

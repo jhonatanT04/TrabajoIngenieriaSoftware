@@ -1,0 +1,10 @@
+<h2>Cierre de Caja</h2>
+
+<div *ngIf="cajaService.getEstado().abierta">
+  <p>Total esperado: ${{ cajaService.getEstado().total }}</p>
+  <button (click)="cerrar()">Cerrar Caja</button>
+</div>
+
+<div *ngIf="!cajaService.getEstado().abierta">
+  <p>No hay caja abierta</p>
+</div>

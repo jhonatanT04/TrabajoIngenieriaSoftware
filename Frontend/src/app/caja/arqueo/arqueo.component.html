@@ -1,0 +1,13 @@
+<h2>Arqueo de Caja</h2>
+
+<div *ngIf="cajaService.getEstado().abierta">
+  <p>Monto inicial: ${{ cajaService.getEstado().montoInicial }}</p>
+  <p>Total ventas: ${{ cajaService.getEstado().ventas }}</p>
+  <h3>Total esperado: ${{ cajaService.getEstado().total }}</h3>
+
+  <a routerLink="/caja/cierre">Ir a cierre</a>
+</div>
+
+<div *ngIf="!cajaService.getEstado().abierta">
+  <p>No hay caja abierta</p>
+</div>

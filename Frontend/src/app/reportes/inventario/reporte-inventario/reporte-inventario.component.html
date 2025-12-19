@@ -1,0 +1,10 @@
+<h2>Reporte de Inventario</h2>
+
+<ul>
+  <li *ngFor="let m of movimientos">
+    {{ m.fecha | date:'short' }} –
+    {{ m.tipo }} –
+    {{ m.producto }} –
+    {{ m.cantidad }}
+  </li>
+</ul>

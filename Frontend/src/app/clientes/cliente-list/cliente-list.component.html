@@ -1,0 +1,10 @@
+<h2>Clientes</h2>
+
+<a routerLink="/clientes/create">Nuevo cliente</a>
+
+<ul>
+  <li *ngFor="let c of clientes">
+    {{ c.nombre }} – {{ c.puntos }} pts
+    <a [routerLink]="['/clientes', c.id]">Ver</a>
+  </li>
+</ul>

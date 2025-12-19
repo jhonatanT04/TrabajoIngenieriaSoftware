@@ -1,0 +1,17 @@
+<div class="login-container">
+  <h2>Registro de Usuario</h2>
+
+  <form [formGroup]="registerForm" (ngSubmit)="register()">
+    <input formControlName="username" placeholder="Usuario" />
+    <input formControlName="email" placeholder="Correo" />
+    <input type="password" formControlName="password" placeholder="Contraseña" />
+
+    <button type="submit" [disabled]="loading">
+      {{ loading ? 'Registrando...' : 'Registrar' }}
+    </button>
+
+    <p *ngIf="success">{{ success }}</p>
+
+    <a routerLink="/auth/login">Volver al login</a>
+  </form>
+</div>

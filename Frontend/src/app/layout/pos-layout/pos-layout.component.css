@@ -1,0 +1,29 @@
+.pos-layout {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.pos-header {
+  height: 60px;
+  background: #020617;
+  color: white;
+  padding: 0 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.pos-header button {
+  background: #dc2626;
+  border: none;
+  padding: 8px 16px;
+  color: white;
+  border-radius: 4px;
+}
+
+.pos-content {
+  flex: 1;
+  background: #0f172a;
+  padding: 10px;
+}

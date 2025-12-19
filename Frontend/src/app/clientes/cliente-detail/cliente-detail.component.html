@@ -1,0 +1,8 @@
+<h2>{{ cliente?.nombre }}</h2>
+
+<p>Cédula: {{ cliente?.cedula }}</p>
+<p>Email: {{ cliente?.email }}</p>
+<p>Puntos: {{ cliente?.puntos }}</p>
+
+<a [routerLink]="['/clientes', cliente.id, 'edit']">Editar</a>
+<a [routerLink]="['/clientes', cliente.id, 'fidelidad']">Fidelidad</a>

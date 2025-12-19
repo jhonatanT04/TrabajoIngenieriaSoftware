@@ -1,0 +1,14 @@
+<h2>Apertura de Caja</h2>
+
+<div *ngIf="!cajaService.getEstado().abierta">
+  <input
+    type="number"
+    [(ngModel)]="monto"
+    placeholder="Monto inicial"
+  />
+  <button (click)="abrir()">Abrir Caja</button>
+</div>
+
+<div *ngIf="cajaService.getEstado().abierta">
+  <p>La caja ya está abierta</p>
+</div>

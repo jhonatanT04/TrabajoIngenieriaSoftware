@@ -1,0 +1,5 @@
+<h2>{{ usuario?.nombre }}</h2>
+<p>Email: {{ usuario?.email }}</p>
+<p>Rol: {{ usuario?.rol }}</p>
+
+<a [routerLink]="['/admin/usuarios', usuario.id, 'edit']">Editar</a>

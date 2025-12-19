@@ -1,0 +1,13 @@
+import { Routes } from '@angular/router';
+import { ReporteVentasComponent } from './ventas/reporte-ventas/reporte-ventas.component';
+import { ReporteCajaComponent } from './caja/reporte-caja/reporte-caja.component';
+import { ReporteInventarioComponent } from './inventario/reporte-inventario/reporte-inventario.component';
+import { ReporteClientesComponent } from './clientes/reporte-clientes/reporte-clientes.component';
+
+export const REPORTES_ROUTES: Routes = [
+  { path: 'ventas', component: ReporteVentasComponent },
+  { path: 'caja', component: ReporteCajaComponent },
+  { path: 'inventario', component: ReporteInventarioComponent },
+  { path: 'clientes', component: ReporteClientesComponent },
+  { path: '', redirectTo: 'ventas', pathMatch: 'full' }
+];

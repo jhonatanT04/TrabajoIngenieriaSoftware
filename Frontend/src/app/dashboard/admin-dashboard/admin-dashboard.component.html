@@ -1,0 +1,8 @@
+<h2>Dashboard Administrador</h2>
+
+<div class="cards">
+  <div class="card" *ngFor="let m of metrics">
+    <h3>{{ m.value }}</h3>
+    <p>{{ m.label }}</p>
+  </div>
+</div>

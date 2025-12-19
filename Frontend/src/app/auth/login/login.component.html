@@ -1,0 +1,29 @@
+<div class="login-container">
+  <h2>Sistema de Gestión de Minimercado</h2>
+
+  <form [formGroup]="loginForm" (ngSubmit)="login()">
+    <input
+      type="text"
+      placeholder="Usuario"
+      formControlName="username"
+    />
+
+    <input
+      type="password"
+      placeholder="Contraseña"
+      formControlName="password"
+    />
+
+    <button type="submit" [disabled]="loading">
+      {{ loading ? 'Ingresando...' : 'Ingresar' }}
+    </button>
+
+    <p class="error" *ngIf="errorMessage">
+      {{ errorMessage }}
+    </p>
+
+    <a routerLink="/auth/forgot-password">
+      ¿Olvidaste tu contraseña?
+    </a>
+  </form>
+</div>

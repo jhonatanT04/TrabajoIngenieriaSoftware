@@ -1,0 +1,15 @@
+<h2>Reporte de Ventas</h2>
+
+<table>
+  <tr>
+    <th>Fecha</th>
+    <th>Producto</th>
+    <th>Cantidad</th>
+  </tr>
+
+  <tr *ngFor="let v of ventas">
+    <td>{{ v.fecha | date:'short' }}</td>
+    <td>{{ v.producto }}</td>
+    <td>{{ v.cantidad }}</td>
+  </tr>
+</table>

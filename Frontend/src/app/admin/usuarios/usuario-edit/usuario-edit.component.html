@@ -1,0 +1,10 @@
+<h2>Editar Usuario</h2>
+
+<input [(ngModel)]="usuario.nombre">
+<input [(ngModel)]="usuario.email">
+
+<select [(ngModel)]="usuario.rol">
+  <option *ngFor="let r of roles" [value]="r">{{ r }}</option>
+</select>
+
+<button (click)="guardar()">Actualizar</button>

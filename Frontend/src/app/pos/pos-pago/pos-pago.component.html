@@ -1,0 +1,15 @@
+<h2>Pago</h2>
+
+<p>Total: ${{ total() }}</p>
+
+<input
+  type="number"
+  [(ngModel)]="efectivo"
+  placeholder="Efectivo recibido"
+/>
+
+<p>Vuelto: ${{ vuelto() }}</p>
+
+<button (click)="pagar()" [disabled]="efectivo < total()">
+  Confirmar pago
+</button>

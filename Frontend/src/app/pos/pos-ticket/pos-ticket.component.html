@@ -1,0 +1,13 @@
+<h2>Ticket</h2>
+
+<ul>
+  <li *ngFor="let p of data.carrito">
+    {{ p.nombre }} x{{ p.cantidad }} - ${{ p.precio }}
+  </li>
+</ul>
+
+<p>Total: ${{ data.total }}</p>
+<p>Efectivo: ${{ data.efectivo }}</p>
+<p>Gracias por su compra</p>
+
+<button (click)="nuevaVenta()">Nueva venta</button>
