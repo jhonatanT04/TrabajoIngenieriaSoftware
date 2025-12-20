@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ReportesService } from '../services/reportes.service';
+import { ReportesService } from '../../services/reportes.service';
 
 @Component({
   standalone: true,
