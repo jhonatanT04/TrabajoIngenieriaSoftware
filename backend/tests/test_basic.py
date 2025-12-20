@@ -3,7 +3,7 @@ os.environ["DATABASE_URL"] = "sqlite:///:memory:"
 
 from fastapi.testclient import TestClient
 from backend.main import app
-from backend.app.database import init_db
+from backend.app.db.database import init_db
 
 init_db()
 client = TestClient(app)
