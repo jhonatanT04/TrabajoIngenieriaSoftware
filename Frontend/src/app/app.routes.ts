@@ -1,10 +1,9 @@
 import { Routes } from '@angular/router';
-
 import { AuthGuard } from './core/guards/auth.guard';
 import { RoleGuard } from './core/guards/role.guard';
 
 export const routes: Routes = [
-  { path: '', redirectTo: 'auth', pathMatch: 'full' },
+  { path: '', redirectTo: '/auth/login', pathMatch: 'full' },
 
   /* =====================
      AUTH (PÚBLICO)
@@ -62,6 +61,36 @@ export const routes: Routes = [
         loadChildren: () =>
           import('./inventario/inventario.routes')
             .then(m => m.INVENTARIO_ROUTES)
+      },
+
+      /* PROVEEDORES */
+      {
+        path: 'proveedores',
+        canActivate: [RoleGuard],
+        data: { roles: ['ADMIN', 'ALMACEN'] },
+        loadChildren: () =>
+          import('./proveedores/proveedores.routes')
+            .then(m => m.PROVEEDORES_ROUTES)
+      },
+
+      /* VENTAS */
+      {
+        path: 'ventas',
+        canActivate: [RoleGuard],
+        data: { roles: ['ADMIN', 'CONTADOR', 'CAJERO'] },
+        loadChildren: () =>
+          import('./ventas/ventas.routes')
+            .then(m => m.VENTAS_ROUTES)
+      },
+
+      /* CAJA */
+      {
+        path: 'caja',
+        canActivate: [RoleGuard],
+        data: { roles: ['ADMIN', 'CAJERO', 'CONTADOR'] },
+        loadChildren: () =>
+          import('./caja/caja.routes')
+            .then(m => m.CAJA_ROUTES)
       },
 
       /* CLIENTES */

@@ -1,8 +1,87 @@
-<h2>Dashboard Administrador</h2>
+<div class="dashboard-container">
+  <!-- Header -->
+  <div class="page-header">
+    <h1 class="page-title">
+      <span class="material-icons">dashboard</span>
+      Dashboard Administrador
+    </h1>
+    <div class="header-actions">
+      <button class="btn btn-light">
+        <span class="material-icons">refresh</span>
+        Actualizar
+      </button>
+    </div>
+  </div>
 
-<div class="cards">
-  <div class="card" *ngFor="let m of metrics">
-    <h3>{{ m.value }}</h3>
-    <p>{{ m.label }}</p>
+  <!-- Métricas principales -->
+  <div class="metrics-grid">
+    <div class="metric-card" *ngFor="let metric of metrics">
+      <div class="metric-header">
+        <div>
+          <div class="metric-value">{{ metric.value }}</div>
+          <div class="metric-label">{{ metric.label }}</div>
+        </div>
+        <div class="metric-icon" [ngClass]="metric.type">
+          <span class="material-icons">{{ metric.icon }}</span>
+        </div>
+      </div>
+      <div class="metric-change" [ngClass]="metric.changeType">
+        <span class="material-icons">{{ metric.changeType === 'positive' ? 'trending_up' : 'trending_down' }}</span>
+        {{ metric.change }}
+      </div>
+    </div>
+  </div>
+
+  <!-- Acciones rápidas -->
+  <div class="quick-actions">
+    <div class="action-card" *ngFor="let action of quickActions" (click)="action.action()">
+      <span class="material-icons">{{ action.icon }}</span>
+      <div class="action-title">{{ action.title }}</div>
+    </div>
+  </div>
+
+  <!-- Gráficos y actividad reciente -->
+  <div class="charts-section">
+    <!-- Gráfico principal -->
+    <div class="chart-card">
+      <div class="chart-header">
+        <h3 class="chart-title">Ventas del mes</h3>
+        <button class="btn btn-sm btn-light">
+          <span class="material-icons">more_vert</span>
+        </button>
+      </div>
+      <div class="chart-placeholder">
+        <span class="material-icons" style="font-size: 3rem; margin-bottom: 1rem;">bar_chart</span>
+        <p>Gráfico de ventas (conectar con backend)</p>
+      </div>
+    </div>
+
+    <!-- Top productos -->
+    <div class="chart-card">
+      <div class="chart-header">
+        <h3 class="chart-title">Top Productos</h3>
+      </div>
+      <div class="chart-placeholder" style="height: 300px;">
+        <span class="material-icons" style="font-size: 3rem; margin-bottom: 1rem;">pie_chart</span>
+        <p>Productos más vendidos</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Actividad reciente -->
+  <div class="activity-section">
+    <div class="chart-header">
+      <h3 class="chart-title">
+        <span class="material-icons" style="vertical-align: middle; margin-right: 0.5rem;">history</span>
+        Actividad Reciente
+      </h3>
+    </div>
+    <div class="activity-item" *ngFor="let activity of recentActivity">
+      <div class="activity-header">
+        <span class="activity-title">{{ activity.title }}</span>
+        <span class="activity-time">{{ activity.time }}</span>
+      </div>
+      <div class="activity-description">{{ activity.description }}</div>
+    </div>
   </div>
 </div>

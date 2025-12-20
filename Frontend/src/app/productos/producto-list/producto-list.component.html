@@ -1,0 +1,108 @@
+<div class="container">
+  <!-- HEADER -->
+  <div class="section-header">
+    <div class="header-top">
+      <h2>Productos</h2>
+      <a routerLink="/productos/create" class="btn btn-primary">
+        <span class="material-icons">add</span>
+        Nuevo Producto
+      </a>
+    </div>
+
+    <!-- SEARCH Y FILTROS -->
+    <div class="filters-section">
+      <div class="search-box">
+        <span class="material-icons">search</span>
+        <input
+          type="text"
+          [(ngModel)]="searchTerm"
+          placeholder="Buscar por nombre o código..."
+          class="search-input"
+        />
+      </div>
+    </div>
+  </div>
+
+  <!-- TABLA DE PRODUCTOS -->
+  <div class="table-container">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Código</th>
+          <th>Nombre</th>
+          <th>Categoría</th>
+          <th>Precio Venta</th>
+          <th>Stock</th>
+          <th>Estado</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let producto of paginatedProductos" [class.inactive]="!producto.activo">
+          <td><span class="badge badge-info">{{ producto.codigo }}</span></td>
+          <td>
+            <div class="product-info">
+              <p class="product-name">{{ producto.nombre }}</p>
+              <p class="product-desc">{{ producto.descripcion }}</p>
+            </div>
+          </td>
+          <td>{{ producto.categoria }}</td>
+          <td><strong>${{ producto.precioVenta | number: '1.2-2' }}</strong></td>
+          <td>
+            <span [class.stock-low]="producto.stock < 50">{{ producto.stock }} unidades</span>
+          </td>
+          <td>
+            <span
+              [class]="producto.activo ? 'badge badge-success' : 'badge badge-danger'"
+            >
+              {{ producto.activo ? 'Activo' : 'Inactivo' }}
+            </span>
+          </td>
+          <td class="actions">
+            <button
+              [routerLink]="['/productos', producto.id]"
+              class="btn-icon"
+              title="Ver detalles"
+            >
+              <span class="material-icons">visibility</span>
+            </button>
+            <button
+              [routerLink]="['/productos/edit', producto.id]"
+              class="btn-icon edit"
+              title="Editar"
+            >
+              <span class="material-icons">edit</span>
+            </button>
+            <button
+              (click)="deleteProducto(producto)"
+              class="btn-icon delete"
+              title="Eliminar"
+            >
+              <span class="material-icons">delete</span>
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div *ngIf="filteredProductos.length === 0" class="empty-state">
+      <span class="material-icons">inventory_2</span>
+      <p>No hay productos disponibles</p>
+    </div>
+  </div>
+
+  <!-- PAGINACIÓN -->
+  <div class="pagination-section" *ngIf="totalPages > 1">
+    <button (click)="previousPage()" [disabled]="currentPage === 1" class="btn btn-secondary">
+      <span class="material-icons">chevron_left</span>
+      Anterior
+    </button>
+    <div class="page-info">
+      Página {{ currentPage }} de {{ totalPages }}
+    </div>
+    <button (click)="nextPage()" [disabled]="currentPage === totalPages" class="btn btn-secondary">
+      Siguiente
+      <span class="material-icons">chevron_right</span>
+    </button>
+  </div>
+</div>

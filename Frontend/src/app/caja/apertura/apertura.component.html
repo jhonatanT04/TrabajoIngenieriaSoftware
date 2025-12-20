@@ -1,14 +1,65 @@
-<h2>Apertura de Caja</h2>
+<div class="container">
+  <!-- HEADER -->
+  <div class="section-header">
+    <div class="header-top">
+      <h2>Apertura de Caja</h2>
+    </div>
+  </div>
 
-<div *ngIf="!cajaService.getEstado().abierta">
-  <input
-    type="number"
-    [(ngModel)]="monto"
-    placeholder="Monto inicial"
-  />
-  <button (click)="abrir()">Abrir Caja</button>
+  <!-- TABLA DE APERTURAS -->
+  <div class="table-container">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Fecha</th>
+          <th>Monto Inicial</th>
+          <th>Monto Final</th>
+          <th>Estado</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let apertura of paginatedAperturas">
+          <td>{{ apertura.fecha | date:'short' }}</td>
+          <td>${{ apertura.montoInicial | number: '1.2-2' }}</td>
+          <td>{{ apertura.montoFinal > 0 ? ('$' + (apertura.montoFinal | number: '1.2-2')) : '-' }}</td>
+          <td>
+            <span [class]="'badge badge-' + (apertura.estado === 'Abierta' ? 'info' : 'success')">
+              {{ apertura.estado }}
+            </span>
+          </td>
+          <td class="actions">
+            <button
+              (click)="deleteApertura(apertura)"
+              class="btn-icon delete"
+              title="Eliminar"
+            >
+              <span class="material-icons">delete</span>
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div *ngIf="filteredAperturas.length === 0" class="empty-state">
+      <span class="material-icons">point_of_sale</span>
+      <p>No hay registros de apertura disponibles</p>
+    </div>
+  </div>
+
+  <!-- PAGINACIÓN -->
+  <div class="pagination-section" *ngIf="totalPages > 1">
+    <button (click)="previousPage()" [disabled]="currentPage === 1" class="btn btn-secondary">
+      <span class="material-icons">chevron_left</span>
+      Anterior
+    </button>
+    <div class="page-info">
+      Página {{ currentPage }} de {{ totalPages }}
+    </div>
+    <button (click)="nextPage()" [disabled]="currentPage === totalPages" class="btn btn-secondary">
+      Siguiente
+      <span class="material-icons">chevron_right</span>
+    </button>
+  </div>
 </div>
 
-<div *ngIf="cajaService.getEstado().abierta">
-  <p>La caja ya está abierta</p>
-</div>

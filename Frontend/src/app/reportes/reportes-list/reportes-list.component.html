@@ -1,0 +1,90 @@
+<div class="container">
+  <!-- HEADER -->
+  <div class="section-header">
+    <div class="header-top">
+      <h2>Reportes</h2>
+      <a routerLink="/reportes/nuevo" class="btn btn-primary">
+        <span class="material-icons">add</span>
+        Nuevo Reporte
+      </a>
+    </div>
+
+    <!-- SEARCH Y FILTROS -->
+    <div class="filters-section">
+      <div class="search-box">
+        <span class="material-icons">search</span>
+        <input
+          type="text"
+          [(ngModel)]="searchTerm"
+          placeholder="Buscar por nombre o tipo..."
+          class="search-input"
+        />
+      </div>
+    </div>
+  </div>
+
+  <!-- TABLA DE REPORTES -->
+  <div class="table-container">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Nombre</th>
+          <th>Tipo</th>
+          <th>Fecha Creación</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let reporte of paginatedReportes">
+          <td><strong>{{ reporte.nombre }}</strong></td>
+          <td>
+            <span class="badge badge-info">{{ reporte.tipo }}</span>
+          </td>
+          <td>{{ reporte.fechaCreacion | date: 'dd/MM/yyyy' }}</td>
+          <td class="actions">
+            <button
+              [routerLink]="['/reportes/ver', reporte.id]"
+              class="btn-icon"
+              title="Ver reporte"
+            >
+              <span class="material-icons">visibility</span>
+            </button>
+            <button
+              class="btn-icon edit"
+              title="Descargar"
+            >
+              <span class="material-icons">download</span>
+            </button>
+            <button
+              (click)="deleteReporte(reporte)"
+              class="btn-icon delete"
+              title="Eliminar"
+            >
+              <span class="material-icons">delete</span>
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div *ngIf="filteredReportes.length === 0" class="empty-state">
+      <span class="material-icons">assessment</span>
+      <p>No hay reportes disponibles</p>
+    </div>
+  </div>
+
+  <!-- PAGINACIÓN -->
+  <div class="pagination-section" *ngIf="totalPages > 1">
+    <button (click)="previousPage()" [disabled]="currentPage === 1" class="btn btn-secondary">
+      <span class="material-icons">chevron_left</span>
+      Anterior
+    </button>
+    <div class="page-info">
+      Página {{ currentPage }} de {{ totalPages }}
+    </div>
+    <button (click)="nextPage()" [disabled]="currentPage === totalPages" class="btn btn-secondary">
+      Siguiente
+      <span class="material-icons">chevron_right</span>
+    </button>
+  </div>
+</div>

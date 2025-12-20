@@ -1,6 +1,6 @@
-import { Component, computed, inject } from '@angular/core';
+import { Component, computed, inject, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router, RouterModule } from '@angular/router';
+import { Router, RouterModule, NavigationEnd } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
 
 interface MenuItem {
@@ -23,6 +23,7 @@ export class AdminLayoutComponent {
   private router = inject(Router);
 
   user = this.authService.getUser();
+  showUserMenu = false;
 
   menu: MenuItem[] = [
     {
@@ -38,7 +39,7 @@ export class AdminLayoutComponent {
     {
       label: 'Productos',
       route: '/productos',
-      roles: ['ADMIN']
+      roles: ['ADMIN', 'ALMACEN', 'CONTADOR']
     },
     {
       label: 'Proveedores',
@@ -72,14 +73,71 @@ export class AdminLayoutComponent {
     }
   ];
 
+  private currentPage = 'Dashboard';
+
+  constructor() {
+    this.router.events.subscribe((event) => {
+      if (event instanceof NavigationEnd) {
+        this.updatePageTitle(event.urlAfterRedirects);
+        this.showUserMenu = false;
+      }
+    });
+  }
+
   get filteredMenu(): MenuItem[] {
     return this.menu.filter(item =>
-      item.roles.includes(this.user?.role)
+      item.roles.includes(this.user?.role || '')
     );
   }
 
-  logout() {
+  getIcon(label: string): string {
+    const icons: { [key: string]: string } = {
+      'Dashboard': 'dashboard',
+      'Usuarios': 'people',
+      'Productos': 'inventory_2',
+      'Proveedores': 'local_shipping',
+      'Inventario': 'warehouse',
+      'Ventas': 'point_of_sale',
+      'Caja': 'point_of_sale',
+      'Clientes': 'person_outline',
+      'Reportes': 'assessment'
+    };
+    return icons[label] || 'folder';
+  }
+
+  getCurrentPageTitle(): string {
+    return this.currentPage;
+  }
+
+  private updatePageTitle(url: string): void {
+    for (const item of this.menu) {
+      if (url.includes(item.route)) {
+        this.currentPage = item.label;
+        return;
+      }
+    }
+    this.currentPage = 'Dashboard';
+  }
+
+  toggleUserMenu(): void {
+    this.showUserMenu = !this.showUserMenu;
+  }
+
+  goToProfile(): void {
+    this.router.navigate(['/admin/profile']);
+    this.showUserMenu = false;
+  }
+
+  logout(): void {
     this.authService.logout();
     this.router.navigate(['/auth/login']);
+  }
+
+  @HostListener('document:click', ['$event'])
+  closeUserMenu(event: MouseEvent): void {
+    const target = event.target as HTMLElement;
+    if (!target.closest('.user-section')) {
+      this.showUserMenu = false;
+    }
   }
 }

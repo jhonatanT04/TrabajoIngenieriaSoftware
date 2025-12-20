@@ -1,0 +1,103 @@
+<div class="container">
+  <!-- HEADER -->
+  <div class="section-header">
+    <div class="header-top">
+      <h2>Proveedores</h2>
+      <a routerLink="/proveedores/create" class="btn btn-primary">
+        <span class="material-icons">add</span>
+        Nuevo Proveedor
+      </a>
+    </div>
+
+    <!-- SEARCH Y FILTROS -->
+    <div class="filters-section">
+      <div class="search-box">
+        <span class="material-icons">search</span>
+        <input
+          type="text"
+          [(ngModel)]="searchTerm"
+          placeholder="Buscar por nombre o email..."
+          class="search-input"
+        />
+      </div>
+    </div>
+  </div>
+
+  <!-- TABLA DE PROVEEDORES -->
+  <div class="table-container">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Nombre</th>
+          <th>Contacto</th>
+          <th>Email</th>
+          <th>Teléfono</th>
+          <th>Ciudad</th>
+          <th>Estado</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let proveedor of paginatedProveedores" [class.inactive]="!proveedor.activo">
+          <td><strong>{{ proveedor.nombre }}</strong></td>
+          <td>{{ proveedor.contacto }}</td>
+          <td>
+            <a href="mailto:{{ proveedor.email }}" class="email-link">{{ proveedor.email }}</a>
+          </td>
+          <td>{{ proveedor.telefono }}</td>
+          <td>{{ proveedor.ciudad }}</td>
+          <td>
+            <span
+              [class]="proveedor.activo ? 'badge badge-success' : 'badge badge-danger'"
+            >
+              {{ proveedor.activo ? 'Activo' : 'Inactivo' }}
+            </span>
+          </td>
+          <td class="actions">
+            <button
+              [routerLink]="['/proveedores', proveedor.id]"
+              class="btn-icon"
+              title="Ver detalles"
+            >
+              <span class="material-icons">visibility</span>
+            </button>
+            <button
+              [routerLink]="['/proveedores/edit', proveedor.id]"
+              class="btn-icon edit"
+              title="Editar"
+            >
+              <span class="material-icons">edit</span>
+            </button>
+            <button
+              (click)="deleteProveedor(proveedor)"
+              class="btn-icon delete"
+              title="Eliminar"
+            >
+              <span class="material-icons">delete</span>
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div *ngIf="filteredProveedores.length === 0" class="empty-state">
+      <span class="material-icons">local_shipping</span>
+      <p>No hay proveedores disponibles</p>
+    </div>
+  </div>
+
+  <!-- PAGINACIÓN -->
+  <div class="pagination-section" *ngIf="totalPages > 1">
+    <button (click)="previousPage()" [disabled]="currentPage === 1" class="btn btn-secondary">
+      <span class="material-icons">chevron_left</span>
+      Anterior
+    </button>
+    <div class="page-info">
+      Página {{ currentPage }} de {{ totalPages }}
+    </div>
+    <button (click)="nextPage()" [disabled]="currentPage === totalPages" class="btn btn-secondary">
+      Siguiente
+      <span class="material-icons">chevron_right</span>
+    </button>
+  </div>
+</div>

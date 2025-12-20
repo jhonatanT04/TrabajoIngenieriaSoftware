@@ -1,9 +1,142 @@
-<h2>Usuarios</h2>
-<a routerLink="/admin/usuarios/create">Nuevo Usuario</a>
+<div class="page-container">
+  <!-- Header -->
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">
+        <span class="material-icons">people</span>
+        Gestión de Usuarios
+      </h1>
+      <p class="page-subtitle">Administra los usuarios del sistema</p>
+    </div>
+    <div class="header-actions">
+      <button class="btn btn-primary" routerLink="/admin/usuarios/create">
+        <span class="material-icons">person_add</span>
+        Nuevo Usuario
+      </button>
+    </div>
+  </div>
 
-<ul>
-  <li *ngFor="let u of usuarios">
-    {{ u.nombre }} - {{ u.rol }}
-    <a [routerLink]="['/admin/usuarios', u.id]">Ver</a>
-  </li>
-</ul>
+  <!-- Filtros y búsqueda -->
+  <div class="filters-section card">
+    <div class="search-bar">
+      <span class="material-icons">search</span>
+      <input type="text" placeholder="Buscar usuario por nombre, email o rol...">
+    </div>
+    <div class="filter-buttons">
+      <button class="btn btn-sm btn-light">
+        <span class="material-icons">filter_list</span>
+        Filtros
+      </button>
+      <button class="btn btn-sm btn-light">
+        <span class="material-icons">download</span>
+        Exportar
+      </button>
+    </div>
+  </div>
+
+  <!-- Tabla de usuarios -->
+  <div class="card">
+    <div class="table-responsive">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>
+              <input type="checkbox">
+            </th>
+            <th>Usuario</th>
+            <th>Email</th>
+            <th>Rol</th>
+            <th>Estado</th>
+            <th>Último acceso</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let usuario of usuarios">
+            <td>
+              <input type="checkbox">
+            </td>
+            <td>
+              <div class="user-info">
+                <div class="user-avatar">
+                  <span class="material-icons">account_circle</span>
+                </div>
+                <div>
+                  <div class="user-name">{{ usuario.username }}</div>
+                  <div class="user-id">#{{ usuario.id }}</div>
+                </div>
+              </div>
+            </td>
+            <td>
+              <span class="email-text">{{ usuario.email }}</span>
+            </td>
+            <td>
+              <span class="badge" [ngClass]="getRoleBadgeClass(usuario.rol.nombre)">
+                {{ usuario.rol.nombre }}
+              </span>
+            </td>
+            <td>
+              <span class="badge" [ngClass]="usuario.activo ? 'badge-success' : 'badge-danger'">
+                {{ usuario.activo ? 'Activo' : 'Inactivo' }}
+              </span>
+            </td>
+            <td>
+              <span class="date-text">{{ usuario.ultimoAcceso ? (usuario.ultimoAcceso | date:'dd/MM/yyyy HH:mm') : 'Nunca' }}</span>
+            </td>
+            <td>
+              <div class="action-buttons">
+                <button
+                  class="btn-icon"
+                  [routerLink]="['/admin/usuarios', usuario.id]"
+                  title="Ver detalles">
+                  <span class="material-icons">visibility</span>
+                </button>
+                <button
+                  class="btn-icon"
+                  [routerLink]="['/admin/usuarios/edit', usuario.id]"
+                  title="Editar">
+                  <span class="material-icons">edit</span>
+                </button>
+                <button
+                  class="btn-icon danger"
+                  (click)="deleteUsuario(usuario)"
+                  title="Eliminar">
+                  <span class="material-icons">delete</span>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Paginación -->
+    <div class="table-footer">
+      <div class="table-info">
+        Mostrando <strong>1-{{ usuarios.length }}</strong> de <strong>{{ usuarios.length }}</strong> usuarios
+      </div>
+      <div class="pagination">
+        <button class="btn btn-sm btn-light" disabled>
+          <span class="material-icons">chevron_left</span>
+        </button>
+        <button class="btn btn-sm btn-primary">1</button>
+        <button class="btn btn-sm btn-light">2</button>
+        <button class="btn btn-sm btn-light">3</button>
+        <button class="btn btn-sm btn-light">
+          <span class="material-icons">chevron_right</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Estado vacío (mostrar si no hay usuarios) -->
+  <div class="empty-state" *ngIf="usuarios.length === 0">
+    <span class="material-icons">people_outline</span>
+    <h3>No hay usuarios registrados</h3>
+    <p>Comienza agregando tu primer usuario al sistema</p>
+    <button class="btn btn-primary" routerLink="/admin/usuarios/create">
+      <span class="material-icons">person_add</span>
+      Crear Usuario
+    </button>
+  </div>
+</div>

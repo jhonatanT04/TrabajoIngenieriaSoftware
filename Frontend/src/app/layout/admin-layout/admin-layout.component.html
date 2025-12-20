@@ -2,15 +2,23 @@
 
   <!-- SIDEBAR -->
   <aside class="sidebar">
-    <h3>Minimercado</h3>
+    <div class="sidebar-header">
+      <span class="logo">M</span>
+      <div class="app-title">
+        <h3>Minimercado</h3>
+        <p>Sistema de Gestión</p>
+      </div>
+    </div>
 
-    <nav>
+    <nav class="sidebar-nav">
       <a
         *ngFor="let item of filteredMenu"
         [routerLink]="item.route"
         routerLinkActive="active"
+        class="nav-item"
       >
-        {{ item.label }}
+        <i class="material-icons">{{ getIcon(item.label) }}</i>
+        <span>{{ item.label }}</span>
       </a>
     </nav>
   </aside>
@@ -20,8 +28,36 @@
 
     <!-- HEADER -->
     <header class="header">
-      <span>Rol: {{ user?.role }}</span>
-      <button (click)="logout()">Salir</button>
+      <div class="header-left">
+        <h1 class="page-title">{{ getCurrentPageTitle() }}</h1>
+      </div>
+
+      <div class="header-right">
+        <div class="user-section">
+          <div class="user-info">
+            <span class="user-name">{{ user?.username }}</span>
+            <span class="user-role">{{ user?.role }}</span>
+          </div>
+          <button class="btn-profile" (click)="toggleUserMenu()">
+            <span class="material-icons">account_circle</span>
+          </button>
+          <div class="user-menu" *ngIf="showUserMenu">
+            <button (click)="goToProfile()" class="menu-item">
+              <span class="material-icons">person</span>
+              <span>Perfil</span>
+            </button>
+            <button class="menu-item">
+              <span class="material-icons">security</span>
+              <span>Cambiar contraseña</span>
+            </button>
+            <div class="menu-divider"></div>
+            <button (click)="logout()" class="menu-item logout">
+              <span class="material-icons">logout</span>
+              <span>Salir</span>
+            </button>
+          </div>
+        </div>
+      </div>
     </header>
 
     <!-- VISTAS -->

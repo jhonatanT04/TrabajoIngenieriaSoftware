@@ -1,19 +1,98 @@
-<h2>Stock</h2>
+<div class="container">
+  <!-- HEADER -->
+  <div class="section-header">
+    <div class="header-top">
+      <h2>Stock de Inventario</h2>
+      <a routerLink="/inventario/movimientos" class="btn btn-primary">
+        <span class="material-icons">swap_horiz</span>
+        Ver Movimientos
+      </a>
+    </div>
 
-<table>
-  <tr>
-    <th>Producto</th>
-    <th>Precio</th>
-    <th>Stock</th>
-    <th></th>
-  </tr>
+    <!-- SEARCH Y FILTROS -->
+    <div class="filters-section">
+      <div class="search-box">
+        <span class="material-icons">search</span>
+        <input
+          type="text"
+          [(ngModel)]="searchTerm"
+          placeholder="Buscar por código, nombre o categoría..."
+          class="search-input"
+        />
+      </div>
+    </div>
+  </div>
 
-  <tr *ngFor="let p of productos">
-    <td>{{ p.nombre }}</td>
-    <td>${{ p.precio }}</td>
-    <td>{{ p.stock }}</td>
-    <td>
-      <a [routerLink]="['/inventario/stock/ajuste', p.id]">Ajustar</a>
-    </td>
-  </tr>
-</table>
+  <!-- TABLA DE STOCK -->
+  <div class="table-container">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Código</th>
+          <th>Producto</th>
+          <th>Categoría</th>
+          <th>Stock Actual</th>
+          <th>Stock Mín/Máx</th>
+          <th>Ubicación</th>
+          <th>Estado</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let stock of paginatedStocks">
+          <td><span class="badge badge-info">{{ stock.codigo }}</span></td>
+          <td><strong>{{ stock.nombre }}</strong></td>
+          <td>{{ stock.categoria }}</td>
+          <td>
+            <span [class.stock-low]="getStockStatus(stock) === 'bajo'"
+                  [class.stock-high]="getStockStatus(stock) === 'alto'">
+              {{ stock.stockActual }} unidades
+            </span>
+          </td>
+          <td>{{ stock.stockMinimo }} / {{ stock.stockMaximo }}</td>
+          <td>{{ stock.ubicacion }}</td>
+          <td>
+            <span [class]="'badge ' + getStockBadge(stock)">
+              {{ getStockStatus(stock) === 'bajo' ? 'Stock Bajo' : getStockStatus(stock) === 'alto' ? 'Stock Alto' : 'Normal' }}
+            </span>
+          </td>
+          <td class="actions">
+            <button
+              [routerLink]="['/inventario/stock/ajuste', stock.id]"
+              class="btn-icon edit"
+              title="Ajustar stock"
+            >
+              <span class="material-icons">tune</span>
+            </button>
+            <button
+              class="btn-icon"
+              title="Ver historial"
+            >
+              <span class="material-icons">history</span>
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div *ngIf="filteredStocks.length === 0" class="empty-state">
+      <span class="material-icons">inventory_2</span>
+      <p>No hay productos en stock</p>
+    </div>
+  </div>
+
+  <!-- PAGINACIÓN -->
+  <div class="pagination-section" *ngIf="totalPages > 1">
+    <button (click)="previousPage()" [disabled]="currentPage === 1" class="btn btn-secondary">
+      <span class="material-icons">chevron_left</span>
+      Anterior
+    </button>
+    <div class="page-info">
+      Página {{ currentPage }} de {{ totalPages }}
+    </div>
+    <button (click)="nextPage()" [disabled]="currentPage === totalPages" class="btn btn-secondary">
+      Siguiente
+      <span class="material-icons">chevron_right</span>
+    </button>
+  </div>
+</div>

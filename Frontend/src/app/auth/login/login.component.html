@@ -1,29 +1,82 @@
 <div class="login-container">
-  <h2>Sistema de Gestión de Minimercado</h2>
+  <div class="login-card">
+    <div class="login-header">
+      <div class="logo-container">
+        <span class="material-icons logo-icon">store</span>
+      </div>
+      <h1>Bienvenido</h1>
+      <h2>Sistema de Gestión de Minimercado</h2>
+      <p class="subtitle">Ingresa tus credenciales para continuar</p>
+    </div>
 
-  <form [formGroup]="loginForm" (ngSubmit)="login()">
-    <input
-      type="text"
-      placeholder="Usuario"
-      formControlName="username"
-    />
+    <div class="form-box">
+      <h3 class="form-title">Accede a tu cuenta</h3>
 
-    <input
-      type="password"
-      placeholder="Contraseña"
-      formControlName="password"
-    />
+      <form [formGroup]="loginForm" (ngSubmit)="login()" class="login-form">
+        <div class="form-group">
+          <label for="username">Usuario</label>
+          <div class="input-group">
+            <span class="material-icons input-icon">person</span>
+            <input
+              type="text"
+              id="username"
+              placeholder="Ingresa tu usuario"
+              formControlName="username"
+              [class.error]="loginForm.get('username')?.invalid && loginForm.get('username')?.touched"
+            />
+          </div>
+          <div class="error-message" *ngIf="loginForm.get('username')?.invalid && loginForm.get('username')?.touched">
+            <span class="material-icons">error</span>
+            El usuario es requerido
+          </div>
+        </div>
 
-    <button type="submit" [disabled]="loading">
-      {{ loading ? 'Ingresando...' : 'Ingresar' }}
-    </button>
+        <div class="form-group">
+          <label for="password">Contraseña</label>
+          <div class="input-group">
+            <span class="material-icons input-icon">lock</span>
+            <input
+              [type]="showPassword ? 'text' : 'password'"
+              id="password"
+              placeholder="Ingresa tu contraseña"
+              formControlName="password"
+              [class.error]="loginForm.get('password')?.invalid && loginForm.get('password')?.touched"
+            />
+            <button
+              type="button"
+              class="toggle-password"
+              (click)="togglePasswordVisibility()"
+              tabindex="-1">
+              <span class="material-icons">{{ showPassword ? 'visibility_off' : 'visibility' }}</span>
+            </button>
+          </div>
+          <div class="error-message" *ngIf="loginForm.get('password')?.invalid && loginForm.get('password')?.touched">
+            <span class="material-icons">error</span>
+            La contraseña es requerida
+          </div>
+          <a routerLink="/auth/forgot-password" class="forgot-password">
+            ¿Olvidaste tu contraseña?
+          </a>
+        </div>
 
-    <p class="error" *ngIf="errorMessage">
-      {{ errorMessage }}
-    </p>
+        <div class="alert alert-danger" *ngIf="errorMessage">
+          <span class="material-icons">error</span>
+          {{ errorMessage }}
+        </div>
 
-    <a routerLink="/auth/forgot-password">
-      ¿Olvidaste tu contraseña?
-    </a>
-  </form>
+        <button type="submit" class="btn-login" [disabled]="loginForm.invalid || loading">
+          <span *ngIf="!loading">INICIAR SESIÓN</span>
+          <span *ngIf="loading">INGRESANDO...</span>
+        </button>
+      </form>
+    </div>
+
+    <div class="login-footer">
+      <p>¿Primera vez aquí? <a href="#">Contacta al administrador</a></p>
+      <p class="demo-credentials">
+        <strong>Credenciales de prueba:</strong><br>
+        Admin: <code>admin / admin</code> | Cajero: <code>cajero / 1234</code>
+      </p>
+    </div>
+  </div>
 </div>

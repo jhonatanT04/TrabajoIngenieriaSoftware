@@ -1,10 +1,100 @@
-<h2>Clientes</h2>
+<div class="container">
+  <!-- HEADER -->
+  <div class="section-header">
+    <div class="header-top">
+      <h2>Clientes</h2>
+      <a routerLink="/clientes/create" class="btn btn-primary">
+        <span class="material-icons">add</span>
+        Nuevo Cliente
+      </a>
+    </div>
 
-<a routerLink="/clientes/create">Nuevo cliente</a>
+    <!-- SEARCH Y FILTROS -->
+    <div class="filters-section">
+      <div class="search-box">
+        <span class="material-icons">search</span>
+        <input
+          type="text"
+          [(ngModel)]="searchTerm"
+          placeholder="Buscar por nombre, email o teléfono..."
+          class="search-input"
+        />
+      </div>
+    </div>
+  </div>
 
-<ul>
-  <li *ngFor="let c of clientes">
-    {{ c.nombre }} – {{ c.puntos }} pts
-    <a [routerLink]="['/clientes', c.id]">Ver</a>
-  </li>
-</ul>
+  <!-- TABLA DE CLIENTES -->
+  <div class="table-container">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Nombre</th>
+          <th>Email</th>
+          <th>Teléfono</th>
+          <th>Deuda</th>
+          <th>Estado</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let cliente of paginatedClientes">
+          <td>{{ cliente.nombre }}</td>
+          <td>{{ cliente.email }}</td>
+          <td>{{ cliente.telefono }}</td>
+          <td>
+            <span [class.debt-high]="cliente.deuda > 0">${{ cliente.deuda | number: '1.2-2' }}</span>
+          </td>
+          <td>
+            <span [class]="'badge badge-' + (cliente.estado === 'Activo' ? 'success' : 'danger')">
+              {{ cliente.estado }}
+            </span>
+          </td>
+          <td class="actions">
+            <button
+              [routerLink]="['/clientes', cliente.id]"
+              class="btn-icon"
+              title="Ver detalles"
+            >
+              <span class="material-icons">visibility</span>
+            </button>
+            <button
+              [routerLink]="['/clientes/edit', cliente.id]"
+              class="btn-icon edit"
+              title="Editar"
+            >
+              <span class="material-icons">edit</span>
+            </button>
+            <button
+              (click)="deleteCliente(cliente)"
+              class="btn-icon delete"
+              title="Eliminar"
+            >
+              <span class="material-icons">delete</span>
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div *ngIf="filteredClientes.length === 0" class="empty-state">
+      <span class="material-icons">people</span>
+      <p>No hay clientes disponibles</p>
+    </div>
+  </div>
+
+  <!-- PAGINACIÓN -->
+  <div class="pagination-section" *ngIf="totalPages > 1">
+    <button (click)="previousPage()" [disabled]="currentPage === 1" class="btn btn-secondary">
+      <span class="material-icons">chevron_left</span>
+      Anterior
+    </button>
+    <div class="page-info">
+      Página {{ currentPage }} de {{ totalPages }}
+    </div>
+    <button (click)="nextPage()" [disabled]="currentPage === totalPages" class="btn btn-secondary">
+      Siguiente
+      <span class="material-icons">chevron_right</span>
+    </button>
+  </div>
+</div>
+

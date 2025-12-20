@@ -1,10 +1,80 @@
-<h2>Movimientos</h2>
+<div class="container">
+  <!-- HEADER -->
+  <div class="section-header">
+    <div class="header-top">
+      <h2>Movimientos de Inventario</h2>
+    </div>
 
-<ul>
-  <li *ngFor="let m of movimientos">
-    {{ m.fecha | date:'short' }} –
-    {{ m.tipo }} –
-    {{ m.producto }} –
-    {{ m.cantidad }}
-  </li>
-</ul>
+    <!-- SEARCH Y FILTROS -->
+    <div class="filters-section">
+      <div class="search-box">
+        <span class="material-icons">search</span>
+        <input
+          type="text"
+          [(ngModel)]="searchTerm"
+          placeholder="Buscar por producto, tipo o usuario..."
+          class="search-input"
+        />
+      </div>
+    </div>
+  </div>
+
+  <!-- TABLA DE MOVIMIENTOS -->
+  <div class="table-container">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Fecha</th>
+          <th>Tipo</th>
+          <th>Producto</th>
+          <th>Cantidad</th>
+          <th>Usuario</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let movimiento of paginatedMovimientos">
+          <td>{{ movimiento.fecha | date:'short' }}</td>
+          <td>
+            <span [class]="'badge badge-' + (movimiento.tipo === 'Entrada' ? 'success' : movimiento.tipo === 'Salida' ? 'warning' : 'info')">
+              {{ movimiento.tipo }}
+            </span>
+          </td>
+          <td>{{ movimiento.producto }}</td>
+          <td><strong>{{ movimiento.cantidad }}</strong></td>
+          <td>{{ movimiento.usuario }}</td>
+          <td class="actions">
+            <button
+              (click)="deleteMovimiento(movimiento)"
+              class="btn-icon delete"
+              title="Eliminar"
+            >
+              <span class="material-icons">delete</span>
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div *ngIf="filteredMovimientos.length === 0" class="empty-state">
+      <span class="material-icons">inbox</span>
+      <p>No hay movimientos disponibles</p>
+    </div>
+  </div>
+
+  <!-- PAGINACIÓN -->
+  <div class="pagination-section" *ngIf="totalPages > 1">
+    <button (click)="previousPage()" [disabled]="currentPage === 1" class="btn btn-secondary">
+      <span class="material-icons">chevron_left</span>
+      Anterior
+    </button>
+    <div class="page-info">
+      Página {{ currentPage }} de {{ totalPages }}
+    </div>
+    <button (click)="nextPage()" [disabled]="currentPage === totalPages" class="btn btn-secondary">
+      Siguiente
+      <span class="material-icons">chevron_right</span>
+    </button>
+  </div>
+</div>
+
