@@ -1,8 +1,8 @@
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
-from .auth import decode_token
-from .database import get_session
-from .crud import get_user_by_id
+from auth.auth import decode_token
+from db.database import get_session
+from crud.crud import get_user_by_id
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/token")
 
