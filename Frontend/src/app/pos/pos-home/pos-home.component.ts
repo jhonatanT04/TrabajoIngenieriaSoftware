@@ -7,7 +7,8 @@ import { InventarioService } from '../../core/services/inventario.service';
   standalone: true,
   selector: 'app-pos-home',
   imports: [CommonModule, FormsModule],
-  templateUrl: './pos-home.component.html'
+  templateUrl: './pos-home.component.html',
+  styleUrls: ['./pos-home.component.css']
 })
 export class PosHomeComponent implements OnInit {
 

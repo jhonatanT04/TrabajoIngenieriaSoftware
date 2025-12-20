@@ -9,10 +9,7 @@ export interface TableColumn {
   format?: (value: any) => string;
 }
 
-/**
- * Componente Table
- * Tabla de datos reutilizable con ordenamiento y paginación
- */
+
 @Component({
   selector: 'app-table',
   standalone: true,
@@ -340,7 +337,7 @@ export class TableComponent {
   }
 
   getBadgeClass(value: string): string {
-    // Implementar lógica para determinar la clase del badge según el valor
+
     const lowerValue = value?.toLowerCase();
     if (lowerValue?.includes('completada') || lowerValue?.includes('activo')) {
       return 'badge-success';

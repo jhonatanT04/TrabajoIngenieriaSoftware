@@ -1,15 +1,71 @@
-<h2>Pago</h2>
+<div class="pago-container">
+  <div class="pago-card">
+    <div class="card-header">
+      <h2>
+        <span class="material-icons">payment</span>
+        Procesar Pago
+      </h2>
+    </div>
 
-<p>Total: ${{ total() }}</p>
+    <div class="resumen-venta">
+      <h3>Resumen de la venta</h3>
+      <div class="productos-list">
+        <div *ngFor="let item of carrito" class="producto-item">
+          <div class="item-nombre">
+            <span class="nombre-texto">{{ item.nombre }}</span>
+            <span class="cantidad-badge">x{{ item.cantidad }}</span>
+          </div>
+          <div class="item-precio">{{ (item.precio * item.cantidad).toFixed(2) }}</div>
+        </div>
+      </div>
+    </div>
 
-<input
-  type="number"
-  [(ngModel)]="efectivo"
-  placeholder="Efectivo recibido"
-/>
+    <div class="total-section">
+      <div class="total-row">
+        <span class="total-label">Total a pagar:</span>
+        <span class="total-value">${{ total().toFixed(2) }}</span>
+      </div>
+    </div>
 
-<p>Vuelto: ${{ vuelto() }}</p>
+    <div class="pago-section">
+      <h3>Método de pago</h3>
+      <div class="input-group">
+        <label>Efectivo recibido</label>
+        <input
+          type="number"
+          [(ngModel)]="efectivo"
+          placeholder="0.00"
+          class="input-efectivo"
+          min="0"
+          step="0.01"
+        />
+      </div>
 
-<button (click)="pagar()" [disabled]="efectivo < total()">
-  Confirmar pago
-</button>
+      <div class="vuelto-section" *ngIf="efectivo > 0">
+        <div class="vuelto-row" [class.negativo]="vuelto() < 0">
+          <span>Vuelto:</span>
+          <span class="vuelto-value">${{ vuelto().toFixed(2) }}</span>
+        </div>
+        <div class="alerta" *ngIf="vuelto() < 0">
+          <span class="material-icons">warning</span>
+          El efectivo recibido es insuficiente
+        </div>
+      </div>
+    </div>
+
+    <div class="acciones">
+      <button class="btn-cancelar" (click)="cancelar()">
+        <span class="material-icons">arrow_back</span>
+        Volver
+      </button>
+      <button
+        class="btn-pagar"
+        (click)="pagar()"
+        [disabled]="efectivo < total()"
+      >
+        <span class="material-icons">check_circle</span>
+        Confirmar pago
+      </button>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,48 @@
+<div class="page">
+  <div class="page-header">
+    <div>
+      <p class="eyebrow">Ventas</p>
+      <h2>Nueva venta</h2>
+      <p class="subtitle">Captura rápida de venta básica.</p>
+    </div>
+    <div class="actions">
+      <button class="btn ghost" (click)="cancelar()">Cancelar</button>
+      <button class="btn primary" (click)="guardar()">Guardar venta</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Datos de la venta</h3>
+    <div class="form-grid">
+      <label>
+        Cliente
+        <input type="text" [(ngModel)]="venta.cliente" placeholder="Nombre del cliente" />
+      </label>
+      <label>
+        Fecha
+        <input type="date" [(ngModel)]="venta.fecha" />
+      </label>
+      <label>
+        Monto
+        <input type="number" step="0.01" [(ngModel)]="venta.monto" placeholder="0.00" />
+      </label>
+      <label>
+        Estado
+        <select [(ngModel)]="venta.estado">
+          <option>Pendiente</option>
+          <option>Completada</option>
+          <option>Cancelada</option>
+        </select>
+      </label>
+      <label>
+        Vendedor
+        <input type="text" [(ngModel)]="venta.vendedor" placeholder="Persona responsable" />
+      </label>
+    </div>
+
+    <label class="full">
+      Notas
+      <textarea [(ngModel)]="venta.notas" rows="3" placeholder="Instrucciones o comentarios"></textarea>
+    </label>
+  </div>
+</div>

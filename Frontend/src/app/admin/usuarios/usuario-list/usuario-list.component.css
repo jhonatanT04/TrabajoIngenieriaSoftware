@@ -1,4 +1,4 @@
-/* Usuario List - Diseño moderno */
+
 
 .page-container {
   padding: 2rem;
@@ -39,7 +39,7 @@
   gap: 1rem;
 }
 
-/* Filtros */
+
 .filters-section {
   display: flex;
   justify-content: space-between;
@@ -83,7 +83,7 @@
   gap: 0.75rem;
 }
 
-/* Tabla */
+
 .table-responsive {
   overflow-x: auto;
 }
@@ -120,7 +120,7 @@
   background-color: var(--bg-primary);
 }
 
-/* Usuario Info */
+
 .user-info {
   display: flex;
   align-items: center;
@@ -163,7 +163,7 @@
   font-size: 0.875rem;
 }
 
-/* Action Buttons */
+
 .action-buttons {
   display: flex;
   gap: 0.5rem;
@@ -198,7 +198,7 @@
   font-size: 18px;
 }
 
-/* Table Footer */
+
 .table-footer {
   display: flex;
   justify-content: space-between;
@@ -217,7 +217,7 @@
   gap: 0.5rem;
 }
 
-/* Empty State */
+
 .empty-state {
   text-align: center;
   padding: 4rem 2rem;
@@ -242,7 +242,7 @@
   margin-bottom: 2rem;
 }
 
-/* Responsive */
+
 @media (max-width: 768px) {
   .page-container {
     padding: 1rem;

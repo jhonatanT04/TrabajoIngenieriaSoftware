@@ -1,7 +1,4 @@
-/**
- * Modelo de Inventario
- * Representa movimientos y operaciones del inventario
- */
+
 export interface MovimientoInventario {
   id: number;
   tipo: TipoMovimientoInventario;

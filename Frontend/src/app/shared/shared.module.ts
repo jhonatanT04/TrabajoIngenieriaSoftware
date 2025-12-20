@@ -10,10 +10,7 @@ import {
   TableComponent
 } from './components';
 
-/**
- * Módulo compartido
- * Exporta componentes, directivas y pipes reutilizables
- */
+
 @NgModule({
   imports: [
     CommonModule,

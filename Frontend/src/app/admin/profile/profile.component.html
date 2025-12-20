@@ -1,0 +1,94 @@
+<div class="profile profile-container" [ngClass]="roleClass">
+  <div class="profile-card" [ngClass]="{ 'profile-card--admin': isAdmin, 'profile-card--cajero': isCajero }">
+    
+    <div class="profile-header" [ngClass]="{ 'profile-header--admin': isAdmin, 'profile-header--cajero': isCajero }">
+      <button class="btn-volver" (click)="volver()" title="Volver">
+        <span class="material-icons">arrow_back</span>
+      </button>
+      <div class="avatar-section">
+        <div class="avatar">
+          <span class="material-icons">person</span>
+        </div>
+        <h2>{{ user.username }}</h2>
+        <p class="role-badge">{{ user.role }}</p>
+      </div>
+    </div>
+
+    
+    <div class="profile-content" [ngClass]="{ 'profile-content--admin': isAdmin, 'profile-content--cajero': isCajero }">
+      <div class="section-header">
+        <h3>Información Personal</h3>
+        <button class="btn-edit" (click)="toggleEdit()" *ngIf="!editMode">
+          <span class="material-icons">edit</span>
+          Editar
+        </button>
+      </div>
+
+      <div class="form-container" [ngClass]="{ 'form-container--admin': isAdmin, 'form-container--cajero': isCajero }">
+        <div class="form-group">
+          <label>
+            <span class="material-icons">badge</span>
+            Usuario
+          </label>
+          <input type="text" [(ngModel)]="user.username" [disabled]="!editMode" />
+        </div>
+
+        <div class="form-group">
+          <label>
+            <span class="material-icons">person_outline</span>
+            Nombre completo
+          </label>
+          <input type="text" [(ngModel)]="user.nombre" [disabled]="!editMode" />
+        </div>
+
+        <div class="form-group">
+          <label>
+            <span class="material-icons">email</span>
+            Correo electrónico
+          </label>
+          <input type="email" [(ngModel)]="user.email" [disabled]="!editMode" />
+        </div>
+
+        <div class="form-group">
+          <label>
+            <span class="material-icons">phone</span>
+            Teléfono
+          </label>
+          <input type="tel" [(ngModel)]="user.telefono" [disabled]="!editMode" placeholder="Ingrese su teléfono" />
+        </div>
+      </div>
+
+      
+      <div class="form-actions" *ngIf="editMode" [ngClass]="{ 'form-actions--admin': isAdmin, 'form-actions--cajero': isCajero }">
+        <button class="btn-cancel" (click)="cancelar()">
+          <span class="material-icons">close</span>
+          Cancelar
+        </button>
+        <button class="btn-save" (click)="guardar()">
+          <span class="material-icons">check</span>
+          Guardar cambios
+        </button>
+      </div>
+
+      
+      <div class="security-section" [ngClass]="{ 'security-section--admin': isAdmin, 'security-section--cajero': isCajero }">
+        <h3>Seguridad de la cuenta</h3>
+        <div class="security-card" [ngClass]="{ 'security-card--admin': isAdmin, 'security-card--cajero': isCajero }">
+          <div class="security-info">
+            <div class="security-icon">
+              <span class="material-icons">lock</span>
+            </div>
+            <div>
+              <h4>Contraseña</h4>
+              <p>Cambia tu contraseña para mantener tu cuenta segura</p>
+            </div>
+          </div>
+          <a [routerLink]="changePasswordLink" class="btn-security">
+            Cambiar contraseña
+            <span class="material-icons">arrow_forward</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

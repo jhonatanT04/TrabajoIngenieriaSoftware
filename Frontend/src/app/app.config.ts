@@ -6,10 +6,7 @@ import { provideAnimations } from '@angular/platform-browser/animations';
 import { routes } from './app.routes';
 import { authInterceptor, errorInterceptor, loadingInterceptor } from './core/interceptors';
 
-/**
- * Configuración principal de la aplicación
- * Incluye providers para routing, HTTP, animaciones e interceptors
- */
+
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),

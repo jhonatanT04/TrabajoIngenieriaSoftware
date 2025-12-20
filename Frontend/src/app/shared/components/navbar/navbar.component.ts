@@ -2,10 +2,7 @@ import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 
-/**
- * Componente Navbar
- * Barra de navegación superior
- */
+
 @Component({
   selector: 'app-navbar',
   standalone: true,

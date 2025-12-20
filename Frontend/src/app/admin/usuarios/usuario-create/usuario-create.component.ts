@@ -9,7 +9,8 @@ import { RolesService } from '../../../core/services/roles.service';
   standalone: true,
   selector: 'app-usuario-create',
   imports: [CommonModule, FormsModule],
-  templateUrl: './usuario-create.component.html'
+  templateUrl: './usuario-create.component.html',
+  styleUrls: ['./usuario-create.component.css']
 })
 export class UsuarioCreateComponent implements OnInit {
 

@@ -1,7 +1,61 @@
-<h2>Nuevo Cliente</h2>
+<div class="page">
+	<div class="page-header">
+		<div>
+			<p class="eyebrow">Clientes</p>
+			<h2>Nuevo cliente</h2>
+			<p class="subtitle">Registra los datos de contacto y facturación.</p>
+		</div>
+		<div class="actions">
+			<button class="btn ghost" routerLink="/clientes">Cancelar</button>
+			<button class="btn primary" (click)="guardar()" [disabled]="guardando">Guardar</button>
+		</div>
+	</div>
 
-<input [(ngModel)]="cliente.nombre" placeholder="Nombre">
-<input [(ngModel)]="cliente.cedula" placeholder="Cédula">
-<input [(ngModel)]="cliente.email" placeholder="Email">
+	<div class="card">
+		<h3>Datos básicos</h3>
+		<div class="form-grid">
+			<label>
+				Nombre completo
+				<input [(ngModel)]="cliente.nombre" placeholder="Nombre y apellidos" />
+			</label>
+			<label>
+				Documento / Cédula
+				<input [(ngModel)]="cliente.cedula" placeholder="Cédula o RUC" />
+			</label>
+			<label>
+				Email
+				<input [(ngModel)]="cliente.email" type="email" placeholder="correo@ejemplo.com" />
+			</label>
+			<label>
+				Teléfono
+				<input [(ngModel)]="cliente.telefono" type="tel" placeholder="099-000-0000" />
+			</label>
+		</div>
+	</div>
 
-<button (click)="guardar()">Guardar</button>
+	<div class="card">
+		<h3>Dirección y estado</h3>
+		<div class="form-grid">
+			<label>
+				Dirección
+				<input [(ngModel)]="cliente.direccion" placeholder="Calle y número" />
+			</label>
+			<label>
+				Ciudad
+				<input [(ngModel)]="cliente.ciudad" placeholder="Ciudad" />
+			</label>
+			<label>
+				Estado
+				<select [(ngModel)]="cliente.activo">
+					<option [ngValue]="true">Activo</option>
+					<option [ngValue]="false">Inactivo</option>
+				</select>
+			</label>
+		</div>
+	</div>
+
+	<div class="actions" style="justify-content: flex-end;">
+		<button class="btn ghost" (click)="cancelar()">Cancelar</button>
+		<button class="btn primary" (click)="guardar()" [disabled]="guardando">Guardar cliente</button>
+	</div>
+</div>

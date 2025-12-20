@@ -1,48 +1,89 @@
-<div class="pos-grid">
+<div class="pos-container">
+  
+  <section class="productos-panel">
+    <div class="search-bar">
+      <span class="material-icons">search</span>
+      <input
+        [(ngModel)]="search"
+        placeholder="Buscar producto o SKU..."
+        class="search-input"
+      />
+    </div>
 
-  <!-- PRODUCTOS -->
-  <section>
-    <input
-      [(ngModel)]="search"
-      placeholder="Buscar producto o SKU"
-    />
-
-    <div class="productos">
+    <div class="productos-grid">
       <button
         *ngFor="let p of productos"
         (click)="agregar(p)"
+        class="producto-card"
+        [class.disabled]="p.stock <= 0"
       >
-        {{ p.nombre }}<br>
-        ${{ p.precio }}
+        <div class="producto-icon">
+          <span class="material-icons">inventory_2</span>
+        </div>
+        <div class="producto-info">
+          <div class="producto-nombre">{{ p.nombre }}</div>
+          <div class="producto-precio">${{ p.precio | number:'1.2-2' }}</div>
+          <div class="producto-stock" [class.stock-low]="p.stock < 10">
+            Stock: {{ p.stock }}
+          </div>
+        </div>
       </button>
     </div>
   </section>
 
-  <!-- CARRITO -->
-  <section>
-    <h3>Carrito</h3>
+  
+  <section class="carrito-panel">
+    <div class="carrito-header">
+      <h3>
+        <span class="material-icons">shopping_cart</span>
+        Carrito
+      </h3>
+      <span class="items-count">{{ carrito.length }} items</span>
+    </div>
 
-    <table>
-      <tr *ngFor="let p of carrito">
-        <td>{{ p.nombre }}</td>
-        <td>
-          <button (click)="restar(p)">−</button>
-          {{ p.cantidad }}
-          <button (click)="sumar(p)">+</button>
-        </td>
-        <td>${{ p.precio }}</td>
-        <td>${{ p.precio * p.cantidad | number:'1.2-2' }}</td>
-        <td>
-          <button (click)="eliminar(p)">🗑</button>
-        </td>
-      </tr>
-    </table>
+    <div class="carrito-items">
+      <div *ngFor="let p of carrito" class="carrito-item">
+        <div class="item-info">
+          <div class="item-nombre">{{ p.nombre }}</div>
+          <div class="item-precio">${{ p.precio | number:'1.2-2' }}</div>
+        </div>
+        <div class="item-controls">
+          <button (click)="restar(p)" class="btn-qty">
+            <span class="material-icons">remove</span>
+          </button>
+          <span class="qty">{{ p.cantidad }}</span>
+          <button (click)="sumar(p)" class="btn-qty">
+            <span class="material-icons">add</span>
+          </button>
+        </div>
+        <div class="item-subtotal">
+          ${{ p.precio * p.cantidad | number:'1.2-2' }}
+        </div>
+        <button (click)="eliminar(p)" class="btn-delete">
+          <span class="material-icons">delete</span>
+        </button>
+      </div>
 
-    <h2>Total: ${{ total() | number:'1.2-2' }}</h2>
+      <div *ngIf="carrito.length === 0" class="carrito-vacio">
+        <span class="material-icons">shopping_cart</span>
+        <p>Carrito vacío</p>
+        <span>Agrega productos para comenzar</span>
+      </div>
+    </div>
 
-    <button (click)="irAPago()" [disabled]="carrito.length === 0">
-      Cobrar
-    </button>
+    <div class="carrito-footer">
+      <div class="total-section">
+        <div class="total-label">Total</div>
+        <div class="total-value">${{ total() | number:'1.2-2' }}</div>
+      </div>
+      <button
+        (click)="irAPago()"
+        [disabled]="carrito.length === 0"
+        class="btn-cobrar"
+      >
+        <span class="material-icons">payment</span>
+        Procesar pago
+      </button>
+    </div>
   </section>
-
 </div>

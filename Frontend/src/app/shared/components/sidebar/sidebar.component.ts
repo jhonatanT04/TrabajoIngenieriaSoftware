@@ -11,10 +11,7 @@ export interface MenuItem {
   divider?: boolean;
 }
 
-/**
- * Componente Sidebar
- * Menú lateral de navegación
- */
+
 @Component({
   selector: 'app-sidebar',
   standalone: true,

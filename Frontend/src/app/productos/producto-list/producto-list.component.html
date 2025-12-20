@@ -1,15 +1,15 @@
 <div class="container">
-  <!-- HEADER -->
+  
   <div class="section-header">
     <div class="header-top">
       <h2>Productos</h2>
-      <a routerLink="/productos/create" class="btn btn-primary">
+      <a routerLink="/productos/nuevo" class="btn btn-primary">
         <span class="material-icons">add</span>
         Nuevo Producto
       </a>
     </div>
 
-    <!-- SEARCH Y FILTROS -->
+    
     <div class="filters-section">
       <div class="search-box">
         <span class="material-icons">search</span>
@@ -23,7 +23,7 @@
     </div>
   </div>
 
-  <!-- TABLA DE PRODUCTOS -->
+  
   <div class="table-container">
     <table class="table">
       <thead>
@@ -60,14 +60,14 @@
           </td>
           <td class="actions">
             <button
-              [routerLink]="['/productos', producto.id]"
+              [routerLink]="['/productos/detalle', producto.id]"
               class="btn-icon"
               title="Ver detalles"
             >
               <span class="material-icons">visibility</span>
             </button>
             <button
-              [routerLink]="['/productos/edit', producto.id]"
+              [routerLink]="['/productos/editar', producto.id]"
               class="btn-icon edit"
               title="Editar"
             >
@@ -91,7 +91,7 @@
     </div>
   </div>
 
-  <!-- PAGINACIÓN -->
+  
   <div class="pagination-section" *ngIf="totalPages > 1">
     <button (click)="previousPage()" [disabled]="currentPage === 1" class="btn btn-secondary">
       <span class="material-icons">chevron_left</span>

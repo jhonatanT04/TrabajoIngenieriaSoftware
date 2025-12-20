@@ -32,7 +32,6 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
     });
   }
 
-  // Manejar la respuesta y errores
   return next(req).pipe(
     catchError((error: HttpErrorResponse) => {
       if (error.status === 401) {

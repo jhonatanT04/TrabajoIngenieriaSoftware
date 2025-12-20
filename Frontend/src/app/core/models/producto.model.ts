@@ -1,7 +1,4 @@
-/**
- * Modelo de Producto
- * Representa un producto en el inventario del minimercado
- */
+
 export interface Producto {
   id: number;
   codigo: string;

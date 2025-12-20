@@ -1,10 +1,7 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
-/**
- * Componente Confirm Dialog
- * Diálogo de confirmación para acciones críticas
- */
+
 @Component({
   selector: 'app-confirm-dialog',
   standalone: true,

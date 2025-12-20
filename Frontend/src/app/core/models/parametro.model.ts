@@ -1,7 +1,4 @@
-/**
- * Modelo de Parámetros del Sistema
- * Representa configuraciones generales del minimercado
- */
+
 export interface Parametro {
   id: number;
   codigo: string;

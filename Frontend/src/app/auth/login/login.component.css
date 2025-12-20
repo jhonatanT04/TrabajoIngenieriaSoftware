@@ -1,8 +1,6 @@
-/* ============================================
-   LOGIN COMPONENT - PANTALLA COMPLETA
-   ============================================ */
 
-/* Asegurar que el host component ocupe todo */
+
+
 :host {
     display: block;
     width: 100%;
@@ -10,7 +8,7 @@
     overflow: hidden;
 }
 
-/* Contenedor principal - Pantalla completa */
+
 .login-container {
     width: 100%;
     height: 100vh;
@@ -25,7 +23,7 @@
     left: 0;
 }
 
-/* Tarjeta blanca exterior */
+
 .login-card {
     background: white;
     border-radius: 20px;
@@ -37,7 +35,7 @@
     overflow: hidden;
 }
 
-/* Header del login */
+
 .login-header {
     text-align: center;
     margin-bottom: 1.5rem;
@@ -72,7 +70,7 @@ h2 {
     line-height: 1.4;
 }
 
-/* Caja oscura del formulario */
+
 .form-box {
     background: #1a202c;
     border-radius: 18px;
@@ -93,7 +91,7 @@ h2 {
     margin: 0;
 }
 
-/* Grupos de formulario */
+
 .form-group {
     margin-bottom: 1.5rem;
 }
@@ -110,7 +108,7 @@ label {
     font-size: 0.9rem;
 }
 
-/* Input groups con iconos */
+
 .input-group {
     position: relative;
     width: 100%;
@@ -157,7 +155,7 @@ label {
     border-color: #ef4444;
 }
 
-/* Botón toggle password */
+
 .toggle-password {
     position: absolute;
     right: 12px;
@@ -201,7 +199,7 @@ label {
     line-height: 1;
 }
 
-/* Mensajes de error */
+
 .error-message {
     color: #ef4444;
     font-size: 0.875rem;
@@ -215,7 +213,7 @@ label {
     font-size: 1rem;
 }
 
-/* Link olvidaste contraseña */
+
 .forgot-password {
     display: block;
     text-align: right;
@@ -231,7 +229,7 @@ label {
     text-decoration: underline;
 }
 
-/* Alerts */
+
 .alert {
     padding: 1rem;
     border-radius: 10px;
@@ -252,7 +250,7 @@ label {
     font-size: 1.25rem;
 }
 
-/* Botón iniciar sesión */
+
 .btn-login {
     width: 100%;
     padding: 1rem;
@@ -280,7 +278,7 @@ label {
     cursor: not-allowed;
 }
 
-/* Footer */
+
 .login-footer {
     text-align: center;
     font-size: 0.875rem;
@@ -324,7 +322,7 @@ label {
     font-weight: 600;
 }
 
-/* Responsive */
+
 @media (max-width: 768px) {
     .login-container {
         padding: 1rem;
@@ -376,13 +374,13 @@ label {
     }
 }
 
-/* Prevenir scroll en body cuando el login está activo */
+
 body.login-active {
     overflow: hidden;
     height: 100vh;
 }
 
-/* Scrollbar personalizado para la card (si es necesario) */
+
 .login-card::-webkit-scrollbar {
     width: 6px;
 }

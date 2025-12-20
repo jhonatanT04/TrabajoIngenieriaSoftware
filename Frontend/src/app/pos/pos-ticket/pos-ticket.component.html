@@ -1,13 +1,70 @@
-<h2>Ticket</h2>
+<div class="ticket-container">
+  <div class="ticket-card">
+    <div class="success-icon">
+      <span class="material-icons">check_circle</span>
+    </div>
 
-<ul>
-  <li *ngFor="let p of data.carrito">
-    {{ p.nombre }} x{{ p.cantidad }} - ${{ p.precio }}
-  </li>
-</ul>
+    <h2>¡Venta completada!</h2>
+    <p class="subtitle">La transacción se procesó correctamente</p>
 
-<p>Total: ${{ data.total }}</p>
-<p>Efectivo: ${{ data.efectivo }}</p>
-<p>Gracias por su compra</p>
+    <div class="ticket-content">
+      <div class="ticket-header">
+        <h3>TICKET DE VENTA</h3>
+        <div class="ticket-info">
+          <p>Fecha: {{ now | date:'dd/MM/yyyy HH:mm' }}</p>
+          <p>Folio: #{{ folio }}</p>
+        </div>
+      </div>
 
-<button (click)="nuevaVenta()">Nueva venta</button>
+      <div class="ticket-items">
+        <div class="item-header">
+          <span>Producto</span>
+          <span>Cant.</span>
+          <span>Precio</span>
+          <span>Total</span>
+        </div>
+        <div *ngFor="let p of data.carrito" class="ticket-item">
+          <span class="item-nombre">{{ p.nombre }}</span>
+          <span class="item-cantidad">{{ p.cantidad }}</span>
+          <span class="item-precio">${{ p.precio | number:'1.2-2' }}</span>
+          <span class="item-total">${{ p.precio * p.cantidad | number:'1.2-2' }}</span>
+        </div>
+      </div>
+
+      <div class="ticket-totales">
+        <div class="total-row">
+          <span>Subtotal:</span>
+          <span>${{ data.total | number:'1.2-2' }}</span>
+        </div>
+        <div class="total-row destacado">
+          <span>Total:</span>
+          <span>${{ data.total | number:'1.2-2' }}</span>
+        </div>
+        <div class="total-row">
+          <span>Efectivo:</span>
+          <span>${{ data.efectivo | number:'1.2-2' }}</span>
+        </div>
+        <div class="total-row cambio">
+          <span>Cambio:</span>
+          <span>${{ data.vuelto | number:'1.2-2' }}</span>
+        </div>
+      </div>
+
+      <div class="ticket-footer">
+        <p>¡Gracias por su compra!</p>
+        <p class="small">Este es un comprobante válido de compra</p>
+      </div>
+    </div>
+
+    <div class="ticket-acciones">
+      <button class="btn-imprimir">
+        <span class="material-icons">print</span>
+        Imprimir ticket
+      </button>
+      <button class="btn-nueva-venta" (click)="nuevaVenta()">
+        <span class="material-icons">add_shopping_cart</span>
+        Nueva venta
+      </button>
+    </div>
+  </div>
+</div>

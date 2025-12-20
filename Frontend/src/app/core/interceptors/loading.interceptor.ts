@@ -1,18 +1,13 @@
 import { HttpInterceptorFn } from '@angular/common/http';
 import { finalize } from 'rxjs';
 
-/**
- * Interceptor de carga
- * Controla el estado de carga global de las peticiones HTTP
- */
 
-// Variable global para controlar el estado de carga
+
 let activeRequests = 0;
 
 export const loadingInterceptor: HttpInterceptorFn = (req, next) => {
   activeRequests++;
 
-  // Emitir evento de inicio de carga
   if (activeRequests === 1) {
     dispatchLoadingEvent(true);
   }
@@ -21,7 +16,6 @@ export const loadingInterceptor: HttpInterceptorFn = (req, next) => {
     finalize(() => {
       activeRequests--;
 
-      // Emitir evento de fin de carga cuando no hay peticiones activas
       if (activeRequests === 0) {
         dispatchLoadingEvent(false);
       }

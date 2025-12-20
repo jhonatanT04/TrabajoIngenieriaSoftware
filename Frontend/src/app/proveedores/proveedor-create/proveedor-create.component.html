@@ -1,0 +1,61 @@
+<div class="page">
+  <div class="page-header">
+    <div>
+      <p class="eyebrow">Proveedores</p>
+      <h2>Nuevo proveedor</h2>
+      <p class="subtitle">Registra datos de contacto y abastecimiento.</p>
+    </div>
+    <div class="actions">
+      <button class="btn ghost" routerLink="/proveedores">Cancelar</button>
+      <button class="btn primary" (click)="guardar()" [disabled]="guardando">Guardar</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Datos principales</h3>
+    <div class="form-grid">
+      <label>
+        Razón social / Nombre
+        <input [(ngModel)]="proveedor.nombre" placeholder="Nombre del proveedor" />
+      </label>
+      <label>
+        Persona de contacto
+        <input [(ngModel)]="proveedor.contacto" placeholder="Nombre de contacto" />
+      </label>
+      <label>
+        Email
+        <input [(ngModel)]="proveedor.email" type="email" placeholder="correo@proveedor.com" />
+      </label>
+      <label>
+        Teléfono
+        <input [(ngModel)]="proveedor.telefono" type="tel" placeholder="099-000-0000" />
+      </label>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Ubicación y estado</h3>
+    <div class="form-grid">
+      <label>
+        Dirección
+        <input [(ngModel)]="proveedor.direccion" placeholder="Calle y número" />
+      </label>
+      <label>
+        Ciudad
+        <input [(ngModel)]="proveedor.ciudad" placeholder="Ciudad" />
+      </label>
+      <label>
+        Estado
+        <select [(ngModel)]="proveedor.activo">
+          <option [ngValue]="true">Activo</option>
+          <option [ngValue]="false">Inactivo</option>
+        </select>
+      </label>
+    </div>
+  </div>
+
+  <div class="actions" style="justify-content: flex-end;">
+    <button class="btn ghost" (click)="cancelar()">Cancelar</button>
+    <button class="btn primary" (click)="guardar()" [disabled]="guardando">Guardar proveedor</button>
+  </div>
+</div>

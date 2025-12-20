@@ -4,7 +4,7 @@
   background: var(--bg-light);
 }
 
-/* SIDEBAR */
+
 .sidebar {
   width: 280px;
   background: linear-gradient(135deg, var(--bg-dark) 0%, #0d1b2a 100%);
@@ -93,7 +93,7 @@
   overflow: hidden;
 }
 
-/* HEADER */
+
 .header {
   height: 70px;
   background: white;

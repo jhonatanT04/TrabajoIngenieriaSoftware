@@ -1,7 +1,4 @@
-/**
- * Modelo de Usuario
- * Representa un usuario del sistema con sus roles y permisos
- */
+
 export interface Usuario {
   id: number;
   username: string;

@@ -1,13 +1,22 @@
 <div class="pos-layout">
-
   <header class="pos-header">
-    <span>POS - Punto de Venta</span>
-
-    <button (click)="logout()">Salir</button>
+    <div class="header-left">
+      <span class="material-icons">shopping_cart</span>
+      <span class="header-title">Sistema de Ventas</span>
+    </div>
+    <div class="header-right">
+      <a class="user-info" routerLink="/pos/profile" title="Mi perfil">
+        <span class="material-icons">person</span>
+        {{ user?.username }}
+      </a>
+      <button class="btn-logout" (click)="logout()">
+        <span class="material-icons">logout</span>
+        Salir
+      </button>
+    </div>
   </header>
 
   <section class="pos-content">
     <router-outlet></router-outlet>
   </section>
-
 </div>

@@ -1,7 +1,4 @@
-/**
- * Modelo de Caja
- * Representa las operaciones de caja del sistema
- */
+
 export interface Caja {
   id: number;
   numero: string;

@@ -1,7 +1,4 @@
-/**
- * Modelo de Reportes
- * Representa datos y configuraciones para reportes del sistema
- */
+
 export interface ReporteVentas {
   periodo: string;
   totalVentas: number;

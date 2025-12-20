@@ -305,7 +305,6 @@ export class LoginComponent {
       next: (user: any) => {
         this.loading = false;
 
-        // Redirección básica por rol
         if (user.role === 'CAJERO') {
           this.router.navigate(['/pos']);
         } else if (user.role === 'ADMIN') {

@@ -1,7 +1,4 @@
-/**
- * Modelo de Venta
- * Representa una venta realizada en el sistema
- */
+
 export interface Venta {
   id: number;
   numero: string;

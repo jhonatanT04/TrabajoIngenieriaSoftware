@@ -1,6 +1,4 @@
-/**
- * Barrel file para exportar todos los servicios del core
- */
+
 export * from './auth.service';
 export * from './producto.service';
 export * from './venta.service';

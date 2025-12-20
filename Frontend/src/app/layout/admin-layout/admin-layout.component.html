@@ -1,6 +1,6 @@
 <div class="layout">
 
-  <!-- SIDEBAR -->
+  
   <aside class="sidebar">
     <div class="sidebar-header">
       <span class="logo">M</span>
@@ -23,10 +23,10 @@
     </nav>
   </aside>
 
-  <!-- CONTENIDO -->
+  
   <div class="content">
 
-    <!-- HEADER -->
+    
     <header class="header">
       <div class="header-left">
         <h1 class="page-title">{{ getCurrentPageTitle() }}</h1>
@@ -46,7 +46,7 @@
               <span class="material-icons">person</span>
               <span>Perfil</span>
             </button>
-            <button class="menu-item">
+            <button (click)="goToChangePassword()" class="menu-item">
               <span class="material-icons">security</span>
               <span>Cambiar contraseña</span>
             </button>
@@ -60,7 +60,7 @@
       </div>
     </header>
 
-    <!-- VISTAS -->
+    
     <main class="main">
       <router-outlet></router-outlet>
     </main>

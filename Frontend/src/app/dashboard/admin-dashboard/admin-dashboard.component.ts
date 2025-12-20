@@ -50,12 +50,12 @@ export class AdminDashboardComponent {
     {
       title: 'Nueva Venta',
       icon: 'add_shopping_cart',
-      action: () => this.router.navigate(['/pos'])
+      action: () => this.router.navigate(['/ventas/nuevo'])
     },
     {
       title: 'Nuevo Producto',
       icon: 'add_box',
-      action: () => this.router.navigate(['/productos/create'])
+      action: () => this.router.navigate(['/productos/nuevo'])
     },
     {
       title: 'Nuevo Usuario',

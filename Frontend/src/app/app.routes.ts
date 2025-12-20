@@ -14,9 +14,7 @@ export const routes: Routes = [
       import('./auth/auth.routes').then(m => m.AUTH_ROUTES)
   },
 
-  /* =====================
-     ADMIN / SISTEMA
-  ====================== */
+  
   {
     path: '',
     loadComponent: () =>
@@ -25,7 +23,7 @@ export const routes: Routes = [
     canActivate: [AuthGuard],
     children: [
 
-      /* DASHBOARD */
+      
       {
         path: 'dashboard',
         loadChildren: () =>
@@ -33,7 +31,7 @@ export const routes: Routes = [
             .then(m => m.DASHBOARD_ROUTES)
       },
 
-      /* ADMIN (SOLO ADMINISTRADOR) */
+      
       {
         path: 'admin',
         canActivate: [RoleGuard],
@@ -43,7 +41,7 @@ export const routes: Routes = [
             .then(m => m.ADMIN_ROUTES)
       },
 
-      /* PRODUCTOS (ADMIN / ALMACÉN) */
+      
       {
         path: 'productos',
         canActivate: [RoleGuard],
@@ -53,7 +51,7 @@ export const routes: Routes = [
             .then(m => m.PRODUCTOS_ROUTES)
       },
 
-      /* INVENTARIO */
+      
       {
         path: 'inventario',
         canActivate: [RoleGuard],
@@ -63,7 +61,7 @@ export const routes: Routes = [
             .then(m => m.INVENTARIO_ROUTES)
       },
 
-      /* PROVEEDORES */
+      
       {
         path: 'proveedores',
         canActivate: [RoleGuard],
@@ -73,7 +71,7 @@ export const routes: Routes = [
             .then(m => m.PROVEEDORES_ROUTES)
       },
 
-      /* VENTAS */
+      
       {
         path: 'ventas',
         canActivate: [RoleGuard],
@@ -83,7 +81,7 @@ export const routes: Routes = [
             .then(m => m.VENTAS_ROUTES)
       },
 
-      /* CAJA */
+      
       {
         path: 'caja',
         canActivate: [RoleGuard],
@@ -93,7 +91,7 @@ export const routes: Routes = [
             .then(m => m.CAJA_ROUTES)
       },
 
-      /* CLIENTES */
+      
       {
         path: 'clientes',
         canActivate: [RoleGuard],
@@ -103,7 +101,7 @@ export const routes: Routes = [
             .then(m => m.CLIENTES_ROUTES)
       },
 
-      /* REPORTES */
+      
       {
         path: 'reportes',
         canActivate: [RoleGuard],
@@ -117,9 +115,7 @@ export const routes: Routes = [
     ]
   },
 
-  /* =====================
-     POS (SOLO CAJERO)
-  ====================== */
+  
   {
     path: 'pos',
     canActivate: [AuthGuard, RoleGuard],
@@ -132,9 +128,7 @@ export const routes: Routes = [
         .then(m => m.POS_ROUTES)
   },
 
-  /* =====================
-     404
-  ====================== */
+  
   {
     path: '**',
     loadComponent: () =>

@@ -1,10 +1,7 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
-/**
- * Componente Modal
- * Modal reutilizable para mostrar contenido
- */
+
 @Component({
   selector: 'app-modal',
   standalone: true,

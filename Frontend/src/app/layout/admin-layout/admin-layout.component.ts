@@ -128,6 +128,11 @@ export class AdminLayoutComponent {
     this.showUserMenu = false;
   }
 
+  goToChangePassword(): void {
+    this.router.navigate(['/admin/cambiar-contraseña']);
+    this.showUserMenu = false;
+  }
+
   logout(): void {
     this.authService.logout();
     this.router.navigate(['/auth/login']);

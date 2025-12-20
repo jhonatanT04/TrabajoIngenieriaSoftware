@@ -9,9 +9,14 @@ import { ImpuestosComponent } from './parametros/impuestos/impuestos.component';
 import { MonedaComponent } from './parametros/moneda/moneda.component';
 import { FormatosComponent } from './parametros/formatos/formatos.component';
 import { DescuentosComponent } from './parametros/descuentos/descuentos.component';
-import { AdminGuard } from './guards/admin.guard';
+import { ProfileComponent } from './profile/profile.component';
+import { ChangePasswordComponent } from './change-password/change-password.component';
+import { AdminGuard } from '../core/guards/admin.guard';
 
 export const ADMIN_ROUTES: Routes = [
+  { path: 'profile', component: ProfileComponent },
+  { path: 'cambiar-contraseña', component: ChangePasswordComponent },
+
   { path: 'usuarios', component: UsuarioListComponent, canActivate: [AdminGuard] },
   { path: 'usuarios/create', component: UsuarioCreateComponent, canActivate: [AdminGuard] },
   { path: 'usuarios/:id', component: UsuarioDetailComponent, canActivate: [AdminGuard] },

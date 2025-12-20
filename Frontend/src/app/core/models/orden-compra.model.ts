@@ -1,7 +1,4 @@
-/**
- * Modelo de Orden de Compra
- * Representa órdenes de compra a proveedores
- */
+
 export interface OrdenCompra {
   id: number;
   numero: string;

@@ -1,5 +1,5 @@
 <div class="page-container">
-  <!-- Header -->
+  
   <div class="page-header">
     <div>
       <h1 class="page-title">
@@ -16,7 +16,7 @@
     </div>
   </div>
 
-  <!-- Filtros y búsqueda -->
+  
   <div class="filters-section card">
     <div class="search-bar">
       <span class="material-icons">search</span>
@@ -34,7 +34,7 @@
     </div>
   </div>
 
-  <!-- Tabla de usuarios -->
+  
   <div class="card">
     <div class="table-responsive">
       <table class="table">
@@ -110,7 +110,7 @@
       </table>
     </div>
 
-    <!-- Paginación -->
+    
     <div class="table-footer">
       <div class="table-info">
         Mostrando <strong>1-{{ usuarios.length }}</strong> de <strong>{{ usuarios.length }}</strong> usuarios
@@ -129,7 +129,7 @@
     </div>
   </div>
 
-  <!-- Estado vacío (mostrar si no hay usuarios) -->
+  
   <div class="empty-state" *ngIf="usuarios.length === 0">
     <span class="material-icons">people_outline</span>
     <h3>No hay usuarios registrados</h3>

@@ -10,7 +10,8 @@ import { CajaService } from '../../core/services/caja.service';
   standalone: true,
   selector: 'app-pos-pago',
   imports: [CommonModule, FormsModule],
-  templateUrl: './pos-pago.component.html'
+  templateUrl: './pos-pago.component.html',
+  styleUrls: ['./pos-pago.component.css']
 })
 export class PosPagoComponent {
 
@@ -37,10 +38,8 @@ export class PosPagoComponent {
   pagar(): void {
     const totalVenta = this.total();
 
-    // 🔥 REGISTRAR MOVIMIENTO EN CAJA
     this.cajaService.registrarVenta(totalVenta);
 
-    // 👉 IR AL TICKET
     this.router.navigate(['/pos/ticket'], {
       state: {
         carrito: this.carrito,
@@ -49,5 +48,9 @@ export class PosPagoComponent {
         vuelto: this.vuelto()
       }
     });
+  }
+
+  cancelar(): void {
+    this.router.navigate(['/pos']);
   }
 }

@@ -1,10 +1,62 @@
-<h2>Nuevo Usuario</h2>
+<div class="page">
+  <div class="page-header">
+    <div>
+      <p class="eyebrow">Usuarios</p>
+      <h2>Nuevo usuario</h2>
+      <p class="subtitle">Crea cuentas con rol y estado inicial.</p>
+    </div>
+    <div class="actions">
+      <button class="btn ghost" routerLink="/admin/usuarios">Cancelar</button>
+      <button class="btn primary" (click)="guardar()">Guardar</button>
+    </div>
+  </div>
 
-<input [(ngModel)]="usuario.nombre" placeholder="Nombre">
-<input [(ngModel)]="usuario.email" placeholder="Email">
+  <div class="card">
+    <h3>Datos básicos</h3>
+    <div class="form-grid">
+      <label>
+        Nombre
+        <input [(ngModel)]="usuario.nombre" placeholder="Ej. Juan" />
+      </label>
+      <label>
+        Apellido
+        <input [(ngModel)]="usuario.apellido" placeholder="Ej. Pérez" />
+      </label>
+      <label>
+        Email
+        <input type="email" [(ngModel)]="usuario.email" placeholder="correo@ejemplo.com" />
+      </label>
+      <label>
+        Teléfono
+        <input [(ngModel)]="usuario.telefono" placeholder="999-999-999" />
+      </label>
+    </div>
+  </div>
 
-<select [(ngModel)]="usuario.rol">
-  <option *ngFor="let r of roles" [value]="r">{{ r }}</option>
-</select>
-
-<button (click)="guardar()">Guardar</button>
+  <div class="card">
+    <h3>Acceso</h3>
+    <div class="form-grid">
+      <label>
+        Usuario
+        <input [(ngModel)]="usuario.username" placeholder="usuario" />
+      </label>
+      <label>
+        Rol
+        <select [(ngModel)]="usuario.rol">
+          <option *ngFor="let r of roles" [value]="r">{{ r }}</option>
+        </select>
+      </label>
+      <label>
+        Contraseña
+        <input type="password" [(ngModel)]="usuario.password" placeholder="******" />
+      </label>
+      <label>
+        Activo
+        <select [(ngModel)]="usuario.activo">
+          <option [ngValue]="true">Sí</option>
+          <option [ngValue]="false">No</option>
+        </select>
+      </label>
+    </div>
+  </div>
+</div>
