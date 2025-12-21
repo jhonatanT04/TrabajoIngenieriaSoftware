@@ -2,7 +2,7 @@ from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
 
 # Importaciones locales
-from db.database import init_db
+from db.database import init_db, seed_data
 import schemas
 import deps
 from endpoints import router as endpoints_router
@@ -28,6 +28,7 @@ app.add_middleware(
 def on_startup() -> None:
     """Inicializa la base de datos al arrancar el servidor"""
     init_db()
+    seed_data()
 
 # ==================== RUTAS DE SALUD / ROOT ====================
 @app.get("/salud", tags=["Salud"])
