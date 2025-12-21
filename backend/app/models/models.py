@@ -1,6 +1,5 @@
-from __future__ import annotations
 
-from typing import Optional, List
+from typing import Optional
 from models.enums import *
 from sqlmodel import SQLModel, Field, Relationship
 from uuid import uuid4, UUID
@@ -33,8 +32,8 @@ class Profile(SQLModel, table=True):
     created_at: datetime = Field(default_factory=datetime.utcnow)
     updated_at: datetime = Field(default_factory=datetime.utcnow)
     
-    users: List["User"] = Relationship(back_populates="profile")
-    permissions: List["Permission"] = Relationship(back_populates="profiles", link_model=ProfilePermission)
+    users: list["User"] = Relationship(back_populates="profile")
+    permissions: list["Permission"] = Relationship(back_populates="profiles", link_model=ProfilePermission)
 
 
 class Permission(SQLModel, table=True):
@@ -44,7 +43,7 @@ class Permission(SQLModel, table=True):
     action: str  # CREATE, READ, UPDATE, DELETE
     description: Optional[str] = None
     
-    profiles: List["Profile"] = Relationship(back_populates="permissions", link_model=ProfilePermission)
+    profiles: list["Profile"] = Relationship(back_populates="permissions", link_model=ProfilePermission)
 
 
 class User(SQLModel, table=True):
@@ -63,10 +62,10 @@ class User(SQLModel, table=True):
     updated_at: datetime = Field(default_factory=datetime.utcnow)
     
     profile: Optional["Profile"] = Relationship(back_populates="users")
-    purchase_orders: List["PurchaseOrder"] = Relationship(back_populates="created_by_user")
-    inventory_movements: List["InventoryMovement"] = Relationship(back_populates="user")
-    cash_sessions: List["CashRegisterSession"] = Relationship(back_populates="user")
-    sales: List["Sale"] = Relationship(back_populates="cashier")
+    purchase_orders: list["PurchaseOrder"] = Relationship(back_populates="created_by_user")
+    inventory_movements: list["InventoryMovement"] = Relationship(back_populates="user")
+    cash_sessions: list["CashRegisterSession"] = Relationship(back_populates="user")
+    sales: list["Sale"] = Relationship(back_populates="cashier")
 
 
 class SystemParameter(SQLModel, table=True):
@@ -88,9 +87,9 @@ class Category(SQLModel, table=True):
     description: Optional[str] = None
     parent_category_id: Optional[UUID] = Field(default=None, foreign_key="categories.id")
     created_at: datetime = Field(default_factory=datetime.utcnow)
-    
-    products: List["Product"] = Relationship(back_populates="category")
-    promotions: List["Promotion"] = Relationship(back_populates="categories", link_model=PromotionCategory)
+
+    products: list["Product"] = Relationship(back_populates="category")
+    promotions: list["Promotion"] = Relationship(back_populates="categories", link_model=PromotionCategory)
 
 
 class Brand(SQLModel, table=True):
@@ -98,8 +97,8 @@ class Brand(SQLModel, table=True):
     id: Optional[UUID] = Field(default_factory=uuid4, primary_key=True)
     name: str
     description: Optional[str] = None
-    
-    products: List["Product"] = Relationship(back_populates="brand")
+
+    products: list["Product"] = Relationship(back_populates="brand")
 
 
 class Product(SQLModel, table=True):
@@ -128,13 +127,13 @@ class Product(SQLModel, table=True):
     category: Optional["Category"] = Relationship(back_populates="products")
     brand: Optional["Brand"] = Relationship(back_populates="products")
     supplier: Optional["Supplier"] = Relationship(back_populates="products")
-    presentations: List["ProductPresentation"] = Relationship(back_populates="product")
-    inventory: List["Inventory"] = Relationship(back_populates="product")
-    inventory_movements: List["InventoryMovement"] = Relationship(back_populates="product")
-    purchase_order_details: List["PurchaseOrderDetail"] = Relationship(back_populates="product")
-    reception_details: List["ProductReceptionDetail"] = Relationship(back_populates="product")
-    sale_details: List["SaleDetail"] = Relationship(back_populates="product")
-    promotions: List["Promotion"] = Relationship(back_populates="products", link_model=PromotionProduct)
+    presentations: list["ProductPresentation"] = Relationship(back_populates="product")
+    inventory: list["Inventory"] = Relationship(back_populates="product")
+    inventory_movements: list["InventoryMovement"] = Relationship(back_populates="product")
+    purchase_order_details: list["PurchaseOrderDetail"] = Relationship(back_populates="product")
+    reception_details: list["ProductReceptionDetail"] = Relationship(back_populates="product")
+    sale_details: list["SaleDetail"] = Relationship(back_populates="product")
+    promotions: list["Promotion"] = Relationship(back_populates="products", link_model=PromotionProduct)
 
 
 class ProductPresentation(SQLModel, table=True):
@@ -165,10 +164,10 @@ class Supplier(SQLModel, table=True):
     is_active: bool = True
     created_at: datetime = Field(default_factory=datetime.utcnow)
     updated_at: datetime = Field(default_factory=datetime.utcnow)
-    
-    products: List["Product"] = Relationship(back_populates="supplier")
-    purchase_orders: List["PurchaseOrder"] = Relationship(back_populates="supplier")
-    credit_notes: List["CreditNote"] = Relationship(back_populates="supplier")
+
+    products: list["Product"] = Relationship(back_populates="supplier")
+    purchase_orders: list["PurchaseOrder"] = Relationship(back_populates="supplier")
+    credit_notes: list["CreditNote"] = Relationship(back_populates="supplier")
 
 
 class PurchaseOrder(SQLModel, table=True):
@@ -189,9 +188,9 @@ class PurchaseOrder(SQLModel, table=True):
     
     supplier: Optional["Supplier"] = Relationship(back_populates="purchase_orders")
     created_by_user: Optional["User"] = Relationship(back_populates="purchase_orders")
-    details: List["PurchaseOrderDetail"] = Relationship(back_populates="purchase_order")
-    receptions: List["ProductReception"] = Relationship(back_populates="purchase_order")
-    credit_notes: List["CreditNote"] = Relationship(back_populates="purchase_order")
+    details: list["PurchaseOrderDetail"] = Relationship(back_populates="purchase_order")
+    receptions: list["ProductReception"] = Relationship(back_populates="purchase_order")
+    credit_notes: list["CreditNote"] = Relationship(back_populates="purchase_order")
 
 
 class PurchaseOrderDetail(SQLModel, table=True):
@@ -230,9 +229,9 @@ class Location(SQLModel, table=True):
     shelf: str
     position: Optional[str] = None
     description: Optional[str] = None
-    
-    inventory: List["Inventory"] = Relationship(back_populates="location")
-    reception_details: List["ProductReceptionDetail"] = Relationship(back_populates="location")
+
+    inventory: list["Inventory"] = Relationship(back_populates="location")
+    reception_details: list["ProductReceptionDetail"] = Relationship(back_populates="location")
 
 
 class Inventory(SQLModel, table=True):
@@ -277,7 +276,7 @@ class ProductReception(SQLModel, table=True):
     status: str = "recibida"
     
     purchase_order: Optional["PurchaseOrder"] = Relationship(back_populates="receptions")
-    details: List["ProductReceptionDetail"] = Relationship(back_populates="reception")
+    details: list["ProductReceptionDetail"] = Relationship(back_populates="reception")
 
 
 class ProductReceptionDetail(SQLModel, table=True):
@@ -326,10 +325,10 @@ class Sale(SQLModel, table=True):
     cashier: Optional["User"] = Relationship(back_populates="sales")
     cash_register: Optional["CashRegister"] = Relationship(back_populates="sales")
     customer: Optional["Customer"] = Relationship(back_populates="sales")
-    details: List["SaleDetail"] = Relationship(back_populates="sale")
-    payments: List["SalePayment"] = Relationship(back_populates="sale")
+    details: list["SaleDetail"] = Relationship(back_populates="sale")
+    payments: list["SalePayment"] = Relationship(back_populates="sale")
     invoice: Optional["Invoice"] = Relationship(back_populates="sale")
-    loyalty_transactions: List["LoyaltyTransaction"] = Relationship(back_populates="sale")
+    loyalty_transactions: list["LoyaltyTransaction"] = Relationship(back_populates="sale")
 
 
 class SaleDetail(SQLModel, table=True):
@@ -365,9 +364,9 @@ class Promotion(SQLModel, table=True):
     is_active: bool = True
     created_at: datetime = Field(default_factory=datetime.utcnow)
     updated_at: datetime = Field(default_factory=datetime.utcnow)
-    
-    products: List["Product"] = Relationship(back_populates="promotions", link_model=PromotionProduct)
-    categories: List["Category"] = Relationship(back_populates="promotions", link_model=PromotionCategory)
+
+    products: list["Product"] = Relationship(back_populates="promotions", link_model=PromotionProduct)
+    categories: list["Category"] = Relationship(back_populates="promotions", link_model=PromotionCategory)
 
 
 class Invoice(SQLModel, table=True):
@@ -399,9 +398,9 @@ class CashRegister(SQLModel, table=True):
     register_number: str = Field(unique=True, index=True)
     location: Optional[str] = None
     is_active: bool = True
-    
-    sessions: List["CashRegisterSession"] = Relationship(back_populates="cash_register")
-    sales: List["Sale"] = Relationship(back_populates="cash_register")
+
+    sessions: list["CashRegisterSession"] = Relationship(back_populates="cash_register")
+    sales: list["Sale"] = Relationship(back_populates="cash_register")
 
 
 class CashRegisterSession(SQLModel, table=True):
@@ -420,8 +419,8 @@ class CashRegisterSession(SQLModel, table=True):
     
     cash_register: Optional["CashRegister"] = Relationship(back_populates="sessions")
     user: Optional["User"] = Relationship(back_populates="cash_sessions")
-    transactions: List["CashTransaction"] = Relationship(back_populates="session")
-    cash_counts: List["CashCount"] = Relationship(back_populates="session")
+    transactions: list["CashTransaction"] = Relationship(back_populates="session")
+    cash_counts: list["CashCount"] = Relationship(back_populates="session")
 
 
 class PaymentMethod(SQLModel, table=True):
@@ -431,8 +430,8 @@ class PaymentMethod(SQLModel, table=True):
     requires_reference: bool = False
     is_active: bool = True
     
-    transactions: List["CashTransaction"] = Relationship(back_populates="payment_method")
-    sale_payments: List["SalePayment"] = Relationship(back_populates="payment_method")
+    transactions: list["CashTransaction"] = Relationship(back_populates="payment_method")
+    sale_payments: list["SalePayment"] = Relationship(back_populates="payment_method")
 
 
 class CashTransaction(SQLModel, table=True):
@@ -476,7 +475,7 @@ class CashCount(SQLModel, table=True):
     notes: Optional[str] = None
     
     session: Optional["CashRegisterSession"] = Relationship(back_populates="cash_counts")
-    details: List["CashCountDetail"] = Relationship(back_populates="cash_count")
+    details: list["CashCountDetail"] = Relationship(back_populates="cash_count")
 
 
 class CashCountDetail(SQLModel, table=True):
@@ -511,12 +510,11 @@ class Customer(SQLModel, table=True):
     created_at: datetime = Field(default_factory=datetime.utcnow)
     updated_at: datetime = Field(default_factory=datetime.utcnow)
     
-    sales: List["Sale"] = Relationship(back_populates="customer")
-    invoices: List["Invoice"] = Relationship(back_populates="customer")
-    preferences: List["CustomerPreference"] = Relationship(back_populates="customer")
-    loyalty_transactions: List["LoyaltyTransaction"] = Relationship(back_populates="customer")
-    notifications: List["CustomerNotification"] = Relationship(back_populates="customer")
-
+    sales: list["Sale"] = Relationship(back_populates="customer")
+    invoices: list["Invoice"] = Relationship(back_populates="customer")
+    preferences: list["CustomerPreference"] = Relationship(back_populates="customer")
+    loyalty_transactions: list["LoyaltyTransaction"] = Relationship(back_populates="customer")
+    notifications: list["CustomerNotification"] = Relationship(back_populates="customer")
 
 class CustomerPreference(SQLModel, table=True):
     __tablename__ = "customer_preferences"
