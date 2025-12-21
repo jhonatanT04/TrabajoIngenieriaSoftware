@@ -8,7 +8,7 @@ load_dotenv()
 
 DATABASE_URL = os.getenv(
     "DATABASE_URL",
-    "postgresql+psycopg2://minimercado:1234@localhost:5432/minimercado_db",
+    "postgresql+psycopg2://postgres:root@localhost:5432/minimercado",
 )
 
 engine = create_engine(DATABASE_URL, echo=False)
@@ -28,6 +28,7 @@ def init_db() -> None:
         tables = sorted(SQLModel.metadata.tables.keys())
         logger.info(f"✅ Base de datos inicializada con {len(tables)} tablas")
         logger.info(f"Tablas creadas: {', '.join(tables)}")
+        SQLModel.metadata.create_all(engine)
         
     except Exception as exc:
         print(f"\n❌ ERROR ORIGINAL DE POSTGRES: {exc}\n")

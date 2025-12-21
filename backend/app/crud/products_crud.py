@@ -2,10 +2,10 @@ from typing import Optional, List
 from sqlmodel import Session, select
 from uuid import UUID
 
-from backend.app.models.models import (
+from models.models import (
     Product, Category, Brand, ProductPresentation
 )
-from base_crud import CRUDBase
+from .base_crud import CRUDBase
 
 
 class CRUDProduct(CRUDBase[Product, Product, Product]):

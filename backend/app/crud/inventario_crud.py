@@ -3,11 +3,11 @@ from sqlmodel import Session, select
 from uuid import UUID
 from datetime import datetime
 
-from backend.app.models.models import (
+from models.models import (
     Inventory, Location, InventoryMovement, ProductReception,
     ProductReceptionDetail, ProductLabel, MovementType
 )
-from base_crud import CRUDBase
+from .base_crud import CRUDBase
 
 
 class CRUDInventory(CRUDBase[Inventory, Inventory, Inventory]):

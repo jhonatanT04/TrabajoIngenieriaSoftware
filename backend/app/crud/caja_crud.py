@@ -7,13 +7,13 @@ from sqlmodel import Session, select
 from uuid import UUID
 from datetime import datetime
 
-from backend.app.models.models import (
+from models.models import (
     CashRegister, CashRegisterSession, PaymentMethod, CashTransaction,
     SalePayment, CashCount, CashCountDetail, Customer, CustomerPreference,
     LoyaltyTransaction, CustomerNotification, SessionStatus, TransactionType,
     LoyaltyTransactionType
 )
-from base_crud import CRUDBase
+from .base_crud import CRUDBase
 
 
 # ==================== CAJA ====================

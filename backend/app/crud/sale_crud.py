@@ -3,10 +3,10 @@ from sqlmodel import Session, select
 from uuid import UUID
 from datetime import datetime
 
-from backend.app.models.models import (
+from models.models import (
     Sale, SaleDetail, Promotion, Invoice, SaleStatus, PromotionType
 )
-from base_crud import CRUDBase
+from .base_crud import CRUDBase
 
 
 class CRUDSale(CRUDBase[Sale, Sale, Sale]):
