@@ -41,10 +41,10 @@ def seed_data() -> None:
         with Session(engine) as session:
             # Verificar si ya hay datos
             if session.query(Profile).first():
-                logger.info("⚠️  La base de datos ya contiene datos. Saltando seed.")
+                logger.info("La base de datos ya contiene datos. Saltando seed.")
                 return
             
-            logger.info("🌱 Insertando datos iniciales...")
+            logger.info("Insertando datos iniciales...")
             
             # IDS FIJOS PARA RELACIONAR
             PROFILE_ADMIN_ID = uuid4()
@@ -97,7 +97,7 @@ def seed_data() -> None:
             ]
             session.add_all(users)
             session.commit()
-            logger.info(f"✅ Insertados {len(users)} usuarios")
+            logger.info(f"Insertados {len(users)} usuarios")
             
             # 3. CATEGORÍAS
             categories = [
@@ -114,7 +114,7 @@ def seed_data() -> None:
             ]
             session.add_all(categories)
             session.commit()
-            logger.info(f"✅ Insertadas {len(categories)} categorías")
+            logger.info(f"Insertadas {len(categories)} categorías")
             
             # 4. MARCAS
             brands = [
@@ -131,7 +131,7 @@ def seed_data() -> None:
             ]
             session.add_all(brands)
             session.commit()
-            logger.info(f"✅ Insertadas {len(brands)} marcas")
+            logger.info(f"Insertadas {len(brands)} marcas")
             
             # 5. PRODUCTOS
             products = [
@@ -158,7 +158,7 @@ def seed_data() -> None:
             ]
             session.add_all(products)
             session.commit()
-            logger.info(f"✅ Insertados {len(products)} productos")
+            logger.info(f"Insertados {len(products)} productos")
             
             # 6. CLIENTES
             customers = [
@@ -178,7 +178,7 @@ def seed_data() -> None:
             ]
             session.add_all(customers)
             session.commit()
-            logger.info(f"✅ Insertados {len(customers)} clientes")
+            logger.info(f"Insertados {len(customers)} clientes")
             
             # 7. CAJAS
             registers = [
@@ -188,7 +188,7 @@ def seed_data() -> None:
             ]
             session.add_all(registers)
             session.commit()
-            logger.info(f"✅ Insertadas {len(registers)} cajas registradoras")
+            logger.info(f"Insertadas {len(registers)} cajas registradoras")
             
             # 8. MÉTODOS DE PAGO
             payment_methods = [
@@ -199,12 +199,12 @@ def seed_data() -> None:
             ]
             session.add_all(payment_methods)
             session.commit()
-            logger.info(f"✅ Insertados {len(payment_methods)} métodos de pago")
+            logger.info(f"Insertados {len(payment_methods)} métodos de pago")
             
-            logger.info("🎉 Datos iniciales insertados correctamente")
+            logger.info("Datos iniciales insertados correctamente")
             
     except Exception as exc:
-        logger.error(f"❌ Error al insertar datos iniciales: {exc}")
+        logger.error(f"Error al insertar datos iniciales: {exc}")
         raise
 
 
