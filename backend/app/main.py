@@ -6,7 +6,7 @@ from db.database import init_db, seed_data
 import schemas
 import deps
 from endpoints import router as endpoints_router
-from routers import router_auth,router_user
+from routers import router_auth,router_user,router_productos
 
 app = FastAPI(
     title="Minimercado - Backend",
@@ -48,9 +48,8 @@ def root():
 
 # Endpoints principales
 app.include_router(endpoints_router)
-
-# Router de autenticación (opcional)
 app.include_router(router_user.router)
 app.include_router(router_auth.router)
+app.include_router(router_productos.router)
 
 
