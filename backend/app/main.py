@@ -1,12 +1,8 @@
 from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
 
-# Importaciones locales
 from db.database import init_db, seed_data
-import schemas
-import deps
-from endpoints import router as endpoints_router
-from routers import router_auth,router_user,router_productos
+from routers import router_auth,router_user,router_productos,router_categoria,router_marca,router_proveedor
 
 app = FastAPI(
     title="Minimercado - Backend",
@@ -17,7 +13,7 @@ app = FastAPI(
 # ==================== CONFIGURACIÓN DE CORS ====================
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # ⚠️ En producción usa dominios específicos
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -30,13 +26,6 @@ def on_startup() -> None:
     init_db()
     seed_data()
 
-# ==================== RUTAS DE SALUD / ROOT ====================
-@app.get("/salud", tags=["Salud"])
-def health_check():
-    return {
-        "status": "ok",
-        "message": "Backend Minimercado funcionando correctamente",
-    }
 
 @app.get("/", include_in_schema=False)
 def root():
@@ -47,9 +36,11 @@ def root():
 # ==================== REGISTRAR ROUTERS ====================
 
 # Endpoints principales
-app.include_router(endpoints_router)
+app.include_router(router_proveedor.router)
 app.include_router(router_user.router)
 app.include_router(router_auth.router)
 app.include_router(router_productos.router)
+app.include_router(router_categoria.router)
+app.include_router(router_marca.router)
 
 

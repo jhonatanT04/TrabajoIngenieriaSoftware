@@ -73,7 +73,7 @@ async def create_product(
     }
 
 
-@router.get("/products", tags=["Productos"],dependencies=[Depends(RoleChecker(allowed_roles=["Administrador,Cajero"]))])
+@router.get("/products", tags=["Productos"],dependencies=[Depends(RoleChecker(allowed_roles=["Administrador","Cajero"]))])
 async def list_products(
     db: DBSession,
     skip: int = Query(0, ge=0, description="Registros a saltar"),
