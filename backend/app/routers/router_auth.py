@@ -11,7 +11,7 @@ from uuid import UUID
 
 from db.database import get_session
 from models.models import User, Profile
-from crud import crud
+from crud import users_crud
 from auth.auth import (
     authenticate_user,
     create_user_token,
@@ -91,7 +91,7 @@ def login(
     token_data = create_user_token(user)
     
     # Obtener nombre del perfil
-    profile = crud.profile.get(db, id=user.profile_id)
+    profile = users_crud.profile.get(db, id=user.profile_id)
     
     return {
         **token_data,
@@ -118,14 +118,14 @@ def register(
     y solo accesible para administradores
     """
     # Verificar si el usuario ya existe
-    existing_user = crud.user.get_by_username(db, username=register_data.username)
+    existing_user = users_crud.user.get_by_username(db, username=register_data.username)
     if existing_user:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="El nombre de usuario ya está registrado"
         )
     
-    existing_email = crud.user.get_by_email(db, email=register_data.email)
+    existing_email = users_crud.user.get_by_email(db, email=register_data.email)
     if existing_email:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -133,11 +133,11 @@ def register(
         )
     
     # Obtener o crear perfil
-    profile = crud.profile.get_by_name(db, name=register_data.profile_name)
+    profile = users_crud.profile.get_by_name(db, name=register_data.profile_name)
     if not profile:
         # Crear perfil básico si no existe
         profile = Profile(name=register_data.profile_name)
-        profile = crud.profile.create(db, obj_in=profile)
+        profile = users_crud.profile.create(db, obj_in=profile)
     
     # Crear usuario
     user_data = User(
@@ -150,7 +150,7 @@ def register(
         is_active=True
     )
     
-    user = crud.user.create(db, obj_in=user_data)
+    user = users_crud.user.create(db, obj_in=user_data)
     
     # Crear token
     token_data = create_user_token(user)
@@ -176,7 +176,7 @@ def get_current_user_info(
     """
     Obtener información del usuario actual
     """
-    profile = crud.profile.get(db, id=current_user.profile_id)
+    profile = users_crud.profile.get(db, id=current_user.profile_id)
     
     return UserResponse(
         id=current_user.id,
@@ -214,7 +214,7 @@ def change_password(
     
     # Actualizar contraseña
     new_hashed_password = get_password_hash(password_data.new_password)
-    crud.user.update_password(db, user=current_user, hashed_password=new_hashed_password)
+    users_crud.user.update_password(db, user=current_user, hashed_password=new_hashed_password)
     
     return {"message": "Contraseña actualizada exitosamente"}
 
@@ -244,11 +244,11 @@ def list_all_users(
     """
     Listar todos los usuarios (solo administradores)
     """
-    users = crud.user.get_multi(db, skip=skip, limit=limit)
+    users = users_crud.user.get_multi(db, skip=skip, limit=limit)
     
     result = []
     for user in users:
-        profile = crud.profile.get(db, id=user.profile_id)
+        profile = users_crud.profile.get(db, id=user.profile_id)
         result.append({
             "id": str(user.id),
             "username": user.username,
@@ -281,14 +281,14 @@ def deactivate_user(
             detail="No puedes desactivar tu propia cuenta"
         )
     
-    user = crud.user.get(db, id=user_id)
+    user = users_crud.user.get(db, id=user_id)
     if not user:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Usuario no encontrado"
         )
     
-    crud.user.deactivate(db, id=user_id)
+    users_crud.user.deactivate(db, id=user_id)
     return {"message": "Usuario desactivado exitosamente"}
 
 
@@ -304,7 +304,7 @@ def activate_user(
     """
     Activar un usuario (solo administradores)
     """
-    user = crud.user.get(db, id=user_id)
+    user = users_crud.user.get(db, id=user_id)
     if not user:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -312,7 +312,7 @@ def activate_user(
         )
     
     user.is_active = True
-    crud.user.update(db, db_obj=user, obj_in={"is_active": True})
+    users_crud.user.update(db, db_obj=user, obj_in={"is_active": True})
     return {"message": "Usuario activado exitosamente"}
 
 
@@ -335,12 +335,12 @@ def delete_user(
             detail="No puedes eliminar tu propia cuenta"
         )
     
-    user = crud.user.get(db, id=user_id)
+    user = users_crud.user.get(db, id=user_id)
     if not user:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Usuario no encontrado"
         )
     
-    crud.user.delete(db, id=user_id)
+    users_crud.user.delete(db, id=user_id)
     return {"message": "Usuario eliminado exitosamente"}

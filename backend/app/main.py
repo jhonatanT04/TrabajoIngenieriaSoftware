@@ -6,6 +6,7 @@ from db.database import init_db, seed_data
 import schemas
 import deps
 from endpoints import router as endpoints_router
+from routers import router_auth
 
 
 app = FastAPI(
@@ -50,11 +51,9 @@ def root():
 app.include_router(endpoints_router)
 
 # Router de autenticación (opcional)
-try:
-    from routers.auth import router as auth_router
-    app.include_router(auth_router)
-except ImportError:
-    pass
+
+app.include_router(router_auth.router)
+
 
 # ==================== USUARIO ACTUAL ====================
 @app.get(

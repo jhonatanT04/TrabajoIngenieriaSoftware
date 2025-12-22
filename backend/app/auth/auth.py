@@ -16,7 +16,7 @@ import os
 
 from db.database import get_session
 from models.models import User
-from crud import crud
+from crud import users_crud
 
 load_dotenv()
 
@@ -104,11 +104,11 @@ def authenticate_user(db: Session, username: str, password: str) -> Optional[Use
         Usuario autenticado o None
     """
     # Intentar buscar por username
-    user = crud.user.get_by_username(db, username=username)
+    user = users_crud.user.get_by_username(db, username=username)
     
     # Si no se encuentra, intentar por email
     if not user:
-        user = crud.user.get_by_email(db, email=username)
+        user = users_crud.user.get_by_email(db, email=username)
     
     # Si no existe el usuario o está inactivo
     if not user or not user.is_active:
@@ -155,7 +155,7 @@ async def get_current_user(
         raise credentials_exception
     
     # Obtener usuario de la base de datos
-    user = crud.user.get(db, id=UUID(user_id))
+    user = users_crud.user.get(db, id=UUID(user_id))
     if user is None:
         raise credentials_exception
     
@@ -201,7 +201,7 @@ class PermissionChecker:
         Verificar que el usuario tenga los permisos requeridos
         """
         # Cargar el perfil con sus permisos
-        profile = crud.profile.get_with_permissions(db, id=current_user.profile_id)
+        profile = users_crud.profile.get_with_permissions(db, id=current_user.profile_id)
         
         if not profile:
             raise HTTPException(
@@ -241,7 +241,7 @@ class RoleChecker:
         """
         Verificar que el usuario tenga uno de los roles permitidos
         """
-        profile = crud.profile.get(db, id=current_user.profile_id)
+        profile = users_crud.profile.get(db, id=current_user.profile_id)
         
         if not profile:
             raise HTTPException(
