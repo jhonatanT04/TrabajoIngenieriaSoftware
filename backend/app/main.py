@@ -6,8 +6,7 @@ from db.database import init_db, seed_data
 import schemas
 import deps
 from endpoints import router as endpoints_router
-from routers import router_auth
-
+from routers import router_auth,router_user
 
 app = FastAPI(
     title="Minimercado - Backend",
@@ -51,18 +50,7 @@ def root():
 app.include_router(endpoints_router)
 
 # Router de autenticación (opcional)
-
+app.include_router(router_user.router)
 app.include_router(router_auth.router)
 
 
-# ==================== USUARIO ACTUAL ====================
-@app.get(
-    "/users/me",
-    response_model=schemas.UserRead,
-    tags=["Usuarios"],
-)
-def read_current_user(
-    current_user: schemas.UserRead = Depends(deps.get_current_user),
-):
-    """Devuelve la información del usuario autenticado"""
-    return current_user

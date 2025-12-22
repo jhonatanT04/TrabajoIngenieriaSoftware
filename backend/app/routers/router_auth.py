@@ -112,10 +112,28 @@ def register(
     db: Session = Depends(get_session)
 ):
     """
-    Registrar un nuevo usuario
+    Crear nuevo usuario en el sistema
     
-    Note: En producción, este endpoint debería estar protegido
-    y solo accesible para administradores
+    Campos requeridos:
+    - username: Nombre de usuario unico
+    - email: Correo electronico unico
+    - full_name: Nombre completo del usuario
+    - hashed_password: Contrasena hasheada
+    
+    Campos opcionales:
+    - profile_id: UUID del perfil/rol
+    - is_active: Estado del usuario (default: true)
+    
+    Ejemplo de Body JSON:
+    ```json
+    {
+        "username": "john_doe",
+        "email": "john@example.com",
+        "full_name": "John Doe",
+        "hashed_password": "hashed_password_here",
+        "is_active": true
+    }
+    ```
     """
     # Verificar si el usuario ya existe
     existing_user = users_crud.user.get_by_username(db, username=register_data.username)
@@ -229,118 +247,3 @@ def refresh_token(
     token_data = create_user_token(current_user)
     return token_data
 
-
-# ==================== ENDPOINTS SOLO PARA ADMINISTRADORES ====================
-@router.get(
-    "/users",
-    dependencies=[Depends(RoleChecker(allowed_roles=["Administrador"]))]
-)
-def list_all_users(
-    skip: int = 0,
-    limit: int = 100,
-    db: Session = Depends(get_session),
-    current_user: User = Depends(get_current_user)
-):
-    """
-    Listar todos los usuarios (solo administradores)
-    """
-    users = users_crud.user.get_multi(db, skip=skip, limit=limit)
-    
-    result = []
-    for user in users:
-        profile = users_crud.profile.get(db, id=user.profile_id)
-        result.append({
-            "id": str(user.id),
-            "username": user.username,
-            "email": user.email,
-            "first_name": user.first_name,
-            "last_name": user.last_name,
-            "is_active": user.is_active,
-            "profile_name": profile.name if profile else None
-        })
-    
-    return result
-
-
-@router.put(
-    "/users/{user_id}/deactivate",
-    dependencies=[Depends(RoleChecker(allowed_roles=["Administrador"]))]
-)
-def deactivate_user(
-    user_id: UUID,
-    db: Session = Depends(get_session),
-    current_user: User = Depends(get_current_user)
-):
-    """
-    Desactivar un usuario (solo administradores)
-    """
-    # No permitir desactivar al propio usuario
-    if user_id == current_user.id:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="No puedes desactivar tu propia cuenta"
-        )
-    
-    user = users_crud.user.get(db, id=user_id)
-    if not user:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Usuario no encontrado"
-        )
-    
-    users_crud.user.deactivate(db, id=user_id)
-    return {"message": "Usuario desactivado exitosamente"}
-
-
-@router.put(
-    "/users/{user_id}/activate",
-    dependencies=[Depends(RoleChecker(allowed_roles=["Administrador"]))]
-)
-def activate_user(
-    user_id: UUID,
-    db: Session = Depends(get_session),
-    current_user: User = Depends(get_current_user)
-):
-    """
-    Activar un usuario (solo administradores)
-    """
-    user = users_crud.user.get(db, id=user_id)
-    if not user:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Usuario no encontrado"
-        )
-    
-    user.is_active = True
-    users_crud.user.update(db, db_obj=user, obj_in={"is_active": True})
-    return {"message": "Usuario activado exitosamente"}
-
-
-@router.delete(
-    "/users/{user_id}",
-    dependencies=[Depends(RoleChecker(allowed_roles=["Administrador"]))]
-)
-def delete_user(
-    user_id: UUID,
-    db: Session = Depends(get_session),
-    current_user: User = Depends(get_current_user)
-):
-    """
-    Eliminar un usuario permanentemente (solo administradores)
-    """
-    # No permitir eliminar al propio usuario
-    if user_id == current_user.id:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="No puedes eliminar tu propia cuenta"
-        )
-    
-    user = users_crud.user.get(db, id=user_id)
-    if not user:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Usuario no encontrado"
-        )
-    
-    users_crud.user.delete(db, id=user_id)
-    return {"message": "Usuario eliminado exitosamente"}
