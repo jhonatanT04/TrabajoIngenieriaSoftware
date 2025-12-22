@@ -99,7 +99,7 @@ async def list_products(
         return product.get_multi(db, skip=skip, limit=limit)
 
 
-@router.get("/products/{product_id}", tags=["Productos"],dependencies=[Depends(RoleChecker(allowed_roles=["Administrador,Cajero"]))])
+@router.get("/products/{product_id}", tags=["Productos"],dependencies=[Depends(RoleChecker(allowed_roles=["Administrador","Cajero"]))])
 async def get_product(
     product_id: UUID,
     db: DBSession
@@ -120,7 +120,7 @@ async def get_product(
     return prod
 
 
-@router.get("/products/sku/{sku}", tags=["Productos"],dependencies=[Depends(RoleChecker(allowed_roles=["Administrador,Cajero"]))])
+@router.get("/products/sku/{sku}", tags=["Productos"],dependencies=[Depends(RoleChecker(allowed_roles=["Administrador","Cajero"]))])
 async def get_product_by_sku(
     sku: str,
     db: DBSession
@@ -141,7 +141,7 @@ async def get_product_by_sku(
     return prod
 
 
-@router.get("/products/barcode/{barcode}", tags=["Productos"],dependencies=[Depends(RoleChecker(allowed_roles=["Administrador,Cajero"]))])
+@router.get("/products/barcode/{barcode}", tags=["Productos"],dependencies=[Depends(RoleChecker(allowed_roles=["Administrador","Cajero"]))])
 async def get_product_by_barcode(
     barcode: str,
     db: DBSession
@@ -163,7 +163,7 @@ async def get_product_by_barcode(
     return prod
 
 
-@router.get("/products/search/name", tags=["Productos"],dependencies=[Depends(RoleChecker(allowed_roles=["Administrador,Cajero"]))])
+@router.get("/products/search/name", tags=["Productos"],dependencies=[Depends(RoleChecker(allowed_roles=["Administrador","Cajero"]))])
 async def search_products_by_name(
     db: DBSession,
     name: str = Query(..., min_length=1, description="Termino de busqueda")
@@ -183,7 +183,7 @@ async def search_products_by_name(
     return products
 
 
-@router.get("/products/category/{category_id}", tags=["Productos"],dependencies=[Depends(RoleChecker(allowed_roles=["Administrador,Cajero"]))])
+@router.get("/products/category/{category_id}", tags=["Productos"],dependencies=[Depends(RoleChecker(allowed_roles=["Administrador","Cajero"]))])
 async def get_products_by_category(
     category_id: UUID,
     db: DBSession
@@ -202,7 +202,7 @@ async def get_products_by_category(
     return products
 
 
-@router.get("/products/supplier/{supplier_id}", tags=["Productos"],dependencies=[Depends(RoleChecker(allowed_roles=["Administrador,Cajero"]))])
+@router.get("/products/supplier/{supplier_id}", tags=["Productos"],dependencies=[Depends(RoleChecker(allowed_roles=["Administrador","Cajero"]))])
 async def get_products_by_supplier(
     supplier_id: UUID,
     db: DBSession

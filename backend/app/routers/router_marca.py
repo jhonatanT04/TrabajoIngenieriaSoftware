@@ -49,7 +49,7 @@ async def create_brand(
     }
 
 
-@router.get("/brands", tags=["Marcas"],dependencies=[Depends(RoleChecker(allowed_roles=["Administrador,Cajero"]))])
+@router.get("/brands", tags=["Marcas"],dependencies=[Depends(RoleChecker(allowed_roles=["Administrador","Cajero"]))])
 async def list_brands(
     db: DBSession,
     skip: int = Query(0, ge=0, description="Registros a saltar"),
@@ -70,7 +70,7 @@ async def list_brands(
     return brands
 
 
-@router.get("/brands/{brand_id}", tags=["Marcas"],dependencies=[Depends(RoleChecker(allowed_roles=["Administrador,Cajero"]))])
+@router.get("/brands/{brand_id}", tags=["Marcas"],dependencies=[Depends(RoleChecker(allowed_roles=["Administrador","Cajero"]))])
 async def get_brand(
     brand_id: UUID,
     db: DBSession

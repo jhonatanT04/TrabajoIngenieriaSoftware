@@ -53,7 +53,7 @@ async def create_category(
     }
 
 
-@router.get("/categories", tags=["Categorias"],dependencies=[Depends(RoleChecker(allowed_roles=["Administrador,Cajero"]))])
+@router.get("/categories", tags=["Categorias"],dependencies=[Depends(RoleChecker(allowed_roles=["Administrador","Cajero"]))])
 async def list_categories(
     db: DBSession,
     skip: int = Query(0, ge=0, description="Registros a saltar"),
@@ -74,7 +74,7 @@ async def list_categories(
     return categories
 
 
-@router.get("/categories/root", tags=["Categorias"],dependencies=[Depends(RoleChecker(allowed_roles=["Administrador,Cajero"]))])
+@router.get("/categories/root", tags=["Categorias"],dependencies=[Depends(RoleChecker(allowed_roles=["Administrador","Cajero"]))])
 async def get_root_categories(
     db: DBSession
 ):
@@ -90,7 +90,7 @@ async def get_root_categories(
     return categories
 
 
-@router.get("/categories/{category_id}/subcategories", tags=["Categorias"],dependencies=[Depends(RoleChecker(allowed_roles=["Administrador,Cajero"]))])
+@router.get("/categories/{category_id}/subcategories", tags=["Categorias"],dependencies=[Depends(RoleChecker(allowed_roles=["Administrador","Cajero"]))])
 async def get_subcategories(
     category_id: UUID,
     db: DBSession
