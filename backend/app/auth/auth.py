@@ -25,8 +25,8 @@ SECRET_KEY = os.getenv("SECRET_KEY", "CHANGE_ME_TO_A_SECURE_RANDOM_KEY")
 ALGORITHM = os.getenv("ALGORITHM", "HS256")
 ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "1440"))
 
-# Contexto de encriptación para contraseñas
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+# Contexto de encriptación para contraseñas (usando argon2 en lugar de bcrypt)
+pwd_context = CryptContext(schemes=["argon2"], deprecated="auto")
 
 # Esquema de seguridad para FastAPI
 security = HTTPBearer()

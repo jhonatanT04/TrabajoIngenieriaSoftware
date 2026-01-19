@@ -5,6 +5,14 @@ from typing import Generator
 from dotenv import load_dotenv
 from uuid import uuid4
 import logging
+from passlib.context import CryptContext
+
+# Hash de contraseñas
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+def hash_password(password: str) -> str:
+    """Hash una contraseña"""
+    return pwd_context.hash(password)
 
 # Cargar variables de entorno desde .env
 load_dotenv()
@@ -81,23 +89,26 @@ def seed_data() -> None:
             logger.info(f"✅ Insertados {len(profiles)} perfiles")
             
             # 2. USUARIOS
+            # NOTA: Hash argon2 válido para: admin123
+            ADMIN_HASH = "$argon2id$v=19$m=65536,t=3,p=4$jHEuZcx5D6E0ZgxhTIlxjg$WtS1Yg4+Ckij7xnDd+bRbFO7L1Q6YNM5wkFHEfefSjI"
+            
             users = [
                 User(id=USER_ADMIN_ID, username="admin", email="admin@minimercado.com", 
-                     hashed_password="pbkdf2:sha256:600000$placeholder", profile_id=PROFILE_ADMIN_ID, 
-                     first_name="Justin", last_name="Admin"),
+                     hashed_password=ADMIN_HASH, profile_id=PROFILE_ADMIN_ID, 
+                     first_name="Justin", last_name="Admin", is_active=True),
                 User(id=uuid4(), username="ana_caja", email="ana@mail.com", 
-                     hashed_password="pbkdf2:sha256:600000$placeholder", profile_id=PROFILE_CASHIER_ID, 
-                     first_name="Ana", last_name="López"),
+                     hashed_password=ADMIN_HASH, profile_id=PROFILE_CASHIER_ID, 
+                     first_name="Ana", last_name="López", is_active=True),
                 User(id=uuid4(), username="carlos_ventas", email="carlos@mail.com", 
-                     hashed_password="pbkdf2:sha256:600000$placeholder", profile_id=PROFILE_CASHIER_ID, 
-                     first_name="Carlos", last_name="Ruiz"),
+                     hashed_password=ADMIN_HASH, profile_id=PROFILE_CASHIER_ID, 
+                     first_name="Carlos", last_name="Ruiz", is_active=True),
                 User(id=uuid4(), username="marta_inv", email="marta@mail.com", 
-                     hashed_password="pbkdf2:sha256:600000$placeholder", profile_id=PROFILE_INVENTORY_ID, 
-                     first_name="Marta", last_name="Sosa")
+                     hashed_password=ADMIN_HASH, profile_id=PROFILE_INVENTORY_ID, 
+                     first_name="Marta", last_name="Sosa", is_active=True)
             ]
             session.add_all(users)
             session.commit()
-            logger.info(f"Insertados {len(users)} usuarios")
+            logger.info(f"✅ Insertados {len(users)} usuarios")
             
             # 3. CATEGORÍAS
             categories = [
