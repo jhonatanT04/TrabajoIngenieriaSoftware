@@ -2,7 +2,18 @@ from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.db.database import init_db, seed_data
-from app.routers import router_auth,router_user,router_productos,router_categoria,router_marca,router_proveedor,router_cliente
+from app.routers import (
+    router_auth,
+    router_user,
+    router_productos,
+    router_categoria,
+    router_marca,
+    router_proveedor,
+    router_cliente,
+    router_venta,
+    router_caja,
+    router_inventario
+)
 
 app = FastAPI(
     title="Minimercado - Backend",
@@ -43,5 +54,8 @@ app.include_router(router_auth.router)
 app.include_router(router_productos.router)
 app.include_router(router_categoria.router)
 app.include_router(router_marca.router)
+app.include_router(router_venta.router)
+app.include_router(router_caja.router)
+app.include_router(router_inventario.router)
 
 
