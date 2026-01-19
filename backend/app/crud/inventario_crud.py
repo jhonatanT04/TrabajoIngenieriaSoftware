@@ -3,7 +3,7 @@ from sqlmodel import Session, select
 from uuid import UUID
 from datetime import datetime
 
-from models.models import (
+from app.models.models import (
     Inventory, Location, InventoryMovement, ProductReception,
     ProductReceptionDetail, ProductLabel, MovementType
 )

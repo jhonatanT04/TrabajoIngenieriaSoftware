@@ -1,12 +1,12 @@
 from fastapi import APIRouter, Depends, HTTPException, Query, Body
 from typing import Optional
 from uuid import UUID
-from models.models import Category
+from app.models.models import Category
 from pydantic import BaseModel
 
 
-from deps import  DBSession
-from auth.auth import RoleChecker
+from app.deps import  DBSession
+from app.auth.auth import RoleChecker
 router = APIRouter()
 
 class CategoryCreate(BaseModel):

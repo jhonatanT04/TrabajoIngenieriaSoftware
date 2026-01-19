@@ -9,25 +9,25 @@ from sqlmodel import Session
 from uuid import UUID
 
 # Imports de autenticación
-from auth.auth import decode_token
-from db.database import get_session
+from app.auth.auth import decode_token
+from app.db.database import get_session
 
 # Imports de CRUD
-from crud.users_crud import user, profile, permission, system_parameter
-from crud.products_crud import product, category, brand, product_presentation
-from crud.inventario_crud import (
+from app.crud.users_crud import user, profile, permission, system_parameter
+from app.crud.products_crud import product, category, brand, product_presentation
+from app.crud.inventario_crud import (
     inventory, location, inventory_movement, 
     product_reception, product_reception_detail, product_label
 )
-from crud.proovider_crud import supplier, purchase_order, purchase_order_detail, credit_note
-from crud.sale_crud import sale, sale_detail, promotion, invoice
-from crud.caja_crud import (
+from app.crud.proovider_crud import supplier, purchase_order, purchase_order_detail, credit_note
+from app.crud.sale_crud import sale, sale_detail, promotion, invoice
+from app.crud.caja_crud import (
     cash_register, cash_register_session, payment_method, 
     cash_transaction, sale_payment, cash_count, cash_count_detail,
     customer, customer_preference, loyalty_transaction, customer_notification
 )
 
-from models.models import User, Profile
+from app.models.models import User, Profile
 
 
 # ==================== CONFIGURACIÓN DE SEGURIDAD ====================

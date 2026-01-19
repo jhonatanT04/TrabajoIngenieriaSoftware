@@ -2,8 +2,8 @@ from sqlmodel import select
 from sqlalchemy.exc import NoResultFound
 from typing import Optional, List
 from uuid import UUID
-from models import models
-from db.database import get_session
+from app.models import models
+from app.db.database import get_session
 
 def get_user_by_username(session, username: str) -> Optional[models.User]:
     stmt = select(models.User).where(models.User.username == username)

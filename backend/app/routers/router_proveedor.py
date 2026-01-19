@@ -3,9 +3,9 @@ from typing import Optional
 from uuid import UUID
 from pydantic import BaseModel
 
-from models.models import Supplier
-from deps import DBSession
-from auth.auth import RoleChecker
+from app.models.models import Supplier
+from app.deps import DBSession
+from app.auth.auth import RoleChecker
 router = APIRouter()
 
 

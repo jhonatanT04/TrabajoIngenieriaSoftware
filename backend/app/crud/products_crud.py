@@ -2,7 +2,7 @@ from typing import Optional, List
 from sqlmodel import Session, select
 from uuid import UUID
 
-from models.models import (
+from app.models.models import (
     Product, Category, Brand, ProductPresentation
 )
 from .base_crud import CRUDBase

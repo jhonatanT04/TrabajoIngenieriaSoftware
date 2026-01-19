@@ -1,5 +1,5 @@
 import os
-from models.models import Brand, CashRegister, Category, Customer, PaymentMethod, Product, Profile, User
+from app.models.models import Brand, CashRegister, Category, Customer, PaymentMethod, Product, Profile, User
 from sqlmodel import SQLModel, create_engine, Session
 from typing import Generator
 from dotenv import load_dotenv
@@ -11,7 +11,7 @@ load_dotenv()
 
 DATABASE_URL = os.getenv(
     "DATABASE_URL",
-    "postgresql+psycopg2://postgres:root@localhost:5432/minimercado",
+    "postgresql+psycopg2://postgres:123456e@localhost:5432/minimercado",
 )
 
 engine = create_engine(DATABASE_URL, echo=False)

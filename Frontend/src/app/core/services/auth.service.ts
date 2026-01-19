@@ -1,6 +1,8 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable, of, throwError } from 'rxjs';
-import { delay } from 'rxjs/operators';
+import { BehaviorSubject, Observable, of } from 'rxjs';
+import { tap } from 'rxjs/operators';
+import { HttpClient } from '@angular/common/http';
+import { environment } from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -9,9 +11,9 @@ export class AuthService {
 
   private currentUserSubject = new BehaviorSubject<any>(null);
   currentUser$ = this.currentUserSubject.asObservable();
+  private baseUrl = `${environment.apiUrl}/auth`;
 
-  constructor() {
-
+  constructor(private http: HttpClient) {
     const user = localStorage.getItem('user');
     if (user) {
       this.currentUserSubject.next(JSON.parse(user));
@@ -19,42 +21,46 @@ export class AuthService {
   }
 
   login(username: string, password: string): Observable<any> {
-
-    if (username === 'admin' && password === 'admin') {
-      return this.setSession({
-        username,
-        role: 'ADMIN',
-        token: 'jwt-mock'
-      });
-    }
-
-    if (username === 'cajero' && password === '1234') {
-      return this.setSession({
-        username,
-        role: 'CAJERO',
-        token: 'jwt-mock'
-      });
-    }
-
-    return throwError(() => new Error('Credenciales inválidas'));
+    return this.http.post<any>(`${this.baseUrl}/login`, { username, password }).pipe(
+      tap((res) => {
+        const sessionUser = {
+          id: res?.user?.id,
+          username: res?.user?.username,
+          email: res?.user?.email,
+          first_name: res?.user?.first_name,
+          last_name: res?.user?.last_name,
+          role: res?.user?.profile_name, // compat: mantener 'role' para guards
+          token: res?.access_token,
+          tokenType: res?.token_type
+        };
+        localStorage.setItem('user', JSON.stringify(sessionUser));
+        this.currentUserSubject.next(sessionUser);
+      })
+    );
   }
 
-  register(data: any): Observable<any> {
-
-    return of({ success: true }).pipe(delay(1000));
+  register(data: { username: string; email: string; password: string; first_name?: string; last_name?: string; profile_name?: string; }): Observable<any> {
+    return this.http.post<any>(`${this.baseUrl}/register`, data).pipe(
+      tap((res) => {
+        const sessionUser = {
+          id: res?.user?.id,
+          username: res?.user?.username,
+          email: res?.user?.email,
+          first_name: res?.user?.first_name,
+          last_name: res?.user?.last_name,
+          role: res?.user?.profile_name,
+          token: res?.access_token,
+          tokenType: res?.token_type
+        };
+        localStorage.setItem('user', JSON.stringify(sessionUser));
+        this.currentUserSubject.next(sessionUser);
+      })
+    );
   }
 
   forgotPassword(email: string): Observable<any> {
-
-    return of({ message: 'Correo enviado' }).pipe(delay(1000));
-  }
-
-  
-
-  private setSession(user: any): Observable<any> {
-    localStorage.setItem('user', JSON.stringify(user));
-    this.currentUserSubject.next(user);
-    return of(user).pipe(delay(800));
+    // No endpoint en backend; mantener placeholder
+    return of({ message: 'Correo enviado (simulado)' });
   }
 
   logout(): void {
@@ -62,10 +68,15 @@ export class AuthService {
     this.currentUserSubject.next(null);
   }
 
-  
-
   isAuthenticated(): boolean {
-    return !!localStorage.getItem('user');
+    const user = localStorage.getItem('user');
+    if (!user) return false;
+    try {
+      const u = JSON.parse(user);
+      return !!u?.token;
+    } catch {
+      return false;
+    }
   }
 
   getUser(): any {
@@ -73,6 +84,6 @@ export class AuthService {
   }
 
   getRole(): string | null {
-    return this.getUser()?.role || null;
+    return this.getUser()?.role || null; // 'role' mapeado desde profile_name
   }
 }

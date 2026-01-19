@@ -1,8 +1,8 @@
 from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
 
-from db.database import init_db, seed_data
-from routers import router_auth,router_user,router_productos,router_categoria,router_marca,router_proveedor,router_cliente
+from app.db.database import init_db, seed_data
+from app.routers import router_auth,router_user,router_productos,router_categoria,router_marca,router_proveedor,router_cliente
 
 app = FastAPI(
     title="Minimercado - Backend",

@@ -3,7 +3,7 @@ from sqlmodel import Session, select
 from uuid import UUID
 from datetime import datetime
 
-from models.models import (
+from app.models.models import (
     Supplier, PurchaseOrder, PurchaseOrderDetail, CreditNote, OrderStatus
 )
 from .base_crud import CRUDBase

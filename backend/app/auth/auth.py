@@ -7,16 +7,16 @@ from typing import Optional, Any
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from passlib.context import CryptContext
-import jwt
-from jwt.exceptions import PyJWTError
+from jose import jwt
+from jose.exceptions import JWTError
 from sqlmodel import Session
 from uuid import UUID
 from dotenv import load_dotenv
 import os
 
-from db.database import get_session
-from models.models import User
-from crud import users_crud
+from app.db.database import get_session
+from app.models.models import User
+from app.crud import users_crud
 
 load_dotenv()
 
@@ -86,7 +86,7 @@ def decode_token(token: str) -> Optional[dict]:
         return payload
     except jwt.ExpiredSignatureError:
         return None
-    except PyJWTError:
+    except JWTError:
         return None
 
 

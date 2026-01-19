@@ -9,11 +9,10 @@ import { environment } from '../../../environments/environment';
   providedIn: 'root'
 })
 export class ProductoService {
-  private apiUrl = `${environment.apiUrl}/productos`;
+  private apiUrl = `${environment.apiUrl}/products`;
 
   constructor(private http: HttpClient) {}
 
-  
   getAll(params?: any): Observable<Producto[]> {
     let httpParams = new HttpParams();
     if (params) {
@@ -26,61 +25,49 @@ export class ProductoService {
     return this.http.get<Producto[]>(this.apiUrl, { params: httpParams });
   }
 
-  
-  getById(id: number): Observable<Producto> {
+  getById(id: string): Observable<Producto> {
     return this.http.get<Producto>(`${this.apiUrl}/${id}`);
   }
 
-  
   getByCodigo(codigo: string): Observable<Producto> {
-    return this.http.get<Producto>(`${this.apiUrl}/codigo/${codigo}`);
+    return this.http.get<Producto>(`${this.apiUrl}/sku/${codigo}`);
   }
 
-  
   create(data: ProductoCreateRequest): Observable<Producto> {
     return this.http.post<Producto>(this.apiUrl, data);
   }
 
-  
-  update(id: number, data: Partial<Producto>): Observable<Producto> {
+  update(id: string, data: Partial<Producto>): Observable<Producto> {
     return this.http.put<Producto>(`${this.apiUrl}/${id}`, data);
   }
 
-  
-  delete(id: number): Observable<void> {
+  delete(id: string): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/${id}`);
   }
 
-  
   search(query: string): Observable<Producto[]> {
-    return this.http.get<Producto[]>(`${this.apiUrl}/search`, {
-      params: { q: query }
+    return this.http.get<Producto[]>(`${this.apiUrl}/search/name`, {
+      params: { name: query }
     });
   }
 
-  
   getStockBajo(): Observable<Producto[]> {
-    return this.http.get<Producto[]>(`${this.apiUrl}/stock-bajo`);
+    return this.http.get<Producto[]>(`${this.apiUrl}/low-stock/list`);
   }
 
-
-  
   getCategorias(): Observable<Categoria[]> {
-    return this.http.get<Categoria[]>(`${environment.apiUrl}/categorias`);
+    return this.http.get<Categoria[]>(`${environment.apiUrl}/categories`);
   }
 
-  
   createCategoria(data: Partial<Categoria>): Observable<Categoria> {
-    return this.http.post<Categoria>(`${environment.apiUrl}/categorias`, data);
+    return this.http.post<Categoria>(`${environment.apiUrl}/categories`, data);
   }
 
-  
-  updateCategoria(id: number, data: Partial<Categoria>): Observable<Categoria> {
-    return this.http.put<Categoria>(`${environment.apiUrl}/categorias/${id}`, data);
+  updateCategoria(id: string, data: Partial<Categoria>): Observable<Categoria> {
+    return this.http.put<Categoria>(`${environment.apiUrl}/categories/${id}`, data);
   }
 
-  
-  deleteCategoria(id: number): Observable<void> {
-    return this.http.delete<void>(`${environment.apiUrl}/categorias/${id}`);
+  deleteCategoria(id: string): Observable<void> {
+    return this.http.delete<void>(`${environment.apiUrl}/categories/${id}`);
   }
 }

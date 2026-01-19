@@ -1,10 +1,10 @@
 fastapi==0.100.0
 uvicorn[standard]==0.22.0
 sqlmodel==0.0.8
-SQLAlchemy==2.0.20
+SQLAlchemy==1.4.41
 python-jose==3.3.0
 passlib[bcrypt]==1.7.4
 python-multipart==0.0.6
 psycopg2-binary==2.9.7
-bcrypt==3.2.2
-passlib==1.7.4
+python-dotenv==1.0.0
+email-validator==2.1.0

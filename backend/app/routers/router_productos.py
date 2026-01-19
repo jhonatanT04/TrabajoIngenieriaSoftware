@@ -3,10 +3,10 @@ from typing import Optional
 from uuid import UUID
 from pydantic import BaseModel
 
-from deps import *
-from models.models import *
-from auth.auth import RoleChecker
-from deps import DBSession
+from app.deps import *
+from app.models.models import *
+from app.auth.auth import RoleChecker
+from app.deps import DBSession
 router = APIRouter()
 
 class ProductCreate(BaseModel):

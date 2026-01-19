@@ -1,6 +1,6 @@
 
 from typing import Optional
-from models.enums import *
+from app.models.enums import *
 from sqlmodel import SQLModel, Field, Relationship
 from uuid import uuid4, UUID
 from datetime import datetime

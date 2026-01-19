@@ -2,10 +2,10 @@ from fastapi import APIRouter,Depends, HTTPException, Query, Body
 from typing import  Optional
 from uuid import UUID
 from pydantic import BaseModel
-from models.models import Customer
+from app.models.models import Customer
 
-from deps import get_db, DBSession
-from auth.auth import RoleChecker
+from app.deps import get_db, DBSession
+from app.auth.auth import RoleChecker
 router = APIRouter()
 
 class CustomerCreate(BaseModel):

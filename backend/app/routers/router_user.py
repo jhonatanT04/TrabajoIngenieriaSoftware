@@ -4,13 +4,13 @@ from uuid import UUID
 
 from pydantic import BaseModel
 
-from db.database import get_session
-from deps import *
-from models.models import *
-from crud.users_crud import *
+from app.db.database import get_session
+from app.deps import *
+from app.models.models import *
+from app.crud.users_crud import *
 
-from deps import get_db, DBSession
-from auth.auth import RoleChecker
+from app.deps import get_db, DBSession
+from app.auth.auth import RoleChecker
 router = APIRouter()
 
 class UserCreate(BaseModel):

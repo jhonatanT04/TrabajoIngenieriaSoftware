@@ -9,10 +9,10 @@ from pydantic import BaseModel, EmailStr
 from typing import Optional
 from uuid import UUID
 
-from db.database import get_session
-from models.models import User, Profile
-from crud import users_crud
-from auth.auth import (
+from app.db.database import get_session
+from app.models.models import User, Profile
+from app.crud import users_crud
+from app.auth.auth import (
     authenticate_user,
     create_user_token,
     get_password_hash,

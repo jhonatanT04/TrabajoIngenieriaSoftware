@@ -7,7 +7,7 @@ from sqlmodel import Session, select
 from uuid import UUID
 from datetime import datetime
 
-from models.models import (
+from app.models.models import (
     CashRegister, CashRegisterSession, PaymentMethod, CashTransaction,
     SalePayment, CashCount, CashCountDetail, Customer, CustomerPreference,
     LoyaltyTransaction, CustomerNotification, SessionStatus, TransactionType,
