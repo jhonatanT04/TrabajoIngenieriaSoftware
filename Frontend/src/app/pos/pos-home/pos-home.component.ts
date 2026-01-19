@@ -2,7 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { InventarioService } from '../../core/services/inventario.service';
+import { ProductoService } from '../../core/services/producto.service';
+
 @Component({
   standalone: true,
   selector: 'app-pos-home',
@@ -11,18 +12,29 @@ import { InventarioService } from '../../core/services/inventario.service';
   styleUrls: ['./pos-home.component.css']
 })
 export class PosHomeComponent implements OnInit {
-
   search = '';
   carrito: any[] = [];
   productos: any[] = [];
+  loading = false;
 
   constructor(
     private router: Router,
-    private inventario: InventarioService
+    private productoService: ProductoService
   ) {}
 
   ngOnInit() {
-    this.productos = this.inventario.getProductos();
+    this.loadProductos();
+  }
+
+  loadProductos() {
+    this.loading = true;
+    this.productoService.getAll().subscribe({
+      next: (productos) => {
+        this.productos = productos;
+        this.loading = false;
+      },
+      error: () => this.loading = false
+    });
   }
 
   agregar(producto: any) {

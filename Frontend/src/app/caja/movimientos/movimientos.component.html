@@ -1,6 +1,8 @@
 <h2>Movimientos de Caja</h2>
 
-<table *ngIf="cajaService.getMovimientos().length > 0">
+<div *ngIf="loading">Cargando...</div>
+
+<table *ngIf="!loading && getMovimientos().length > 0">
   <thead>
     <tr>
       <th>Fecha</th>
@@ -10,19 +12,19 @@
     </tr>
   </thead>
   <tbody>
-    <tr *ngFor="let m of cajaService.getMovimientos()">
-      <td>{{ m.fecha | date:'short' }}</td>
-      <td>{{ m.tipo }}</td>
-      <td>{{ m.descripcion }}</td>
+    <tr *ngFor="let m of getMovimientos()">
+      <td>{{ m.created_at | date:'short' }}</td>
+      <td>{{ m.transaction_type }}</td>
+      <td>{{ m.description }}</td>
       <td
-        [style.color]="m.tipo === 'INGRESO' ? 'green' : 'red'"
+        [style.color]="m.transaction_type === 'ingreso' ? 'green' : 'red'"
       >
-        ${{ m.monto | number:'1.2-2' }}
+        ${{ m.amount | number:'1.2-2' }}
       </td>
     </tr>
   </tbody>
 </table>
 
-<p *ngIf="cajaService.getMovimientos().length === 0">
+<p *ngIf="!loading && getMovimientos().length === 0">
   No existen movimientos registrados.
 </p>

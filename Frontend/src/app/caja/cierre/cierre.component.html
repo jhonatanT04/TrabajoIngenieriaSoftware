@@ -1,10 +1,23 @@
 <h2>Cierre de Caja</h2>
 
-<div *ngIf="cajaService.getEstado().abierta">
-  <p>Total esperado: ${{ cajaService.getEstado().total }}</p>
-  <button (click)="cerrar()">Cerrar Caja</button>
+<div *ngIf="loading">Cargando...</div>
+
+<div *ngIf="!loading && getEstado().abierta">
+  <p>Total esperado: ${{ getEstado().total }}</p>
+  
+  <div>
+    <label>Monto real en caja:</label>
+    <input type="number" [(ngModel)]="actualClosingAmount" />
+  </div>
+  
+  <div>
+    <label>Notas:</label>
+    <textarea [(ngModel)]="notes"></textarea>
+  </div>
+  
+  <button (click)="cerrar()" [disabled]="loading">Cerrar Caja</button>
 </div>
 
-<div *ngIf="!cajaService.getEstado().abierta">
+<div *ngIf="!loading && !getEstado().abierta">
   <p>No hay caja abierta</p>
 </div>

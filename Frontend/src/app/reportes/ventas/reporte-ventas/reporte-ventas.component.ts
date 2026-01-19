@@ -9,12 +9,19 @@ import { ReportesService } from '../../services/reportes.service';
   templateUrl: './reporte-ventas.component.html'
 })
 export class ReporteVentasComponent implements OnInit {
-
   ventas: any[] = [];
+  loading = false;
 
   constructor(private reportes: ReportesService) {}
 
   ngOnInit() {
-    this.ventas = this.reportes.reporteVentas();
+    this.loading = true;
+    this.reportes.reporteVentas().subscribe({
+      next: (data) => {
+        this.ventas = data;
+        this.loading = false;
+      },
+      error: () => this.loading = false
+    });
   }
 }

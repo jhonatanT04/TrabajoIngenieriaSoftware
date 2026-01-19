@@ -1,32 +1,33 @@
 import { Injectable } from '@angular/core';
 import { CajaService } from '../../core/services/caja.service';
-import { MovimientosService } from '../../core/services/movimientos.service';
-import { ClientesService } from '../../core/services/clientes.service';
+import { InventarioService } from '../../core/services/inventario.service';
+import { ClienteService } from '../../core/services/cliente.service';
+import { VentaService } from '../../core/services/venta.service';
+import { Observable } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class ReportesService {
 
   constructor(
     private caja: CajaService,
-    private movimientos: MovimientosService,
-    private clientes: ClientesService
+    private inventario: InventarioService,
+    private clientes: ClienteService,
+    private ventas: VentaService
   ) {}
 
-  reporteCaja() {
-    return this.caja.getEstado();
+  reporteCaja(): Observable<any> {
+    return this.caja.getSessions({ status: 'abierta' });
   }
 
-  reporteInventario() {
-    return this.movimientos.getAll();
+  reporteInventario(): Observable<any> {
+    return this.inventario.getMovements();
   }
 
-  reporteClientes() {
+  reporteClientes(): Observable<any> {
     return this.clientes.getAll();
   }
 
-  reporteVentas() {
-    return this.movimientos
-      .getAll()
-      .filter((m: any) => m.tipo === 'SALIDA');
+  reporteVentas(): Observable<any> {
+    return this.ventas.getAll();
   }
 }

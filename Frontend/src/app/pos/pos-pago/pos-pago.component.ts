@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 
 import { PosProducto } from '../../core/models/pos-product.model';
-import { CajaService } from '../../core/services/caja.service';
+import { VentaService } from '../../core/services/venta.service';
 
 @Component({
   standalone: true,
@@ -14,13 +14,13 @@ import { CajaService } from '../../core/services/caja.service';
   styleUrls: ['./pos-pago.component.css']
 })
 export class PosPagoComponent {
-
   carrito: PosProducto[] = history.state.carrito || [];
   efectivo: number = 0;
+  loading = false;
 
   constructor(
     private router: Router,
-    private cajaService: CajaService
+    private ventaService: VentaService
   ) {}
 
   total(): number {
@@ -38,8 +38,8 @@ export class PosPagoComponent {
   pagar(): void {
     const totalVenta = this.total();
 
-    this.cajaService.registrarVenta(totalVenta);
-
+    // TODO: Implementar creación de venta en el backend
+    // Por ahora solo navegamos al ticket
     this.router.navigate(['/pos/ticket'], {
       state: {
         carrito: this.carrito,

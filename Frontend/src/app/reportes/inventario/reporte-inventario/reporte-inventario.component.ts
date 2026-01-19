@@ -9,12 +9,19 @@ import { ReportesService } from '../../services/reportes.service';
   templateUrl: './reporte-inventario.component.html'
 })
 export class ReporteInventarioComponent implements OnInit {
-
   movimientos: any[] = [];
+  loading = false;
 
   constructor(private reportes: ReportesService) {}
 
   ngOnInit() {
-    this.movimientos = this.reportes.reporteInventario();
+    this.loading = true;
+    this.reportes.reporteInventario().subscribe({
+      next: (data) => {
+        this.movimientos = data;
+        this.loading = false;
+      },
+      error: () => this.loading = false
+    });
   }
 }

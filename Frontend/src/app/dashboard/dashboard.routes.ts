@@ -3,6 +3,7 @@ import { AdminDashboardComponent } from './admin-dashboard/admin-dashboard.compo
 import { CajeroDashboardComponent } from './cajero-dashboard/cajero-dashboard.component';
 import { AlmacenDashboardComponent } from './almacen-dashboard/almacen-dashboard.component';
 import { ContadorDashboardComponent } from './contador-dashboard/contador-dashboard.component';
+import { inject } from '@angular/core';
 import { AuthService } from '../core/services/auth.service';
 
 export const DASHBOARD_ROUTES: Routes = [
@@ -10,7 +11,7 @@ export const DASHBOARD_ROUTES: Routes = [
     path: '',
     resolve: {
       roleRedirect: () => {
-        const auth = new AuthService();
+        const auth = inject(AuthService);
         const role = auth.getRole();
 
         switch (role) {
