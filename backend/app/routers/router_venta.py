@@ -6,7 +6,7 @@ from datetime import datetime
 from sqlmodel import select
 
 from app.deps import DBSession
-from app.models.models import Sale, SaleDetail, Customer, CashRegister, PaymentMethod, Inventory, InventoryMovement
+from app.models.models import Sale, SaleDetail, Customer, CashRegister, PaymentMethod, Inventory, InventoryMovement, Product
 from app.auth.auth import RoleChecker, get_current_user
 from app.models.enums import SaleStatus, MovementType
 
@@ -28,6 +28,12 @@ def format_sale_response(sale: Sale):
             "first_name": sale.customer.first_name,
             "last_name": sale.customer.last_name
         } if sale.customer else None,
+        "cashier": {
+            "id": str(sale.cashier.id),
+            "username": sale.cashier.username,
+            "first_name": sale.cashier.first_name,
+            "last_name": sale.cashier.last_name
+        } if sale.cashier else None,
         "subtotal": sale.subtotal,
         "discount_amount": sale.discount_amount,
         "tax_amount": sale.tax_amount,
@@ -133,6 +139,21 @@ async def create_sale(
     discount_total = 0.0
     tax_total = 0.0
     
+    # ⭐ VALIDAR STOCK DISPONIBLE PARA CADA PRODUCTO
+    for item in sale_data.items:
+        inventory_query = select(Inventory).where(Inventory.product_id == item.product_id)
+        inventory = db.exec(inventory_query).first()
+        
+        if not inventory or inventory.quantity < item.quantity:
+            available = inventory.quantity if inventory else 0
+            product_query = select(Product).where(Product.id == item.product_id)
+            product = db.exec(product_query).first()
+            product_name = product.name if product else "Producto desconocido"
+            raise HTTPException(
+                status_code=400, 
+                detail=f"Stock insuficiente para {product_name}. Solicitado: {item.quantity}, Disponible: {available}"
+            )
+    
     for item in sale_data.items:
         item_subtotal = item.quantity * item.unit_price
         item_discount = item_subtotal * (item.discount_percentage / 100)
@@ -193,14 +214,18 @@ async def create_sale(
             db.add(inventory)
         
         # ⭐ CREAR MOVIMIENTO DE INVENTARIO (SALIDA POR VENTA)
+        previous_stock = inventory.quantity if inventory else 0  # Stock antes de la salida
+        new_stock = previous_stock - item.quantity  # Stock después de la salida
+        
         movement = InventoryMovement(
             product_id=item.product_id,
             movement_type=MovementType.salida,
             quantity=item.quantity,
+            previous_stock=previous_stock,
+            new_stock=new_stock,
             unit_cost=item.unit_price,
             total_cost=item.quantity * item.unit_price,
             reference_document=f"Venta {sale_number}",
-            notes=f"Venta a cliente (Sale ID: {new_sale.id})",
             user_id=current_user.id,
             movement_date=dt.datetime.utcnow(),
             created_at=dt.datetime.utcnow()
@@ -267,6 +292,8 @@ async def delete_sale(
 ):
     """
     Eliminar una venta (sin autenticación para desarrollo)
+    ⭐ NOTA: El stock NO se restaura. Se mantiene deducido después de eliminar la venta.
+    Solo se elimina el registro de la transacción.
     """
     query = select(Sale).where(Sale.id == sale_id)
     sale = db.exec(query).first()
@@ -274,24 +301,16 @@ async def delete_sale(
     if not sale:
         raise HTTPException(status_code=404, detail="Venta no encontrada")
     
-    # Revertir el inventario si la venta estaba completada
-    if sale.status.value == 'completada':
-        # Obtener movimientos de inventario de esta venta
+    # Obtener movimientos de inventario de esta venta para eliminarlos
+    # (NO restauramos el stock, solo eliminamos el registro del movimiento)
+    status_value = sale.status.value if hasattr(sale.status, 'value') else str(sale.status)
+    if status_value == 'completada':
         movement_query = select(InventoryMovement).where(
             InventoryMovement.reference_document.like(f"%Venta {sale.sale_number}%")
         )
         movements = db.exec(movement_query).all()
         
-        # Revertir cada movimiento
-        for movement in movements:
-            inventory_query = select(Inventory).where(Inventory.product_id == movement.product_id)
-            inventory = db.exec(inventory_query).first()
-            if inventory:
-                # Sumar de vuelta la cantidad
-                inventory.quantity += movement.quantity
-                db.add(inventory)
-        
-        # Eliminar movimientos de inventario
+        # Eliminar movimientos de inventario (SIN restaurar stock)
         for movement in movements:
             db.delete(movement)
     
@@ -303,7 +322,7 @@ async def delete_sale(
     db.delete(sale)
     db.commit()
     
-    return {"message": "Venta eliminada correctamente", "id": str(sale_id)}
+    return {"message": "Venta eliminada correctamente. Stock permanece deducido.", "id": str(sale_id)}
 
 
 @router.post("/sales/{sale_id}/cancelar", tags=["Ventas"], dependencies=[Depends(RoleChecker(allowed_roles=["Administrador"]))])

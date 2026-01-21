@@ -41,7 +41,9 @@
       <div class="add-line">
         <select [(ngModel)]="nuevoProducto.producto_id" name="producto">
           <option value="" disabled>Selecciona producto</option>
-          <option *ngFor="let p of productos" [value]="p.id">{{ p.name }} - ${{ p.sale_price }}</option>
+          <option *ngFor="let p of productos" [value]="p.id" [disabled]="getStockProducto(p.id) <= 0">
+            {{ p.name }} - ${{ p.sale_price }} (Stock: {{ getStockProducto(p.id) }})
+          </option>
         </select>
         <input type="number" min="1" [(ngModel)]="nuevoProducto.cantidad" name="cantidad" />
         <button type="button" (click)="agregarProducto()">Agregar</button>

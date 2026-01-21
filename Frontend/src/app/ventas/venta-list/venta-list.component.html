@@ -9,7 +9,10 @@
       </a>
     </div>
 
-    
+    <div class="alert alert-error" *ngIf="error">
+      {{ error }}
+    </div>
+
     <div class="filters-section">
       <div class="search-box">
         <span class="material-icons">search</span>

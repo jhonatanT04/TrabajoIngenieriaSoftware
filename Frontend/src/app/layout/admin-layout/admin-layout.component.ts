@@ -2,6 +2,7 @@ import { Component, computed, inject, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule, NavigationEnd } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
+import { DialogComponent } from '../../shared/components/dialog/dialog.component';
 
 interface MenuItem {
   label: string;
@@ -13,7 +14,7 @@ interface MenuItem {
 @Component({
   selector: 'app-admin-layout',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, DialogComponent],
   templateUrl: './admin-layout.component.html',
   styleUrls: ['./admin-layout.component.css']
 })

@@ -6,6 +6,7 @@ import { UsuarioService } from '../../core/services/usuario.service';
 import { ClienteService } from '../../core/services/cliente.service';
 import { ProductoService } from '../../core/services/producto.service';
 import { VentaService } from '../../core/services/venta.service';
+import { InventarioService } from '../../core/services/inventario.service';
 
 interface LineaVenta {
   producto_id: string;
@@ -26,6 +27,7 @@ export class VentaCreateComponent implements OnInit {
   usuarios: any[] = [];
   clientes: any[] = [];
   productos: any[] = [];
+  inventario: any[] = [];
   lineas: LineaVenta[] = [];
 
   venta = {
@@ -49,6 +51,7 @@ export class VentaCreateComponent implements OnInit {
     private clienteService: ClienteService,
     private productoService: ProductoService,
     private ventaService: VentaService,
+    private inventarioService: InventarioService,
     private router: Router
   ) {}
 
@@ -89,6 +92,22 @@ export class VentaCreateComponent implements OnInit {
         this.error = 'No se pudieron cargar los productos';
       }
     });
+
+    this.inventarioService.getAll().subscribe({
+      next: (inventario) => {
+        console.log('✅ Inventario cargado:', inventario);
+        this.inventario = inventario;
+      },
+      error: (err) => {
+        console.error('❌ Error cargando inventario:', err);
+        this.error = 'No se pudieron cargar los datos de inventario';
+      }
+    });
+  }
+
+  getStockProducto(productoId: string): number {
+    const item = this.inventario.find(i => i.product_id === productoId);
+    return item ? item.quantity : 0;
   }
 
   agregarProducto(): void {
@@ -100,6 +119,18 @@ export class VentaCreateComponent implements OnInit {
     const producto = this.productos.find(p => p.id === this.nuevoProducto.producto_id);
     if (!producto) {
       this.error = 'Producto no encontrado';
+      return;
+    }
+
+    // ⭐ VALIDAR STOCK DISPONIBLE
+    const stockDisponible = this.getStockProducto(this.nuevoProducto.producto_id);
+    if (stockDisponible <= 0) {
+      this.error = `${producto.name} no tiene stock disponible`;
+      return;
+    }
+
+    if (this.nuevoProducto.cantidad > stockDisponible) {
+      this.error = `${producto.name} solo tiene ${stockDisponible} unidades disponibles`;
       return;
     }
 
