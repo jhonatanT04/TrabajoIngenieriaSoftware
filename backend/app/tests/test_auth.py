@@ -1,7 +1,7 @@
 import unittest
 from fastapi.testclient import TestClient
 from unittest.mock import patch
-from main import app
+from app.main import app
 
 client = TestClient(app)
 
@@ -22,7 +22,7 @@ class TestAuthLogin(unittest.TestCase):
 
 class TestAuthRegister(unittest.TestCase):
 
-    @patch("crud.users_crud.user.get_by_username")
+    @patch("app.crud.users_crud.user.get_by_username")
     def test_register_usuario_existente(self, mock_get_user):
         mock_get_user.return_value = True
 

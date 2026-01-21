@@ -38,24 +38,24 @@
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let producto of paginatedProductos" [class.inactive]="!producto.activo">
-          <td><span class="badge badge-info">{{ producto.codigo }}</span></td>
+        <tr *ngFor="let producto of paginatedProductos" [class.inactive]="!producto.is_active">
+          <td><span class="badge badge-info">{{ producto.sku }}</span></td>
           <td>
             <div class="product-info">
-              <p class="product-name">{{ producto.nombre }}</p>
-              <p class="product-desc">{{ producto.descripcion }}</p>
+              <p class="product-name">{{ producto.name }}</p>
+              <p class="product-desc">{{ producto.description }}</p>
             </div>
           </td>
-          <td>{{ producto.categoria }}</td>
-          <td><strong>${{ producto.precioVenta | number: '1.2-2' }}</strong></td>
+          <td>{{ producto.category?.name || 'Sin categoría' }}</td>
+          <td><strong>${{ producto.sale_price | number: '1.2-2' }}</strong></td>
           <td>
-            <span [class.stock-low]="producto.stock < 50">{{ producto.stock }} unidades</span>
+            <span [class.stock-low]="producto.stock_min < 50">{{ producto.stock_min }} unidades</span>
           </td>
           <td>
             <span
-              [class]="producto.activo ? 'badge badge-success' : 'badge badge-danger'"
+              [class]="producto.is_active ? 'badge badge-success' : 'badge badge-danger'"
             >
-              {{ producto.activo ? 'Activo' : 'Inactivo' }}
+              {{ producto.is_active ? 'Activo' : 'Inactivo' }}
             </span>
           </td>
           <td class="actions">

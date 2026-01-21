@@ -38,15 +38,15 @@
       </thead>
       <tbody>
         <tr *ngFor="let cliente of paginatedClientes">
-          <td>{{ cliente.nombre }}</td>
+          <td>{{ cliente.first_name }} {{ cliente.last_name }}</td>
           <td>{{ cliente.email }}</td>
-          <td>{{ cliente.telefono }}</td>
+          <td>{{ cliente.phone }}</td>
           <td>
-            <span [class.debt-high]="cliente.deuda > 0">${{ cliente.deuda | number: '1.2-2' }}</span>
+            <span class="loyalty-points">{{ cliente.loyalty_points | number: '1.0-0' }} pts</span>
           </td>
           <td>
-            <span [class]="'badge badge-' + (cliente.estado === 'Activo' ? 'success' : 'danger')">
-              {{ cliente.estado }}
+            <span [class]="'badge badge-' + (cliente.is_active ? 'success' : 'danger')">
+              {{ cliente.is_active ? 'Activo' : 'Inactivo' }}
             </span>
           </td>
           <td class="actions">

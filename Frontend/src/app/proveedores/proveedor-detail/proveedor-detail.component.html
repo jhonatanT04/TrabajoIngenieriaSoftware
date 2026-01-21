@@ -1,0 +1,160 @@
+<div class="page-container">
+  <!-- Loading -->
+  <div *ngIf="loading" class="text-center py-5">
+    <div class="spinner-border" role="status">
+      <span class="visually-hidden">Cargando...</span>
+    </div>
+  </div>
+
+  <!-- Error -->
+  <div *ngIf="error && !loading" class="alert alert-danger">
+    {{ error }}
+    <button class="btn btn-primary mt-3" (click)="volver()">Volver a Proveedores</button>
+  </div>
+
+  <!-- Detalle del Proveedor -->
+  <div *ngIf="proveedor && !loading" class="proveedor-detail">
+    <!-- Header -->
+    <div class="page-header">
+      <div>
+        <h1 class="page-title">
+          <span class="material-icons">business</span>
+          {{ proveedor.business_name }}
+        </h1>
+        <p class="page-subtitle">
+          <span class="badge" [ngClass]="proveedor.is_active ? 'bg-success' : 'bg-danger'">
+            {{ proveedor.is_active ? 'Activo' : 'Inactivo' }}
+          </span>
+        </p>
+      </div>
+      <div class="header-actions">
+        <button class="btn btn-light me-2" (click)="volver()">
+          <span class="material-icons">arrow_back</span>
+          Volver
+        </button>
+        <button class="btn btn-primary" (click)="editar()">
+          <span class="material-icons">edit</span>
+          Editar
+        </button>
+      </div>
+    </div>
+
+    <!-- Contenido -->
+    <div class="row">
+      <!-- Información Principal -->
+      <div class="col-md-8">
+        <div class="card mb-4">
+          <div class="card-header">
+            <h5 class="mb-0">Información General</h5>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label class="text-muted">Razón Social</label>
+                <p class="fw-bold">{{ proveedor.business_name }}</p>
+              </div>
+              <div class="col-md-6 mb-3">
+                <label class="text-muted">RUC / Tax ID</label>
+                <p class="fw-bold">{{ proveedor.tax_id || 'N/A' }}</p>
+              </div>
+              <div class="col-md-6 mb-3">
+                <label class="text-muted">Nombre de Contacto</label>
+                <p>{{ proveedor.contact_name || 'N/A' }}</p>
+              </div>
+              <div class="col-md-6 mb-3">
+                <label class="text-muted">Estado</label>
+                <p>
+                  <span [ngClass]="proveedor.is_active ? 'badge bg-success' : 'badge bg-danger'">
+                    {{ proveedor.is_active ? 'Activo' : 'Inactivo' }}
+                  </span>
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Información de Contacto -->
+        <div class="card mb-4">
+          <div class="card-header">
+            <h5 class="mb-0">Datos de Contacto</h5>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label class="text-muted">Email</label>
+                <p>
+                  <a *ngIf="proveedor.email" [href]="'mailto:' + proveedor.email" class="text-primary">
+                    {{ proveedor.email }}
+                  </a>
+                  <span *ngIf="!proveedor.email">N/A</span>
+                </p>
+              </div>
+              <div class="col-md-6 mb-3">
+                <label class="text-muted">Teléfono</label>
+                <p>
+                  <a *ngIf="proveedor.phone" [href]="'tel:' + proveedor.phone" class="text-primary">
+                    {{ proveedor.phone }}
+                  </a>
+                  <span *ngIf="!proveedor.phone">N/A</span>
+                </p>
+              </div>
+              <div class="col-md-12 mb-3">
+                <label class="text-muted">Dirección</label>
+                <p>{{ proveedor.address || 'N/A' }}</p>
+              </div>
+              <div class="col-md-6 mb-3">
+                <label class="text-muted">Ciudad</label>
+                <p>{{ proveedor.city || 'N/A' }}</p>
+              </div>
+              <div class="col-md-6 mb-3">
+                <label class="text-muted">País</label>
+                <p>{{ proveedor.country || 'N/A' }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sidebar -->
+      <div class="col-md-4">
+        <!-- Información Adicional -->
+        <div class="card mb-4">
+          <div class="card-header">
+            <h5 class="mb-0">Información del Sistema</h5>
+          </div>
+          <div class="card-body">
+            <div class="mb-3">
+              <label class="text-muted">ID</label>
+              <p class="small text-break">{{ proveedor.id }}</p>
+            </div>
+            <div class="mb-3">
+              <label class="text-muted">Fecha de Registro</label>
+              <p>{{ proveedor.created_at ? (proveedor.created_at | date:'dd/MM/yyyy HH:mm') : 'N/A' }}</p>
+            </div>
+            <div class="mb-3">
+              <label class="text-muted">Última Actualización</label>
+              <p>{{ proveedor.updated_at ? (proveedor.updated_at | date:'dd/MM/yyyy HH:mm') : 'N/A' }}</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Estado del Proveedor -->
+        <div class="card">
+          <div class="card-header">
+            <h5 class="mb-0">Estado</h5>
+          </div>
+          <div class="card-body text-center">
+            <div class="status-icon" [ngClass]="proveedor.is_active ? 'active' : 'inactive'">
+              <span class="material-icons">
+                {{ proveedor.is_active ? 'check_circle' : 'cancel' }}
+              </span>
+            </div>
+            <p class="mt-2 mb-0 fw-bold">
+              {{ proveedor.is_active ? 'Proveedor Activo' : 'Proveedor Inactivo' }}
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

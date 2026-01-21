@@ -1,6 +1,10 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
+import { DashboardService } from '../../core/services/dashboard.service';
+import { ProductoService } from '../../core/services/producto.service';
+import { UsuariosService } from '../../core/services/usuarios.service';
+import { ProveedorService } from '../../core/services/proveedor.service';
 
 @Component({
   standalone: true,
@@ -9,40 +13,40 @@ import { Router } from '@angular/router';
   templateUrl: './admin-dashboard.component.html',
   styleUrls: ['./admin-dashboard.component.css']
 })
-export class AdminDashboardComponent {
+export class AdminDashboardComponent implements OnInit {
 
   metrics = [
     {
       label: 'Ventas Hoy',
-      value: '$12,450',
+      value: '$0',
       icon: 'attach_money',
       type: 'success',
-      change: '+12.5% vs ayer',
-      changeType: 'positive'
+      change: 'Cargando...',
+      changeType: 'neutral'
     },
     {
       label: 'Productos',
-      value: '340',
+      value: '0',
       icon: 'inventory_2',
       type: 'primary',
-      change: '+5 esta semana',
-      changeType: 'positive'
+      change: 'Cargando...',
+      changeType: 'neutral'
     },
     {
       label: 'Usuarios',
-      value: '24',
+      value: '0',
       icon: 'people',
       type: 'info',
-      change: '+2 nuevos',
-      changeType: 'positive'
+      change: 'Cargando...',
+      changeType: 'neutral'
     },
     {
       label: 'Proveedores',
-      value: '18',
+      value: '0',
       icon: 'local_shipping',
       type: 'warning',
-      change: 'Sin cambios',
-      changeType: 'positive'
+      change: 'Cargando...',
+      changeType: 'neutral'
     }
   ];
 
@@ -50,12 +54,12 @@ export class AdminDashboardComponent {
     {
       title: 'Nueva Venta',
       icon: 'add_shopping_cart',
-      action: () => this.router.navigate(['/ventas/nuevo'])
+      action: () => this.router.navigate(['/pos'])
     },
     {
       title: 'Nuevo Producto',
       icon: 'add_box',
-      action: () => this.router.navigate(['/productos/nuevo'])
+      action: () => this.router.navigate(['/productos/create'])
     },
     {
       title: 'Nuevo Usuario',
@@ -69,33 +73,86 @@ export class AdminDashboardComponent {
     }
   ];
 
-  recentActivity = [
-    {
-      title: 'Venta #1234 completada',
-      description: 'Usuario: Juan Pérez - Total: $450.00',
-      time: 'Hace 5 min'
-    },
-    {
-      title: 'Nuevo producto agregado',
-      description: 'Producto: Coca Cola 2L - Stock: 50 unidades',
-      time: 'Hace 15 min'
-    },
-    {
-      title: 'Inventario actualizado',
-      description: 'Se actualizaron 25 productos',
-      time: 'Hace 1 hora'
-    },
-    {
-      title: 'Usuario creado',
-      description: 'Nuevo cajero: María González',
-      time: 'Hace 2 horas'
-    },
-    {
-      title: 'Cierre de caja',
-      description: 'Caja #1 - Total: $3,450.00',
-      time: 'Hace 3 horas'
-    }
-  ];
+  recentActivity: any[] = [];
 
-  constructor(private router: Router) {}
+  constructor(
+    private router: Router,
+    private dashboardService: DashboardService,
+    private productoService: ProductoService,
+    private usuariosService: UsuariosService,
+    private proveedorService: ProveedorService
+  ) {}
+
+  ngOnInit(): void {
+    this.loadMetrics();
+    this.loadRecentActivity();
+  }
+
+  loadMetrics(): void {
+    // Cargar productos
+    this.productoService.getAll().subscribe({
+      next: (productos) => {
+        this.metrics[1].value = productos.length.toString();
+        this.metrics[1].change = `${productos.length} en inventario`;
+        this.metrics[1].changeType = 'positive';
+      },
+      error: (err) => {
+        console.error('Error cargando productos:', err);
+        this.metrics[1].change = 'Error al cargar';
+        this.metrics[1].changeType = 'neutral';
+      }
+    });
+
+    // Cargar usuarios
+    this.usuariosService.getAll().subscribe({
+      next: (usuarios) => {
+        this.metrics[2].value = usuarios.length.toString();
+        this.metrics[2].change = `${usuarios.length} usuarios activos`;
+        this.metrics[2].changeType = 'positive';
+      },
+      error: (err) => {
+        console.error('Error cargando usuarios:', err);
+        this.metrics[2].change = 'Error al cargar';
+        this.metrics[2].changeType = 'neutral';
+      }
+    });
+
+    // Cargar proveedores
+    this.proveedorService.getAll().subscribe({
+      next: (proveedores) => {
+        this.metrics[3].value = proveedores.length.toString();
+        this.metrics[3].change = `${proveedores.length} proveedores`;
+        this.metrics[3].changeType = 'positive';
+      },
+      error: (err) => {
+        console.error('Error cargando proveedores:', err);
+        this.metrics[3].change = 'Error al cargar';
+        this.metrics[3].changeType = 'neutral';
+      }
+    });
+
+    // Métricas de dashboard (ventas, etc.)
+    this.dashboardService.getMetrics().subscribe({
+      next: (data) => {
+        this.metrics[0].value = `$${data.ventas_hoy.toLocaleString()}`;
+        this.metrics[0].change = 'Ventas de hoy';
+        this.metrics[0].changeType = 'positive';
+      },
+      error: (err) => {
+        console.error('Error cargando métricas:', err);
+      }
+    });
+  }
+
+  loadRecentActivity(): void {
+    this.dashboardService.getRecentActivity(10).subscribe({
+      next: (activity) => {
+        this.recentActivity = activity;
+      },
+      error: (err) => {
+        console.error('Error cargando actividad reciente:', err);
+        this.recentActivity = [];
+      }
+    });
+  }
 }

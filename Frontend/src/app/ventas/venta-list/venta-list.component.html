@@ -38,15 +38,15 @@
       </thead>
       <tbody>
         <tr *ngFor="let venta of paginatedVentas">
-          <td>{{ venta.fecha | date:'short' }}</td>
-          <td>{{ venta.cliente }}</td>
-          <td><strong>${{ venta.monto | number: '1.2-2' }}</strong></td>
+          <td>{{ venta.created_at | date:'short' }}</td>
+          <td>{{ venta.customer_name }}</td>
+          <td><strong>${{ venta.total | number: '1.2-2' }}</strong></td>
           <td>
-            <span [class]="'badge badge-' + (venta.estado === 'Completada' ? 'success' : 'warning')">
-              {{ venta.estado }}
+            <span [class]="'badge badge-' + (venta.status === 'COMPLETED' ? 'success' : 'warning')">
+              {{ venta.status }}
             </span>
           </td>
-          <td>{{ venta.vendedor }}</td>
+          <td>{{ venta.user_name }}</td>
           <td class="actions">
             <button
               [routerLink]="['/ventas/detalle', venta.id]"

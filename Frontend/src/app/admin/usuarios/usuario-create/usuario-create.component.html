@@ -16,11 +16,11 @@
     <div class="form-grid">
       <label>
         Nombre
-        <input [(ngModel)]="usuario.nombre" placeholder="Ej. Juan" />
+        <input [(ngModel)]="usuario.first_name" placeholder="Ej. Juan" />
       </label>
       <label>
         Apellido
-        <input [(ngModel)]="usuario.apellido" placeholder="Ej. Pérez" />
+        <input [(ngModel)]="usuario.last_name" placeholder="Ej. Pérez" />
       </label>
       <label>
         Email
@@ -28,7 +28,7 @@
       </label>
       <label>
         Teléfono
-        <input [(ngModel)]="usuario.telefono" placeholder="999-999-999" />
+        <input [(ngModel)]="usuario.phone" placeholder="999-999-999" />
       </label>
     </div>
   </div>
@@ -41,9 +41,9 @@
         <input [(ngModel)]="usuario.username" placeholder="usuario" />
       </label>
       <label>
-        Rol
-        <select [(ngModel)]="usuario.rol">
-          <option *ngFor="let r of roles" [value]="r">{{ r }}</option>
+        Perfil
+        <select [(ngModel)]="selectedProfileId">
+          <option *ngFor="let p of profiles" [value]="p.id">{{ p.name }}</option>
         </select>
       </label>
       <label>
@@ -52,7 +52,7 @@
       </label>
       <label>
         Activo
-        <select [(ngModel)]="usuario.activo">
+        <select [(ngModel)]="usuario.is_active">
           <option [ngValue]="true">Sí</option>
           <option [ngValue]="false">No</option>
         </select>

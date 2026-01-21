@@ -14,6 +14,7 @@ import { ProveedorService } from '../../core/services/proveedor.service';
 export class ProveedorCreateComponent {
   proveedor = {
     nombre: '',
+    ruc: '',
     contacto: '',
     email: '',
     telefono: '',
@@ -33,7 +34,18 @@ export class ProveedorCreateComponent {
     if (this.guardando) return;
     this.guardando = true;
 
-    this.proveedorService.create(this.proveedor).subscribe({
+    const payload = {
+      business_name: this.proveedor.nombre?.trim() || '',
+      tax_id: this.proveedor.ruc?.trim() || '',
+      representative_name: this.proveedor.contacto?.trim() || undefined,
+      email: this.proveedor.email?.trim() || undefined,
+      phone: this.proveedor.telefono?.trim() || undefined,
+      address: this.proveedor.direccion?.trim() || undefined,
+      city: this.proveedor.ciudad?.trim() || undefined,
+      is_active: !!this.proveedor.activo
+    };
+
+    this.proveedorService.create(payload).subscribe({
       next: () => this.router.navigate(['/proveedores']),
       error: () => (this.guardando = false)
     });

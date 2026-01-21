@@ -59,6 +59,10 @@ export class ProductoService {
     return this.http.get<Categoria[]>(`${environment.apiUrl}/categories`);
   }
 
+  getMarcas(): Observable<any[]> {
+    return this.http.get<any[]>(`${environment.apiUrl}/brands`);
+  }
+
   createCategoria(data: Partial<Categoria>): Observable<Categoria> {
     return this.http.post<Categoria>(`${environment.apiUrl}/categories`, data);
   }

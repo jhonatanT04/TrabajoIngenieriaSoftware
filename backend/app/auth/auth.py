@@ -232,6 +232,24 @@ class RoleChecker:
     """
     def __init__(self, allowed_roles: list[str]):
         self.allowed_roles = allowed_roles
+
+    def _normalize(self, name: str) -> str:
+        """Normaliza nombre de rol: quita acentos/espacios y compara en mayúsculas.
+        También mapea sinónimos comunes.
+        """
+        import unicodedata
+        n = unicodedata.normalize('NFD', name or '').encode('ascii', 'ignore').decode('ascii')
+        n = n.strip().upper()
+        # Sinónimos
+        if n in ("ADMIN", "ADMINISTRADOR"):
+            return "ADMINISTRADOR"
+        if n in ("CAJERO"):
+            return "CAJERO"
+        if n in ("CONTADOR"):
+            return "CONTADOR"
+        if n in ("ALMACEN", "INVENTARIO"):
+            return "INVENTARIO"
+        return n
     
     async def __call__(
         self,
@@ -249,7 +267,9 @@ class RoleChecker:
                 detail="Perfil no encontrado"
             )
         
-        if profile.name not in self.allowed_roles:
+        allowed_norm = { self._normalize(r) for r in self.allowed_roles }
+        user_role = self._normalize(profile.name)
+        if user_role not in allowed_norm:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
                 detail=f"Rol no permitido. Se requiere uno de: {', '.join(self.allowed_roles)}"

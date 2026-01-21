@@ -34,7 +34,7 @@ async def create_brand(
     }
     ```
     """
-    from crud.products_crud import brand
+    from app.crud.products_crud import brand
     
     existing = brand.get_by_name(db, name=brand_data.name)
     if existing:
@@ -64,7 +64,7 @@ async def list_brands(
     
     Retorna lista completa de marcas
     """
-    from crud.products_crud import brand
+    from app.crud.products_crud import brand
     
     brands = brand.get_multi(db, skip=skip, limit=limit)
     return brands
@@ -83,7 +83,7 @@ async def get_brand(
     
     Retorna marca o 404
     """
-    from crud.products_crud import brand
+    from app.crud.products_crud import brand
     
     brand_obj = brand.get(db, id=brand_id)
     if not brand_obj:

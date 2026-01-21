@@ -35,7 +35,13 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
 
     def create(self, db: Session, *, obj_in: CreateSchemaType) -> ModelType:
         """Crear un nuevo registro"""
-        obj_in_data = obj_in.model_dump()
+        # Soporta tanto Pydantic (model_dump) como SQLModel (dict)
+        if hasattr(obj_in, 'model_dump'):
+            obj_in_data = obj_in.model_dump()
+        elif hasattr(obj_in, 'dict'):
+            obj_in_data = obj_in.dict()
+        else:
+            obj_in_data = dict(obj_in)
         db_obj = self.model(**obj_in_data)
         db.add(db_obj)
         db.commit()

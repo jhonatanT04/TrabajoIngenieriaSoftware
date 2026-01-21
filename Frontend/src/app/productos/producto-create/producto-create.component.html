@@ -14,21 +14,35 @@
   <div class="card">
     <h3>Datos básicos</h3>
     <div class="form-grid">
-      <label> Código <input [(ngModel)]="producto.codigo" placeholder="PROD001" /> </label>
-      <label> Nombre <input [(ngModel)]="producto.nombre" placeholder="Nombre comercial" /> </label>
-      <label> Categoría <input [(ngModel)]="producto.categoria" placeholder="Ej. Lácteos" /> </label>
-      <label> Proveedor <input [(ngModel)]="producto.proveedor" placeholder="Proveedor" /> </label>
+      <label> Código <input [(ngModel)]="producto.sku" placeholder="PROD001" /> </label>
+      <label> Nombre <input [(ngModel)]="producto.name" placeholder="Nombre comercial" /> </label>
+      <label> Descripción <input [(ngModel)]="producto.description" placeholder="Descripción del producto" /> </label>
+      <label> Categoría 
+        <select [(ngModel)]="producto.category_id">
+          <option [ngValue]="undefined">Seleccionar categoría</option>
+          <option *ngFor="let cat of categorias" [ngValue]="cat.id">{{ cat.name }}</option>
+        </select>
+      </label>
+      <label> Marca
+        <select [(ngModel)]="producto.brand_id">
+          <option [ngValue]="undefined">Seleccionar marca</option>
+          <option *ngFor="let brand of marcas" [ngValue]="brand.id">{{ brand.name }}</option>
+        </select>
+      </label>
+      <label> Unidad de medida <input [(ngModel)]="producto.unit_of_measure" placeholder="unidad" /> </label>
     </div>
   </div>
 
   <div class="card">
     <h3>Precios y stock</h3>
     <div class="form-grid">
-      <label> Precio compra <input type="number" step="0.01" [(ngModel)]="producto.precioCompra" placeholder="0.00" /> </label>
-      <label> Precio venta <input type="number" step="0.01" [(ngModel)]="producto.precioVenta" placeholder="0.00" /> </label>
-      <label> Stock inicial <input type="number" [(ngModel)]="producto.stock" placeholder="0" /> </label>
+      <label> Precio compra <input type="number" step="0.01" [(ngModel)]="producto.cost_price" placeholder="0.00" /> </label>
+      <label> Precio venta <input type="number" step="0.01" [(ngModel)]="producto.sale_price" placeholder="0.00" /> </label>
+      <label> Impuesto (%) <input type="number" step="0.01" [(ngModel)]="producto.tax_rate" placeholder="0.00" /> </label>
+      <label> Stock mínimo <input type="number" [(ngModel)]="producto.stock_min" placeholder="0" /> </label>
+      <label> Stock máximo <input type="number" [(ngModel)]="producto.stock_max" placeholder="0" /> </label>
       <label> Activo
-        <select [(ngModel)]="producto.activo">
+        <select [(ngModel)]="producto.is_active">
           <option [ngValue]="true">Sí</option>
           <option [ngValue]="false">No</option>
         </select>

@@ -38,19 +38,19 @@
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let proveedor of paginatedProveedores" [class.inactive]="!proveedor.activo">
-          <td><strong>{{ proveedor.nombre }}</strong></td>
-          <td>{{ proveedor.contacto }}</td>
+        <tr *ngFor="let proveedor of paginatedProveedores" [class.inactive]="!proveedor.is_active">
+          <td><strong>{{ proveedor.business_name }}</strong></td>
+          <td>{{ proveedor.contact_name }}</td>
           <td>
             <a href="mailto:{{ proveedor.email }}" class="email-link">{{ proveedor.email }}</a>
           </td>
-          <td>{{ proveedor.telefono }}</td>
-          <td>{{ proveedor.ciudad }}</td>
+          <td>{{ proveedor.phone }}</td>
+          <td>{{ proveedor.city }}</td>
           <td>
             <span
-              [class]="proveedor.activo ? 'badge badge-success' : 'badge badge-danger'"
+              [class]="proveedor.is_active ? 'badge badge-success' : 'badge badge-danger'"
             >
-              {{ proveedor.activo ? 'Activo' : 'Inactivo' }}
+              {{ proveedor.is_active ? 'Activo' : 'Inactivo' }}
             </span>
           </td>
           <td class="actions">

@@ -39,7 +39,7 @@ export class AdminLayoutComponent {
     {
       label: 'Productos',
       route: '/productos',
-      roles: ['ADMIN', 'ALMACEN', 'CONTADOR']
+      roles: ['ADMIN', 'ALMACEN']
     },
     {
       label: 'Proveedores',
@@ -54,7 +54,7 @@ export class AdminLayoutComponent {
     {
       label: 'Ventas',
       route: '/ventas',
-      roles: ['ADMIN', 'CONTADOR']
+      roles: ['ADMIN', 'CONTADOR', 'CAJERO']
     },
     {
       label: 'Caja',

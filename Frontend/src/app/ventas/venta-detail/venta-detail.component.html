@@ -1,0 +1,91 @@
+<div class="detail-container">
+  <div class="loading" *ngIf="loading">Cargando...</div>
+  
+  <div class="error-alert" *ngIf="error">{{ error }}</div>
+
+  <div *ngIf="venta && !loading" class="venta-detail">
+    <div class="header">
+      <h2>Detalle de Venta #{{ venta.sale_number }}</h2>
+      <button class="btn-back" (click)="volver()">← Volver</button>
+    </div>
+
+    <div class="info-grid">
+      <div class="info-card">
+        <h3>Información General</h3>
+        <div class="info-row">
+          <span class="label">Número de Venta:</span>
+          <span class="value">{{ venta.sale_number }}</span>
+        </div>
+        <div class="info-row">
+          <span class="label">Fecha:</span>
+          <span class="value">{{ venta.sale_date | date:'dd/MM/yyyy HH:mm' }}</span>
+        </div>
+        <div class="info-row">
+          <span class="label">Estado:</span>
+          <span class="value badge" [class.completada]="venta.status === 'completada'">{{ venta.status }}</span>
+        </div>
+      </div>
+
+      <div class="info-card">
+        <h3>Cliente</h3>
+        <div class="info-row" *ngIf="venta.customer">
+          <span class="label">Nombre:</span>
+          <span class="value">{{ venta.customer.first_name }} {{ venta.customer.last_name }}</span>
+        </div>
+        <div class="info-row" *ngIf="venta.customer">
+          <span class="label">Documento:</span>
+          <span class="value">{{ venta.customer.document_number }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="items-section">
+      <h3>Productos</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Producto</th>
+            <th>Cantidad</th>
+            <th>Precio Unit.</th>
+            <th>Descuento</th>
+            <th>Subtotal</th>
+            <th>Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of venta.items">
+            <td>{{ item.product_id }}</td>
+            <td>{{ item.quantity }}</td>
+            <td>{{ item.unit_price | currency:'USD':'symbol' }}</td>
+            <td>{{ item.discount_amount | currency:'USD':'symbol' }}</td>
+            <td>{{ item.subtotal | currency:'USD':'symbol' }}</td>
+            <td>{{ item.total | currency:'USD':'symbol' }}</td>
+          </tr>
+        </tbody>
+        <tfoot>
+          <tr>
+            <td colspan="5" class="text-right"><strong>Subtotal:</strong></td>
+            <td><strong>{{ venta.subtotal | currency:'USD':'symbol' }}</strong></td>
+          </tr>
+          <tr>
+            <td colspan="5" class="text-right"><strong>Descuento:</strong></td>
+            <td><strong>-{{ venta.discount_amount | currency:'USD':'symbol' }}</strong></td>
+          </tr>
+          <tr>
+            <td colspan="5" class="text-right"><strong>Impuestos:</strong></td>
+            <td><strong>{{ venta.tax_amount | currency:'USD':'symbol' }}</strong></td>
+          </tr>
+          <tr class="total-row">
+            <td colspan="5" class="text-right"><strong>TOTAL:</strong></td>
+            <td><strong>{{ venta.total_amount | currency:'USD':'symbol' }}</strong></td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+
+    <div class="notes-section" *ngIf="venta.notes">
+      <h3>Notas</h3>
+      <p>{{ venta.notes }}</p>
+    </div>
+  </div>
+</div>

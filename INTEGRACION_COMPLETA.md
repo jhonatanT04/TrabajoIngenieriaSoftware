@@ -1,4 +1,10 @@
-# 🔗 INTEGRACIÓN FRONTEND-BACKEND COMPLETADA
+PS C:\Users\mlata\Desktop\TrabajoIngenieriaSoftware\backend> .\.venv\Scripts\python.exe -m uvicorn app.main:app --host 127.0.0.1 --port 8000
+INFO:     Started server process [10120]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+ERROR:    [Errno 10048] error while attempting to bind on address ('127.0.0.1', 8000): only one usage of each socket address (protocol/network address/port) is normally permitted
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.# 🔗 INTEGRACIÓN FRONTEND-BACKEND COMPLETADA
 
 ## ✅ CAMBIOS REALIZADOS
 

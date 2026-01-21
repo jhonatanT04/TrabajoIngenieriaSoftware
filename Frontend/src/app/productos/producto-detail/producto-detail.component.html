@@ -1,0 +1,156 @@
+<div class="page-container">
+  <!-- Loading -->
+  <div *ngIf="loading" class="text-center py-5">
+    <div class="spinner-border" role="status">
+      <span class="visually-hidden">Cargando...</span>
+    </div>
+  </div>
+
+  <!-- Error -->
+  <div *ngIf="error && !loading" class="alert alert-danger">
+    {{ error }}
+    <button class="btn btn-primary mt-3" (click)="volver()">Volver a Productos</button>
+  </div>
+
+  <!-- Detalle del Producto -->
+  <div *ngIf="producto && !loading" class="producto-detail">
+    <!-- Header -->
+    <div class="page-header">
+      <div>
+        <h1 class="page-title">
+          <span class="material-icons">inventory_2</span>
+          {{ producto.name }}
+        </h1>
+        <p class="page-subtitle">SKU: {{ producto.sku }}</p>
+      </div>
+      <div class="header-actions">
+        <button class="btn btn-light me-2" (click)="volver()">
+          <span class="material-icons">arrow_back</span>
+          Volver
+        </button>
+        <button class="btn btn-primary" (click)="editar()">
+          <span class="material-icons">edit</span>
+          Editar
+        </button>
+      </div>
+    </div>
+
+    <!-- Contenido -->
+    <div class="row">
+      <!-- Información Principal -->
+      <div class="col-md-8">
+        <div class="card mb-4">
+          <div class="card-header">
+            <h5 class="mb-0">Información General</h5>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label class="text-muted">Nombre</label>
+                <p class="fw-bold">{{ producto.name }}</p>
+              </div>
+              <div class="col-md-6 mb-3">
+                <label class="text-muted">SKU</label>
+                <p class="fw-bold">{{ producto.sku }}</p>
+              </div>
+              <div class="col-md-6 mb-3">
+                <label class="text-muted">Código de Barras</label>
+                <p class="fw-bold">{{ producto.barcode || 'N/A' }}</p>
+              </div>
+              <div class="col-md-6 mb-3">
+                <label class="text-muted">Categoría</label>
+                <p class="fw-bold">{{ producto.category?.name || 'Sin categoría' }}</p>
+              </div>
+              <div class="col-md-6 mb-3">
+                <label class="text-muted">Marca</label>
+                <p class="fw-bold">{{ producto.brand?.name || 'Sin marca' }}</p>
+              </div>
+              <div class="col-md-6 mb-3">
+                <label class="text-muted">Estado</label>
+                <p>
+                  <span [ngClass]="producto.is_active ? 'badge bg-success' : 'badge bg-danger'">
+                    {{ producto.is_active ? 'Activo' : 'Inactivo' }}
+                  </span>
+                </p>
+              </div>
+              <div class="col-12 mb-3">
+                <label class="text-muted">Descripción</label>
+                <p>{{ producto.description || 'Sin descripción' }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Precios -->
+        <div class="card mb-4">
+          <div class="card-header">
+            <h5 class="mb-0">Precios</h5>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <div class="col-md-4 mb-3">
+                <label class="text-muted">Precio de Costo</label>
+                <p class="fw-bold fs-5">S/ {{ producto.cost_price?.toFixed(2) || '0.00' }}</p>
+              </div>
+              <div class="col-md-4 mb-3">
+                <label class="text-muted">Precio de Venta</label>
+                <p class="fw-bold fs-5 text-primary">S/ {{ producto.sale_price?.toFixed(2) || '0.00' }}</p>
+              </div>
+              <div class="col-md-4 mb-3">
+                <label class="text-muted">Margen</label>
+                <p class="fw-bold fs-5 text-success">
+                  {{ producto.cost_price && producto.sale_price 
+                     ? ((((producto.sale_price - producto.cost_price) / producto.cost_price) * 100).toFixed(1) + '%')
+                     : '0%' }}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sidebar -->
+      <div class="col-md-4">
+        <!-- Stock -->
+        <div class="card mb-4">
+          <div class="card-header">
+            <h5 class="mb-0">Inventario</h5>
+          </div>
+          <div class="card-body">
+            <div class="mb-3">
+              <label class="text-muted">Stock Actual</label>
+              <p class="fw-bold fs-4 text-success">
+                {{ producto.stock_min || 0 }} {{ producto.unit_of_measure || 'unidades' }}
+              </p>
+            </div>
+            <div class="mb-3">
+              <label class="text-muted">Stock Mínimo</label>
+              <p>{{ producto.stock_min || 0 }} {{ producto.unit_of_measure || 'unidades' }}</p>
+            </div>
+            <div class="mb-3">
+              <label class="text-muted">Stock Máximo</label>
+              <p>{{ producto.stock_max || 0 }} {{ producto.unit_of_measure || 'unidades' }}</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Información Adicional -->
+        <div class="card">
+          <div class="card-header">
+            <h5 class="mb-0">Información Adicional</h5>
+          </div>
+          <div class="card-body">
+            <div class="mb-3">
+              <label class="text-muted">Creado</label>
+              <p>{{ producto.created_at ? (producto.created_at | date:'dd/MM/yyyy HH:mm') : 'N/A' }}</p>
+            </div>
+            <div class="mb-3">
+              <label class="text-muted">Última Actualización</label>
+              <p>{{ producto.updated_at ? (producto.updated_at | date:'dd/MM/yyyy HH:mm') : 'N/A' }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

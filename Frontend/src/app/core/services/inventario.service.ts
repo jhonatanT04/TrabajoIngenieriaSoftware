@@ -23,6 +23,14 @@ export interface InventoryMovement {
   reference_document?: string;
   user_id: string;
   created_at: string;
+  // Campos opcionales usados en UI (alias/fallback del backend)
+  fecha?: string;
+  tipo?: string;
+  producto?: string;
+  cantidad?: number;
+  usuario?: string;
+  product_name?: string;
+  user_name?: string;
 }
 
 export interface InventoryAdjustmentRequest {
@@ -59,14 +67,19 @@ export class InventarioService {
 
   getMovements(params?: any): Observable<InventoryMovement[]> {
     let httpParams = new HttpParams();
+    
+    // Solo agregar parámetros que tengan valores definidos y no vacíos
     if (params) {
       Object.keys(params).forEach(key => {
-        if (params[key] !== null && params[key] !== undefined) {
-          httpParams = httpParams.set(key, params[key]);
+        const value = params[key];
+        // Solo agregar si el valor existe, no es null, no es undefined, y no es string vacío
+        if (value !== null && value !== undefined && value !== '') {
+          httpParams = httpParams.set(key, String(value));
         }
       });
     }
-    return this.http.get<InventoryMovement[]>(`${this.apiUrl}/movements`, { params: httpParams });
+    
+    return this.http.get<InventoryMovement[]>(`${this.apiUrl}/movement-list`, { params: httpParams });
   }
 
   getProductMovements(productId: string, params?: any): Observable<InventoryMovement[]> {

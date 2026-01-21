@@ -27,13 +27,18 @@ export class VentaService {
   }
 
   
-  getById(id: number): Observable<Venta> {
+  getById(id: string | number): Observable<Venta> {
     return this.http.get<Venta>(`${this.apiUrl}/${id}`);
   }
 
   
   create(data: Partial<Venta>): Observable<Venta> {
     return this.http.post<Venta>(this.apiUrl, data);
+  }
+
+  
+  delete(id: string | number): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/${id}`);
   }
 
   

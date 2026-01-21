@@ -38,7 +38,7 @@ async def create_category(
     }
     ```
     """
-    from crud.products_crud import category
+    from app.crud.products_crud import category
     
     existing = category.get_by_name(db, name=category_data.name)
     if existing:
@@ -68,7 +68,7 @@ async def list_categories(
     
     Retorna lista completa de categorias
     """
-    from crud.products_crud import category
+    from app.crud.products_crud import category
     
     categories = category.get_multi(db, skip=skip, limit=limit)
     return categories
@@ -84,7 +84,7 @@ async def get_root_categories(
     Retorna solo las categorias principales del primer nivel
     Util para construir menus jerarquicos
     """
-    from crud.products_crud import category
+    from app.crud.products_crud import category
     
     categories = category.get_root_categories(db)
     return categories

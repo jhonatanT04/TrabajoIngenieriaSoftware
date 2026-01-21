@@ -1,19 +1,9 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-
-interface Proveedor {
-  id: number;
-  nombre: string;
-  email: string;
-  telefono: string;
-  direccion: string;
-  ciudad: string;
-  contacto: string;
-  activo: boolean;
-  fechaCreacion: Date;
-}
+import { ProveedorService } from '../../core/services/proveedor.service';
+import { Proveedor } from '../../core/models/producto.model';
 
 @Component({
   selector: 'app-proveedor-list',
@@ -22,41 +12,42 @@ interface Proveedor {
   templateUrl: './proveedor-list.component.html',
   styleUrls: ['./proveedor-list.component.css']
 })
-export class ProveedorListComponent {
+export class ProveedorListComponent implements OnInit {
 
-  proveedores: Proveedor[] = [
-    {
-      id: 1,
-      nombre: 'Distribuidora Central',
-      email: 'info@distcentral.com',
-      telefono: '555-1234',
-      direccion: 'Calle Principal 123',
-      ciudad: 'Ciudad Principal',
-      contacto: 'Juan Rodríguez',
-      activo: true,
-      fechaCreacion: new Date('2024-01-15')
-    },
-    {
-      id: 2,
-      nombre: 'Proveedores Unidos',
-      email: 'contacto@proveedores.com',
-      telefono: '555-5678',
-      direccion: 'Avenida Comercial 456',
-      ciudad: 'Centro',
-      contacto: 'María García',
-      activo: true,
-      fechaCreacion: new Date('2024-02-20')
-    }
-  ];
-
+  proveedores: Proveedor[] = [];
+  loading = true;
+  error = '';
   searchTerm = '';
+
+  constructor(private proveedorService: ProveedorService) {}
+
+  ngOnInit(): void {
+    this.loadProveedores();
+  }
+
+  loadProveedores(): void {
+    this.loading = true;
+    this.proveedorService.getAll().subscribe({
+      next: (proveedores) => {
+        this.proveedores = proveedores;
+        this.loading = false;
+      },
+      error: (err) => {
+        console.error('Error cargando proveedores:', err);
+        this.error = 'Error al cargar proveedores';
+        this.loading = false;
+      }
+    });
+  }
+
   currentPage = 1;
   itemsPerPage = 10;
 
   get filteredProveedores(): Proveedor[] {
+    if (!this.searchTerm) return this.proveedores;
     return this.proveedores.filter(p =>
-      p.nombre.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
-      p.email.toLowerCase().includes(this.searchTerm.toLowerCase())
+      p.business_name.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
+      (p.email && p.email.toLowerCase().includes(this.searchTerm.toLowerCase()))
     );
   }
 
@@ -70,8 +61,16 @@ export class ProveedorListComponent {
   }
 
   deleteProveedor(proveedor: Proveedor): void {
-    if (confirm(`¿Está seguro de eliminar al proveedor ${proveedor.nombre}?`)) {
-      this.proveedores = this.proveedores.filter(p => p.id !== proveedor.id);
+    if (confirm(`¿Está seguro de eliminar al proveedor ${proveedor.business_name}?`)) {
+      this.proveedorService.delete(proveedor.id).subscribe({
+        next: () => {
+          this.loadProveedores();
+        },
+        error: (err) => {
+          console.error('Error eliminando proveedor:', err);
+          alert('Error al eliminar el proveedor');
+        }
+      });
     }
   }
 

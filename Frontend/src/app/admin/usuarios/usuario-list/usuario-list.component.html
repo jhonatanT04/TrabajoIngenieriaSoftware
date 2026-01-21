@@ -20,17 +20,40 @@
   <div class="filters-section card">
     <div class="search-bar">
       <span class="material-icons">search</span>
-      <input type="text" placeholder="Buscar usuario por nombre, email o rol...">
+      <input type="text" placeholder="Buscar usuario por nombre, email o rol..." [value]="searchQuery" (input)="onSearch($event.target.value)">
     </div>
     <div class="filter-buttons">
-      <button class="btn btn-sm btn-light">
+      <button class="btn btn-sm btn-light" (click)="toggleFilters()">
         <span class="material-icons">filter_list</span>
         Filtros
       </button>
-      <button class="btn btn-sm btn-light">
+      <button class="btn btn-sm btn-light" (click)="exportCSV()">
         <span class="material-icons">download</span>
         Exportar
       </button>
+    </div>
+    <div class="filters-panel" *ngIf="showFilters">
+      <div class="filters-grid">
+        <label>
+          Rol
+          <select [(ngModel)]="selectedRoleId" (change)="applyFilter()">
+            <option [ngValue]="'all'">Todos</option>
+            <option *ngFor="let r of roles" [ngValue]="r.id">{{ r.name }}</option>
+          </select>
+        </label>
+        <label>
+          Estado
+          <select [(ngModel)]="selectedStatus" (change)="applyFilter()">
+            <option [ngValue]="'all'">Todos</option>
+            <option [ngValue]="'active'">Activo</option>
+            <option [ngValue]="'inactive'">Inactivo</option>
+          </select>
+        </label>
+      </div>
+      <div class="filters-actions">
+        <button class="btn btn-sm btn-light" (click)="clearFilters()">Limpiar</button>
+        <button class="btn btn-sm btn-primary" (click)="applyFilter()">Aplicar</button>
+      </div>
     </div>
   </div>
 
@@ -52,7 +75,17 @@
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let usuario of usuarios">
+          <tr *ngIf="loading">
+            <td colspan="7" class="text-center">
+              <div class="spinner">Cargando usuarios...</div>
+            </td>
+          </tr>
+          <tr *ngIf="error && !loading">
+            <td colspan="7" class="text-center text-danger">
+              {{ error }}
+            </td>
+          </tr>
+          <tr *ngFor="let usuario of (filtered.length ? filtered : usuarios)">
             <td>
               <input type="checkbox">
             </td>
@@ -71,17 +104,17 @@
               <span class="email-text">{{ usuario.email }}</span>
             </td>
             <td>
-              <span class="badge" [ngClass]="getRoleBadgeClass(usuario.rol.nombre)">
-                {{ usuario.rol.nombre }}
+              <span class="badge" [ngClass]="getRoleBadgeClass(usuario.profile?.name || 'Sin rol')">
+                {{ usuario.profile?.name || 'Sin rol' }}
               </span>
             </td>
             <td>
-              <span class="badge" [ngClass]="usuario.activo ? 'badge-success' : 'badge-danger'">
-                {{ usuario.activo ? 'Activo' : 'Inactivo' }}
+              <span class="badge" [ngClass]="usuario.is_active ? 'badge-success' : 'badge-danger'">
+                {{ usuario.is_active ? 'Activo' : 'Inactivo' }}
               </span>
             </td>
             <td>
-              <span class="date-text">{{ usuario.ultimoAcceso ? (usuario.ultimoAcceso | date:'dd/MM/yyyy HH:mm') : 'Nunca' }}</span>
+              <span class="date-text">{{ usuario.updated_at ? (usuario.updated_at | date:'dd/MM/yyyy HH:mm') : 'Nunca' }}</span>
             </td>
             <td>
               <div class="action-buttons">
@@ -93,7 +126,7 @@
                 </button>
                 <button
                   class="btn-icon"
-                  [routerLink]="['/admin/usuarios/edit', usuario.id]"
+                  [routerLink]="['/admin/usuarios', usuario.id, 'edit']"
                   title="Editar">
                   <span class="material-icons">edit</span>
                 </button>
@@ -113,7 +146,7 @@
     
     <div class="table-footer">
       <div class="table-info">
-        Mostrando <strong>1-{{ usuarios.length }}</strong> de <strong>{{ usuarios.length }}</strong> usuarios
+        Mostrando <strong>{{ (filtered.length ? filtered.length : usuarios.length) }}</strong> de <strong>{{ usuarios.length }}</strong> usuarios
       </div>
       <div class="pagination">
         <button class="btn btn-sm btn-light" disabled>

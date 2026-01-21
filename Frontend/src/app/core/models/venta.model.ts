@@ -1,21 +1,26 @@
 
 export interface Venta {
-  id: number;
-  numero: string;
-  fecha: Date;
-  clienteId?: number;
-  cliente?: Cliente;
-  usuarioId: number;
-  usuario: string;
-  items: VentaItem[];
+  id: string; // UUID
+  sale_number?: string;
+  sale_date?: Date;
+  created_at?: Date;
+  customer_id?: string;
+  customer?: Cliente;
+  customer_name?: string;
+  cashier_id?: string;
+  user_id?: string;
+  user_name?: string;
+  seller_name?: string;
   subtotal: number;
-  descuento: number;
-  impuesto: number;
-  total: number;
-  metodoPago: MetodoPago;
-  estado: EstadoVenta;
-  cajaId: number;
-  observaciones?: string;
+  discount_amount?: number;
+  tax_amount?: number;
+  total_amount: number;
+  total?: number;
+  status: string;
+  estado?: string;
+  notes?: string;
+  items?: VentaItem[];
+  [key: string]: any; // Para propiedades adicionales del backend
 }
 
 export interface VentaItem {
@@ -31,19 +36,23 @@ export interface VentaItem {
 }
 
 export interface Cliente {
-  id: number;
-  nombre: string;
-  apellido: string;
-  documento: string;
-  tipoDocumento: string;
-  telefono?: string;
+  id: string; // UUID
+  document_type?: string;
+  document_number?: string;
+  first_name: string;
+  last_name: string;
+  business_name?: string;
   email?: string;
-  direccion?: string;
-  ciudad?: string;
-  fechaNacimiento?: Date;
-  puntosFidelidad: number;
-  activo: boolean;
-  fechaRegistro: Date;
+  phone?: string;
+  address?: string;
+  city?: string;
+  preferred_contact_method?: string;
+  segment: string;
+  loyalty_points: number;
+  notes?: string;
+  is_active: boolean;
+  created_at?: string;
+  updated_at?: string;
 }
 
 export interface Promocion {

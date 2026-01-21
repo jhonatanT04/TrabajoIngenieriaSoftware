@@ -33,9 +33,23 @@ export class ClienteCreateComponent {
     if (this.guardando) return;
     this.guardando = true;
 
-    this.clienteService.create(this.cliente).subscribe({
+    const payload = {
+      first_name: this.cliente.nombre.split(' ')[0] || '',
+      last_name: this.cliente.nombre.split(' ').slice(1).join(' ') || this.cliente.nombre,
+      document_number: this.cliente.cedula,
+      email: this.cliente.email || undefined,
+      phone: this.cliente.telefono || undefined,
+      address: this.cliente.direccion || undefined,
+      city: this.cliente.ciudad || undefined,
+      is_active: this.cliente.activo
+    };
+
+    this.clienteService.create(payload).subscribe({
       next: () => this.router.navigate(['/clientes']),
-      error: () => (this.guardando = false)
+      error: (err) => {
+        console.error('Error creando cliente:', err);
+        this.guardando = false;
+      }
     });
   }
 

@@ -1,7 +1,7 @@
 import unittest
 from fastapi.testclient import TestClient
 from unittest.mock import patch, MagicMock
-from main import app
+from app.main import app
 from uuid import uuid4
 
 client = TestClient(app)
@@ -101,7 +101,7 @@ class TestCustomersGetById(unittest.TestCase):
         response = client.get("/customers/invalid-uuid")
         self.assertIn(response.status_code, [401, 403, 422])
     
-    @patch("crud.caja_crud.customer.get")
+    @patch("app.crud.caja_crud.customer.get")
     def test_get_customer_by_id_no_encontrado(self, mock_get):
         mock_get.return_value = None
         customer_id = str(uuid4())
@@ -114,7 +114,7 @@ class TestCustomersGetByDocument(unittest.TestCase):
         response = client.get("/customers/document/0123456789")
         self.assertIn(response.status_code, [401, 403])
     
-    @patch("crud.caja_crud.customer.get_by_document")
+    @patch("app.crud.caja_crud.customer.get_by_document")
     def test_get_customer_by_document_no_encontrado(self, mock_get_by_document):
         mock_get_by_document.return_value = None
         response = client.get("/customers/document/9999999999")
@@ -202,7 +202,7 @@ class TestCustomersLoyaltyPoints(unittest.TestCase):
 
 
 class TestCustomersWithMocks(unittest.TestCase):
-    @patch("crud.caja_crud.customer.get_active_customers")
+    @patch("app.crud.caja_crud.customer.get_active_customers")
     def test_get_customers_mock_activos(self, mock_get_active):
         mock_get_active.return_value = [
             {
@@ -216,13 +216,13 @@ class TestCustomersWithMocks(unittest.TestCase):
         response = client.get("/customers?active_only=true")
         self.assertIn(response.status_code, [200, 401, 403])
     
-    @patch("crud.caja_crud.customer.search_by_name")
+    @patch("app.crud.caja_crud.customer.search_by_name")
     def test_search_customers_mock_vacio(self, mock_search):
         mock_search.return_value = []
         response = client.get("/customers/search/name?name=NoExiste")
         self.assertIn(response.status_code, [200, 401, 403])
     
-    @patch("crud.caja_crud.customer.get_vip_customers")
+    @patch("app.crud.caja_crud.customer.get_vip_customers")
     def test_get_vip_customers_mock(self, mock_get_vip):
         mock_get_vip.return_value = [
             {
@@ -235,7 +235,7 @@ class TestCustomersWithMocks(unittest.TestCase):
         response = client.get("/customers/vip/list")
         self.assertIn(response.status_code, [200, 401, 403])
     
-    @patch("crud.caja_crud.customer.get_top_customers")
+    @patch("app.crud.caja_crud.customer.get_top_customers")
     def test_get_top_customers_mock(self, mock_get_top):
         mock_get_top.return_value = [
             {

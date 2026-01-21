@@ -1,6 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
+import { DashboardService } from '../../core/services/dashboard.service';
 
 @Component({
   standalone: true,
@@ -9,40 +10,40 @@ import { Router } from '@angular/router';
   templateUrl: './cajero-dashboard.component.html',
   styleUrls: ['./cajero-dashboard.component.css']
 })
-export class CajeroDashboardComponent {
+export class CajeroDashboardComponent implements OnInit {
 
   metrics = [
     {
       label: 'Ventas Hoy',
-      value: '$3,245',
+      value: '$0',
       icon: 'point_of_sale',
       type: 'success',
-      change: '+8 ventas',
-      changeType: 'positive'
+      change: 'Cargando...',
+      changeType: 'neutral'
     },
     {
       label: 'Efectivo en Caja',
-      value: '$2,890',
+      value: '$0',
       icon: 'account_balance_wallet',
       type: 'primary',
-      change: 'Caja abierta',
-      changeType: 'positive'
+      change: 'Verificando...',
+      changeType: 'neutral'
     },
     {
       label: 'Clientes Atendidos',
-      value: '32',
+      value: '0',
       icon: 'people',
       type: 'info',
-      change: '+5 nuevos',
-      changeType: 'positive'
+      change: 'Cargando...',
+      changeType: 'neutral'
     },
     {
       label: 'Productos Vendidos',
-      value: '124',
+      value: '0',
       icon: 'inventory_2',
       type: 'warning',
       change: 'Hoy',
-      changeType: 'positive'
+      changeType: 'neutral'
     }
   ];
 
@@ -69,33 +70,42 @@ export class CajeroDashboardComponent {
     }
   ];
 
-  recentActivity = [
-    {
-      title: 'Venta #1245 completada',
-      description: 'Cliente: Ana García - Total: $125.50',
-      time: 'Hace 2 min'
-    },
-    {
-      title: 'Cliente nuevo registrado',
-      description: 'Pedro Martínez - Teléfono: 555-1234',
-      time: 'Hace 15 min'
-    },
-    {
-      title: 'Venta #1244 completada',
-      description: 'Cliente: María López - Total: $89.00',
-      time: 'Hace 30 min'
-    },
-    {
-      title: 'Producto agotado',
-      description: 'Coca Cola 2L - Solicitar reposición',
-      time: 'Hace 1 hora'
-    },
-    {
-      title: 'Venta #1243 completada',
-      description: 'Cliente: Juan Pérez - Total: $210.00',
-      time: 'Hace 2 horas'
-    }
-  ];
+  recentActivity: any[] = [];
 
-  constructor(private router: Router) {}
+  constructor(
+    private router: Router,
+    private dashboardService: DashboardService
+  ) {}
+
+  ngOnInit(): void {
+    this.loadMetrics();
+    this.loadRecentActivity();
+  }
+
+  loadMetrics(): void {
+    this.dashboardService.getMetrics().subscribe({
+      next: (data) => {
+        this.metrics[0].value = `$${data.ventas_hoy.toLocaleString()}`;
+        this.metrics[0].change = 'Ventas de hoy';
+        this.metrics[0].changeType = 'positive';
+      },
+      error: (err) => {
+        console.error('Error cargando métricas:', err);
+        this.metrics[0].change = 'Error al cargar';
+        this.metrics[0].changeType = 'neutral';
+      }
+    });
+  }
+
+  loadRecentActivity(): void {
+    this.dashboardService.getRecentActivity(5).subscribe({
+      next: (activity) => {
+        this.recentActivity = activity;
+      },
+      error: (err) => {
+        console.error('Error cargando actividad reciente:', err);
+        this.recentActivity = [];
+      }
+    });
+  }
 }

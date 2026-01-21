@@ -1,16 +1,9 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-
-interface Cliente {
-  id: number;
-  nombre: string;
-  email: string;
-  telefono: string;
-  deuda: number;
-  estado: string;
-}
+import { ClienteService } from '../../core/services/cliente.service';
+import { Cliente } from '../../core/models/venta.model';
 
 @Component({
   standalone: true,
@@ -19,44 +12,44 @@ interface Cliente {
   templateUrl: './cliente-list.component.html',
   styleUrls: ['./cliente-list.component.css']
 })
-export class ClienteListComponent {
+export class ClienteListComponent implements OnInit {
 
-  clientes: Cliente[] = [
-    {
-      id: 1,
-      nombre: 'Juan Pérez',
-      email: 'juan@example.com',
-      telefono: '123456789',
-      deuda: 0,
-      estado: 'Activo'
-    },
-    {
-      id: 2,
-      nombre: 'María García',
-      email: 'maria@example.com',
-      telefono: '987654321',
-      deuda: 250.50,
-      estado: 'Activo'
-    },
-    {
-      id: 3,
-      nombre: 'Carlos López',
-      email: 'carlos@example.com',
-      telefono: '555666777',
-      deuda: 100.00,
-      estado: 'Inactivo'
-    }
-  ];
-
+  clientes: Cliente[] = [];
+  loading = true;
+  error = '';
   searchTerm = '';
   currentPage = 1;
   itemsPerPage = 10;
 
+  constructor(private clienteService: ClienteService) {}
+
+  ngOnInit(): void {
+    this.loadClientes();
+  }
+
+  loadClientes(): void {
+    this.loading = true;
+    this.clienteService.getAll().subscribe({
+      next: (clientes) => {
+        this.clientes = clientes;
+        this.loading = false;
+      },
+      error: (err) => {
+        console.error('Error cargando clientes:', err);
+        this.error = 'Error al cargar clientes';
+        this.loading = false;
+      }
+    });
+  }
+
   get filteredClientes(): Cliente[] {
+    if (!this.searchTerm) return this.clientes;
     return this.clientes.filter(c =>
-      c.nombre.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
-      c.email.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
-      c.telefono.includes(this.searchTerm)
+      c.first_name.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
+      c.last_name.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
+      (c.email && c.email.toLowerCase().includes(this.searchTerm.toLowerCase())) ||
+      (c.phone && c.phone.includes(this.searchTerm)) ||
+      (c.document_number && c.document_number.includes(this.searchTerm))
     );
   }
 
@@ -70,11 +63,16 @@ export class ClienteListComponent {
   }
 
   deleteCliente(cliente: Cliente): void {
-    if (confirm(`¿Está seguro de eliminar a ${cliente.nombre}?`)) {
-      this.clientes = this.clientes.filter(c => c.id !== cliente.id);
-      if (this.currentPage > this.totalPages && this.totalPages > 0) {
-        this.currentPage = this.totalPages;
-      }
+    if (confirm(`¿Está seguro de eliminar a ${cliente.first_name} ${cliente.last_name}?`)) {
+      this.clienteService.delete(cliente.id).subscribe({
+        next: () => {
+          this.loadClientes();
+        },
+        error: (err) => {
+          console.error('Error eliminando cliente:', err);
+          alert('Error al eliminar el cliente');
+        }
+      });
     }
   }
 

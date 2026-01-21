@@ -16,7 +16,34 @@ export class AuthService {
   constructor(private http: HttpClient) {
     const user = localStorage.getItem('user');
     if (user) {
-      this.currentUserSubject.next(JSON.parse(user));
+      try {
+        const parsed = JSON.parse(user);
+        const normalized = { ...parsed, role: this.normalizeRole(parsed?.role ?? parsed?.profile_name) };
+        localStorage.setItem('user', JSON.stringify(normalized));
+        this.currentUserSubject.next(normalized);
+      } catch {
+        this.currentUserSubject.next(JSON.parse(user));
+      }
+    }
+  }
+
+  private normalizeRole(name: string | null | undefined): string | null {
+    if (!name) return null;
+    const n = name.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+    switch (n) {
+      case 'administrador':
+      case 'admin':
+        return 'ADMIN';
+      case 'almacen':
+      case 'almacenista':
+      case 'almacenero':
+        return 'ALMACEN';
+      case 'cajero':
+        return 'CAJERO';
+      case 'contador':
+        return 'CONTADOR';
+      default:
+        return name.toUpperCase();
     }
   }
 
@@ -29,7 +56,7 @@ export class AuthService {
           email: res?.user?.email,
           first_name: res?.user?.first_name,
           last_name: res?.user?.last_name,
-          role: res?.user?.profile_name, // compat: mantener 'role' para guards
+          role: this.normalizeRole(res?.user?.profile_name),
           token: res?.access_token,
           tokenType: res?.token_type
         };
@@ -48,7 +75,7 @@ export class AuthService {
           email: res?.user?.email,
           first_name: res?.user?.first_name,
           last_name: res?.user?.last_name,
-          role: res?.user?.profile_name,
+          role: this.normalizeRole(res?.user?.profile_name),
           token: res?.access_token,
           tokenType: res?.token_type
         };
@@ -84,6 +111,7 @@ export class AuthService {
   }
 
   getRole(): string | null {
-    return this.getUser()?.role || null; // 'role' mapeado desde profile_name
+    const role = this.getUser()?.role || null;
+    return this.normalizeRole(role);
   }
 }

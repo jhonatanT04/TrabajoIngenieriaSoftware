@@ -1,17 +1,35 @@
 
 export interface Usuario {
-  id: number;
+  id: string; // UUID en el backend
   username: string;
   email: string;
-  nombre: string;
-  apellido: string;
-  telefono?: string;
-  rol: Rol;
-  rolId: number;
-  activo: boolean;
-  fechaCreacion: Date;
-  ultimoAcceso?: Date;
-  avatar?: string;
+  first_name?: string;
+  last_name?: string;
+  phone?: string;
+  profile_id: string; // UUID
+  profile?: Profile;
+  profile_name?: string;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+  password?: string;
+  document_number?: string;
+  hashed_password?: string; // Solo para creación, no se retorna en GET
+}
+
+export interface Profile {
+  id: string;
+  name: string;
+  description?: string;
+  is_active: boolean;
+  permissions?: Permission[];
+}
+
+export interface Permission {
+  id: string;
+  module_name: string;
+  action: string;
+  description?: string;
 }
 
 export interface Rol {

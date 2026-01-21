@@ -1,4 +1,187 @@
-<h2>Ajuste de Stock – {{ producto?.nombre }}</h2>
+<div class="page-container">
+  <div class="header-section">
+    <div class="header-title">
+      <button class="btn-back" (click)="volver()" title="Volver">
+        <i class="material-icons">arrow_back</i>
+      </button>
+      <div>
+        <h1>Ajuste de Stock</h1>
+        <p class="text-muted">{{ producto?.name }}</p>
+      </div>
+    </div>
+  </div>
 
-<input type="number" [(ngModel)]="cantidad">
-<button (click)="ajustar()">Guardar</button>
+  <!-- Mensajes de estado -->
+  <div *ngIf="successMessage" class="alert alert-success alert-dismissible fade show">
+    <i class="material-icons">check_circle</i>
+    {{ successMessage }}
+  </div>
+
+  <div *ngIf="errorMessage" class="alert alert-danger alert-dismissible fade show">
+    <i class="material-icons">error</i>
+    {{ errorMessage }}
+  </div>
+
+  <!-- Información del producto -->
+  <div class="info-section" *ngIf="producto && !loading">
+    <div class="info-card">
+      <div class="info-item">
+        <label>SKU</label>
+        <p class="info-value">{{ producto.sku }}</p>
+      </div>
+      <div class="info-item">
+        <label>Código de Barras</label>
+        <p class="info-value">{{ producto.barcode || 'N/A' }}</p>
+      </div>
+      <div class="info-item">
+        <label>Unidad de Medida</label>
+        <p class="info-value">{{ producto.unit_of_measure || 'unidades' }}</p>
+      </div>
+      <div class="info-item">
+        <label>Categoría</label>
+        <p class="info-value">{{ producto.category?.name || 'Sin categoría' }}</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stock actual -->
+  <div class="stock-info-card" *ngIf="!loading">
+    <div class="stock-header">
+      <h3>Estado Actual del Stock</h3>
+    </div>
+    <div class="stock-details">
+      <div class="stock-item">
+        <span class="label">Stock Actual:</span>
+        <span class="value">{{ stockActual }}</span>
+      </div>
+      <div class="stock-item">
+        <span class="label">Stock Mínimo:</span>
+        <span class="value">{{ producto?.stock_min || 0 }}</span>
+      </div>
+      <div class="stock-item">
+        <span class="label">Stock Máximo:</span>
+        <span class="value">{{ producto?.stock_max || 0 }}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Formulario de ajuste -->
+  <div class="form-section" *ngIf="!loading">
+    <div class="form-card">
+      <h3>Información del Ajuste</h3>
+      <form [formGroup]="form" (ngSubmit)="ajustar()">
+        <!-- Nueva cantidad -->
+        <div class="form-group">
+          <label for="nuevaCantidad">Nueva Cantidad *</label>
+          <div class="input-group">
+            <input
+              type="number"
+              id="nuevaCantidad"
+              formControlName="nuevaCantidad"
+              class="form-control"
+              min="0"
+              placeholder="Ingrese la nueva cantidad"
+            />
+            <span class="input-unit">{{ producto?.unit_of_measure || 'unidades' }}</span>
+          </div>
+          <div *ngIf="submitted && f['nuevaCantidad'].errors" class="error-message">
+            <span *ngIf="f['nuevaCantidad'].errors['required']">Este campo es requerido</span>
+            <span *ngIf="f['nuevaCantidad'].errors['min']">No puede ser negativo</span>
+          </div>
+        </div>
+
+        <!-- Diferencia -->
+        <div class="form-group">
+          <label>Diferencia</label>
+          <div class="difference-box" [ngClass]="{'positive': diferencia > 0, 'negative': diferencia < 0, 'zero': diferencia === 0}">
+            <span class="icon">
+              <i class="material-icons" *ngIf="diferencia > 0">trending_up</i>
+              <i class="material-icons" *ngIf="diferencia < 0">trending_down</i>
+              <i class="material-icons" *ngIf="diferencia === 0">drag_handle</i>
+            </span>
+            <span class="value">{{ diferencia > 0 ? '+' : '' }}{{ diferencia }}</span>
+            <span class="label">{{ diferencia > 0 ? 'Incremento' : diferencia < 0 ? 'Decremento' : 'Sin cambios' }}</span>
+          </div>
+        </div>
+
+        <!-- Tipo de ajuste -->
+        <div class="form-group">
+          <label for="tipoAjuste">Tipo de Ajuste *</label>
+          <select
+            id="tipoAjuste"
+            formControlName="tipoAjuste"
+            class="form-control"
+          >
+            <option value="">Seleccione un tipo...</option>
+            <option *ngFor="let tipo of tiposAjuste" [value]="tipo.id">
+              {{ tipo.label }}
+            </option>
+          </select>
+          <div *ngIf="submitted && f['tipoAjuste'].errors" class="error-message">
+            <span *ngIf="f['tipoAjuste'].errors['required']">Debe seleccionar un tipo de ajuste</span>
+          </div>
+        </div>
+
+        <!-- Razón -->
+        <div class="form-group">
+          <label for="razon">Razón del Ajuste *</label>
+          <textarea
+            id="razon"
+            formControlName="razon"
+            class="form-control"
+            rows="3"
+            placeholder="Describa la razón del ajuste"
+          ></textarea>
+          <div *ngIf="submitted && f['razon'].errors" class="error-message">
+            <span *ngIf="f['razon'].errors['required']">La razón es obligatoria</span>
+          </div>
+        </div>
+
+        <!-- Observaciones -->
+        <div class="form-group">
+          <label for="observaciones">Observaciones Adicionales</label>
+          <textarea
+            id="observaciones"
+            formControlName="observaciones"
+            class="form-control"
+            rows="2"
+            placeholder="Añada observaciones si lo considera necesario"
+          ></textarea>
+        </div>
+
+        <!-- Botones de acción -->
+        <div class="button-group">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            (click)="resetForm()"
+            [disabled]="loading"
+          >
+            <i class="material-icons">refresh</i>
+            Limpiar
+          </button>
+          <button
+            type="submit"
+            class="btn btn-primary"
+            [disabled]="loading || form.invalid"
+          >
+            <span *ngIf="!loading">
+              <i class="material-icons">save</i>
+              Guardar Ajuste
+            </span>
+            <span *ngIf="loading">
+              <i class="material-icons spinner">hourglass_empty</i>
+              Procesando...
+            </span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="loading" class="loading-container">
+    <div class="spinner"></div>
+    <p>Cargando...</p>
+  </div>
+</div>

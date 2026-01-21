@@ -1,45 +1,64 @@
 import os
+from uuid import uuid4
+
 os.environ["DATABASE_URL"] = "sqlite:///:memory:"
 
 from fastapi.testclient import TestClient
-from backend.main import app
-from backend.app.db.database import init_db
+from app.main import app
+from app.db.database import init_db
 
 init_db()
 client = TestClient(app)
 
+
 def test_root():
     r = client.get("/")
     assert r.status_code == 200
-    assert r.json().get("status") == "ok"
+    assert "message" in r.json()
+
 
 def test_register_and_login_and_product_flow():
-    # register
-    register_payload = {"username": "admin", "password": "secret", "full_name": "Admin User", "role": "admin"}
+    # registrar usuario admin para pruebas
+    username = f"user_{uuid4().hex[:8]}"
+    email = f"{username}@example.com"
+    register_payload = {
+        "username": username,
+        "email": email,
+        "password": "secret",
+        "profile_name": "Administrador",
+    }
     r = client.post("/auth/register", json=register_payload)
     assert r.status_code == 200
     data = r.json()
-    assert data["username"] == "admin"
-
-    # token
-    token_resp = client.post("/auth/token", data={"username": "admin", "password": "secret"})
-    assert token_resp.status_code == 200
-    token = token_resp.json()["access_token"]
-
+    token = data["access_token"]
     headers = {"Authorization": f"Bearer {token}"}
 
+    # login para validar credenciales
+    login_resp = client.post("/auth/login", json={"username": username, "password": "secret"})
+    assert login_resp.status_code == 200
+
     # create product
-    p_payload = {"sku": "SKU1", "name": "Producto 1", "price_sale": 10.0, "stock": 100}
-    r = client.post("/products/", json=p_payload)
+    sku = f"SKU_{uuid4().hex[:8]}"
+    p_payload = {
+        "sku": sku,
+        "name": "Producto 1",
+        "cost_price": 5.0,
+        "sale_price": 10.0,
+        "stock_min": 0,
+        "requires_lot_control": False,
+        "requires_expiration_date": False,
+        "is_active": True,
+    }
+    r = client.post("/products", json=p_payload, headers=headers)
     assert r.status_code == 200
     product = r.json()
 
     # list products
-    r = client.get("/products/")
+    r = client.get("/products", headers=headers)
     assert r.status_code == 200
     assert len(r.json()) >= 1
 
     # adjust inventory
-    adj = {"product_id": product["id"], "quantity": -5, "reason": "venta manual"}
-    r = client.post("/inventory/adjust", json=adj)
+    adj = {"product_id": product["id"], "new_quantity": 95, "reason": "venta manual"}
+    r = client.post("/inventory/adjustment", json=adj, headers=headers)
     assert r.status_code == 200

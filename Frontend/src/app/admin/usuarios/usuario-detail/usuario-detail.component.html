@@ -1,5 +1,14 @@
-<h2>{{ usuario?.nombre }}</h2>
-<p>Email: {{ usuario?.email }}</p>
-<p>Rol: {{ usuario?.rol }}</p>
+<div *ngIf="loading" class="spinner">Cargando...</div>
+<div *ngIf="error" class="alert alert-danger">{{ error }}</div>
 
-<a [routerLink]="['/admin/usuarios', usuario.id, 'edit']">Editar</a>
+<div *ngIf="usuario && !loading" class="usuario-detail">
+  <h2>{{ usuario.first_name }} {{ usuario.last_name }}</h2>
+  <p><strong>Usuario:</strong> {{ usuario.username }}</p>
+  <p><strong>Email:</strong> {{ usuario.email }}</p>
+  <p><strong>Rol:</strong> {{ usuario.profile?.name }}</p>
+  <p><strong>Teléfono:</strong> {{ usuario.phone }}</p>
+  <p><strong>Estado:</strong> <span [class]="usuario.is_active ? 'badge badge-success' : 'badge badge-danger'">{{ usuario.is_active ? 'Activo' : 'Inactivo' }}</span></p>
+  
+  <a [routerLink]="['/admin/usuarios', usuario.id, 'edit']" class="btn btn-primary">Editar</a>
+  <a [routerLink]="['/admin/usuarios']" class="btn btn-secondary">Volver</a>
+</div>

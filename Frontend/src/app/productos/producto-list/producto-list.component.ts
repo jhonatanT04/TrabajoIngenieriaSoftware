@@ -1,21 +1,9 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-
-interface Producto {
-  id: number;
-  codigo: string;
-  nombre: string;
-  descripcion: string;
-  precioCompra: number;
-  precioVenta: number;
-  stock: number;
-  categoria: string;
-  proveedor: string;
-  activo: boolean;
-  fechaCreacion: Date;
-}
+import { ProductoService } from '../../core/services/producto.service';
+import { Producto } from '../../core/models/producto.model';
 
 @Component({
   selector: 'app-producto-list',
@@ -24,58 +12,41 @@ interface Producto {
   templateUrl: './producto-list.component.html',
   styleUrls: ['./producto-list.component.css']
 })
-export class ProductoListComponent {
+export class ProductoListComponent implements OnInit {
 
-  productos: Producto[] = [
-    {
-      id: 1,
-      codigo: 'PROD001',
-      nombre: 'Arroz Blanco 1kg',
-      descripcion: 'Arroz de excelente calidad',
-      precioCompra: 1.20,
-      precioVenta: 2.50,
-      stock: 150,
-      categoria: 'Alimentos',
-      proveedor: 'Proveedor A',
-      activo: true,
-      fechaCreacion: new Date('2024-01-15')
-    },
-    {
-      id: 2,
-      codigo: 'PROD002',
-      nombre: 'Leche Integral 1L',
-      descripcion: 'Leche fresca pasteurizada',
-      precioCompra: 0.80,
-      precioVenta: 1.50,
-      stock: 200,
-      categoria: 'Lácteos',
-      proveedor: 'Proveedor B',
-      activo: true,
-      fechaCreacion: new Date('2024-01-20')
-    },
-    {
-      id: 3,
-      codigo: 'PROD003',
-      nombre: 'Pan Integral 500g',
-      descripcion: 'Pan recién horneado',
-      precioCompra: 0.50,
-      precioVenta: 1.00,
-      stock: 80,
-      categoria: 'Panadería',
-      proveedor: 'Panadería Local',
-      activo: true,
-      fechaCreacion: new Date('2024-02-10')
-    }
-  ];
-
+  productos: Producto[] = [];
   searchTerm = '';
   currentPage = 1;
   itemsPerPage = 10;
+  loading = true;
+  error = '';
+
+  constructor(private productoService: ProductoService) {}
+
+  ngOnInit(): void {
+    this.loadProductos();
+  }
+
+  loadProductos(): void {
+    this.loading = true;
+    this.productoService.getAll().subscribe({
+      next: (productos) => {
+        this.productos = productos;
+        this.loading = false;
+      },
+      error: (err) => {
+        console.error('Error cargando productos:', err);
+        this.error = 'Error al cargar productos';
+        this.loading = false;
+      }
+    });
+  }
 
   get filteredProductos(): Producto[] {
+    if (!this.searchTerm) return this.productos;
     return this.productos.filter(p =>
-      p.nombre.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
-      p.codigo.toLowerCase().includes(this.searchTerm.toLowerCase())
+      p.name.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
+      p.sku.toLowerCase().includes(this.searchTerm.toLowerCase())
     );
   }
 
@@ -89,13 +60,30 @@ export class ProductoListComponent {
   }
 
   deleteProducto(producto: Producto): void {
-    if (confirm(`¿Está seguro de eliminar el producto ${producto.nombre}?`)) {
-      this.productos = this.productos.filter(p => p.id !== producto.id);
+    if (confirm(`¿Está seguro de eliminar el producto ${producto.name}?`)) {
+      this.productoService.delete(producto.id!).subscribe({
+        next: () => {
+          this.loadProductos();
+        },
+        error: (err) => {
+          console.error('Error eliminando producto:', err);
+          alert('Error al eliminar el producto');
+        }
+      });
     }
   }
 
   toggleStatus(producto: Producto): void {
-    producto.activo = !producto.activo;
+    const nuevoEstado = !producto.is_active;
+    this.productoService.update(producto.id!, { is_active: nuevoEstado }).subscribe({
+      next: () => {
+        producto.is_active = nuevoEstado;
+      },
+      error: (err) => {
+        console.error('Error actualizando estado:', err);
+        alert('Error al actualizar el estado del producto');
+      }
+    });
   }
 
   previousPage(): void {

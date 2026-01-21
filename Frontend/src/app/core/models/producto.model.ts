@@ -1,60 +1,71 @@
 
 export interface Producto {
-  id: number;
-  codigo: string;
-  nombre: string;
-  descripcion?: string;
-  categoriaId: number;
-  categoria: Categoria;
-  precio: number;
-  precioCompra: number;
-  stock: number;
-  stockMinimo: number;
-  stockMaximo: number;
-  unidadMedida: string;
-  imagen?: string;
-  activo: boolean;
-  proveedorId?: number;
-  proveedor?: Proveedor;
-  iva: number;
-  descuento?: number;
-  fechaCreacion: Date;
-  fechaActualizacion?: Date;
+  id?: string; // UUID del backend
+  sku: string;
+  barcode?: string;
+  name: string;
+  description?: string;
+  category_id?: string;
+  category?: Categoria;
+  brand_id?: string;
+  brand?: Brand;
+  main_supplier_id?: string;
+  supplier?: Proveedor;
+  unit_of_measure: string;
+  sale_price: number;
+  cost_price: number;
+  tax_rate: number;
+  stock_min: number;
+  stock_max?: number;
+  weight?: number;
+  requires_lot_control: boolean;
+  requires_expiration_date: boolean;
+  is_active: boolean;
+  created_at?: string;
+  updated_at?: string;
 }
 
 export interface Categoria {
-  id: number;
-  nombre: string;
-  descripcion?: string;
-  activo: boolean;
-  orden?: number;
-  icono?: string;
+  id: string;
+  name: string;
+  description?: string;
+  parent_category_id?: string;
+  created_at?: string;
+}
+
+export interface Brand {
+  id: string;
+  name: string;
+  description?: string;
 }
 
 export interface Proveedor {
-  id: number;
-  nombre: string;
-  razonSocial: string;
-  ruc: string;
-  telefono: string;
-  email: string;
-  direccion: string;
-  ciudad: string;
-  contacto: string;
-  activo: boolean;
+  id: string;
+  business_name: string;
+  tax_id?: string;
+  contact_name?: string;
+  email?: string;
+  phone?: string;
+  address?: string;
+  city?: string;
+  country?: string;
+  is_active: boolean;
+  created_at?: string;
+  updated_at?: string;
 }
 
 export interface ProductoCreateRequest {
-  codigo: string;
-  nombre: string;
-  descripcion?: string;
-  categoriaId: number;
-  precio: number;
-  precioCompra: number;
-  stock: number;
-  stockMinimo: number;
-  stockMaximo: number;
-  unidadMedida: string;
-  proveedorId?: number;
-  iva: number;
+  sku: string;
+  name: string;
+  description?: string;
+  category_id?: string;
+  brand_id?: string;
+  main_supplier_id?: string;
+  unit_of_measure: string;
+  sale_price: number;
+  cost_price: number;
+  tax_rate: number;
+  stock_min: number;
+  stock_max?: number;
+  is_active?: boolean;
 }

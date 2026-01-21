@@ -7,6 +7,21 @@
 
     
     <div class="filters-section">
+      <div class="filter-group">
+        <label for="productoFilter">Filtrar por producto:</label>
+        <select 
+          id="productoFilter" 
+          [(ngModel)]="productoFilter" 
+          (change)="onFilterChange()"
+          class="filter-select"
+        >
+          <option value="">Todos los productos</option>
+          <option *ngFor="let producto of productos" [value]="producto.id">
+            {{ producto.name }} ({{ producto.sku }})
+          </option>
+        </select>
+      </div>
+      
       <div class="search-box">
         <span class="material-icons">search</span>
         <input
@@ -34,15 +49,15 @@
       </thead>
       <tbody>
         <tr *ngFor="let movimiento of paginatedMovimientos">
-          <td>{{ movimiento.fecha | date:'short' }}</td>
+          <td>{{ movimiento.fecha ? (movimiento.fecha | date:'short') : '—' }}</td>
           <td>
             <span [class]="'badge badge-' + (movimiento.tipo === 'Entrada' ? 'success' : movimiento.tipo === 'Salida' ? 'warning' : 'info')">
-              {{ movimiento.tipo }}
+              {{ movimiento.tipo || movimiento.movement_type || 'N/A' }}
             </span>
           </td>
-          <td>{{ movimiento.producto }}</td>
-          <td><strong>{{ movimiento.cantidad }}</strong></td>
-          <td>{{ movimiento.usuario }}</td>
+          <td>{{ movimiento.producto || movimiento.product_name || movimiento.product_id }}</td>
+          <td><strong>{{ movimiento.cantidad ?? movimiento.quantity }}</strong></td>
+          <td>{{ movimiento.usuario || movimiento.user_name || movimiento.user_id }}</td>
           <td class="actions">
             <button
               (click)="deleteMovimiento(movimiento)"
