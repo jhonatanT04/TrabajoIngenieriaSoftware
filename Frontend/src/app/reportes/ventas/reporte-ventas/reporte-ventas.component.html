@@ -1,15 +1,111 @@
-<h2>Reporte de Ventas</h2>
+<div class="container">
+  <div class="section-header">
+    <h2>Reporte de Ventas</h2>
+  </div>
 
-<table>
-  <tr>
-    <th>Fecha</th>
-    <th>Producto</th>
-    <th>Cantidad</th>
-  </tr>
+  <div *ngIf="error" class="alert alert-danger">{{ error }}</div>
 
-  <tr *ngFor="let v of ventas">
-    <td>{{ v.fecha | date:'short' }}</td>
-    <td>{{ v.producto }}</td>
-    <td>{{ v.cantidad }}</td>
-  </tr>
-</table>
+  <!-- Filtros -->
+  <div class="filters-section">
+    <div class="filter-group">
+      <label for="fecha_inicio">Desde</label>
+      <input
+        id="fecha_inicio"
+        type="date"
+        [(ngModel)]="filtro.fecha_inicio"
+        class="form-control"
+      />
+    </div>
+    <div class="filter-group">
+      <label for="fecha_fin">Hasta</label>
+      <input
+        id="fecha_fin"
+        type="date"
+        [(ngModel)]="filtro.fecha_fin"
+        class="form-control"
+      />
+    </div>
+    <div class="filter-actions">
+      <button (click)="cargarReporte()" class="btn btn-primary">
+        <span class="material-icons">search</span>
+        Buscar
+      </button>
+      <button (click)="limpiarFiltros()" class="btn btn-secondary">
+        <span class="material-icons">clear</span>
+        Limpiar
+      </button>
+    </div>
+  </div>
+
+  <!-- Resumen -->
+  <div class="summary" *ngIf="!loading && ventas.length > 0">
+    <div class="summary-item">
+      <span class="label">Total Ventas</span>
+      <span class="value">{{ cantidadVentas }}</span>
+    </div>
+    <div class="summary-item">
+      <span class="label">Subtotal</span>
+      <span class="value">{{ subtotal | currency }}</span>
+    </div>
+    <div class="summary-item">
+      <span class="label">Total Venta</span>
+      <span class="value">{{ totalVentas | currency }}</span>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="loading" class="spinner">
+    <div class="spinner-border"></div>
+    <p>Cargando reporte...</p>
+  </div>
+
+  <!-- Tabla -->
+  <div *ngIf="!loading" class="table-container">
+    <table class="table" *ngIf="ventas.length > 0">
+      <thead>
+        <tr>
+          <th>Número</th>
+          <th>Fecha</th>
+          <th>Cliente</th>
+          <th>Subtotal</th>
+          <th>Descuento</th>
+          <th>Impuesto</th>
+          <th>Total</th>
+          <th>Estado</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let venta of ventas">
+          <td>{{ venta.sale_number }}</td>
+          <td>{{ venta.sale_date | date: 'dd/MM/yyyy HH:mm' }}</td>
+          <td>{{ venta.customer?.first_name }} {{ venta.customer?.last_name }}</td>
+          <td>{{ venta.subtotal | currency }}</td>
+          <td>{{ venta.discount_amount | currency }}</td>
+          <td>{{ venta.tax_amount | currency }}</td>
+          <td><strong>{{ venta.total_amount | currency }}</strong></td>
+          <td>
+            <span [class]="'badge badge-' + (venta.status === 'completada' ? 'success' : 'warning')">
+              {{ venta.status }}
+            </span>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div *ngIf="ventas.length === 0" class="empty-state">
+      <span class="material-icons">assessment</span>
+      <p>No hay ventas para el período seleccionado</p>
+    </div>
+  </div>
+
+  <!-- Acciones -->
+  <div class="actions">
+    <button (click)="descargarPDF()" class="btn-icon" title="Descargar PDF">
+      <span class="material-icons">file_download</span>
+    </button>
+    <button (click)="volver()" class="btn btn-secondary">
+      <span class="material-icons">arrow_back</span>
+      Volver a Reportes
+    </button>
+  </div>
+</div>

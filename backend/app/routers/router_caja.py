@@ -4,14 +4,24 @@ from uuid import UUID
 from pydantic import BaseModel
 from datetime import datetime
 from sqlmodel import select
+from sqlalchemy.orm import selectinload
 
 from app.deps import DBSession, get_current_user
 from app.models.models import CashRegisterSession, CashRegister, CashTransaction, User, TransactionType, SessionStatus
 from app.auth.auth import RoleChecker
 
-router = APIRouter()
+router = APIRouter(
+    prefix="/caja",
+    tags=["Caja"]
+)
 
 # ========== SCHEMAS ==========
+class CashRegisterResponse(BaseModel):
+    id: str
+    register_number: str
+    location: Optional[str] = None
+    is_active: bool
+
 class SessionOpenRequest(BaseModel):
     cash_register_id: UUID
     opening_amount: float
@@ -33,10 +43,21 @@ def format_cash_session(session: CashRegisterSession) -> dict:
     """
     Formatea una sesión de caja según lo esperado por el frontend Angular
     """
+    # Cargar relación del usuario si no está cargada
+    user_data = None
+    if session.user:
+        user_data = {
+            "id": str(session.user.id),
+            "first_name": session.user.first_name,
+            "last_name": session.user.last_name,
+            "email": session.user.email
+        }
+    
     return {
         "id": str(session.id),
         "cash_register_id": str(session.cash_register_id),
         "user_id": str(session.user_id),
+        "user": user_data,
         "opening_date": session.opening_date.isoformat(),
         "closing_date": session.closing_date.isoformat() if session.closing_date else None,
         "opening_amount": session.opening_amount,
@@ -64,7 +85,35 @@ def format_cash_transaction(transaction: CashTransaction) -> dict:
     }
 
 # ========== ENDPOINTS ==========
-@router.post("/cash-sessions/open", tags=["Caja"], dependencies=[Depends(RoleChecker(allowed_roles=["Administrador", "Cajero"]))])
+@router.get("/cash-registers", dependencies=[Depends(RoleChecker(allowed_roles=["Administrador", "Cajero"]))])
+async def get_cash_registers(
+    db: DBSession,
+    current_user: User = Depends(get_current_user),
+    is_active: Optional[bool] = Query(True, description="Filtrar por cajas activas")
+):
+    """
+    Obtener lista de cajas registradoras disponibles
+    """
+    query = select(CashRegister)
+    if is_active is not None:
+        query = query.where(CashRegister.is_active == is_active)
+    
+    cash_registers = db.exec(query.order_by(CashRegister.register_number)).all()
+    
+    return {
+        "success": True,
+        "data": [
+            {
+                "id": str(cr.id),
+                "register_number": cr.register_number,
+                "location": cr.location,
+                "is_active": cr.is_active
+            }
+            for cr in cash_registers
+        ]
+    }
+
+@router.post("/cash-sessions/open", dependencies=[Depends(RoleChecker(allowed_roles=["Administrador", "Cajero"]))])
 async def open_cash_session(
     session_data: SessionOpenRequest,
     db: DBSession,
@@ -113,7 +162,7 @@ async def open_cash_session(
     
     return format_cash_session(session)
 
-@router.post("/cash-sessions/{session_id}/close", tags=["Caja"], dependencies=[Depends(RoleChecker(allowed_roles=["Administrador", "Cajero"]))])
+@router.post("/cash-sessions/{session_id}/close", dependencies=[Depends(RoleChecker(allowed_roles=["Administrador", "Cajero"]))])
 async def close_cash_session(
     session_id: UUID,
     close_data: SessionCloseRequest,
@@ -124,7 +173,7 @@ async def close_cash_session(
     Cerrar una sesión de caja
     """
     # Obtener sesión
-    session = db.exec(select(CashRegisterSession).where(CashRegisterSession.id == session_id)).first()
+    session = db.exec(select(CashRegisterSession).options(selectinload(CashRegisterSession.user)).where(CashRegisterSession.id == session_id)).first()
     
     if not session:
         raise HTTPException(
@@ -165,17 +214,29 @@ async def close_cash_session(
     
     return format_cash_session(session)
 
-@router.get("/cash-sessions", tags=["Caja"], dependencies=[Depends(RoleChecker(allowed_roles=["Administrador", "Cajero"]))])
+@router.get("/cash-sessions", dependencies=[Depends(RoleChecker(allowed_roles=["Administrador", "Cajero"]))])
 async def list_cash_sessions(
     db: DBSession,
+    current_user: User = Depends(get_current_user),
     skip: int = Query(0, ge=0),
     limit: int = Query(100, ge=1, le=1000),
     status: Optional[str] = None
 ):
     """
-    Listar sesiones de caja con paginación y filtros
+    Listar sesiones de caja con paginación y filtros.
+    Admin ve todas las sesiones, Cajero solo ve las suyas.
     """
-    query = select(CashRegisterSession)
+    from app.crud.users_crud import profile
+    
+    query = select(CashRegisterSession).options(selectinload(CashRegisterSession.user))
+    
+    # Obtener perfil del usuario para determinar si es admin o cajero
+    user_profile = profile.get(db, id=current_user.profile_id)
+    is_admin = user_profile and user_profile.name.upper() in ["ADMIN", "ADMINISTRADOR"]
+    
+    # Si es cajero, filtrar solo sus sesiones
+    if not is_admin:
+        query = query.where(CashRegisterSession.user_id == current_user.id)
     
     if status:
         try:
@@ -194,7 +255,7 @@ async def list_cash_sessions(
     sessions = db.exec(query).all()
     return [format_cash_session(session) for session in sessions]
 
-@router.get("/cash-sessions/{session_id}", tags=["Caja"], dependencies=[Depends(RoleChecker(allowed_roles=["Administrador", "Cajero"]))])
+@router.get("/cash-sessions/{session_id}", dependencies=[Depends(RoleChecker(allowed_roles=["Administrador", "Cajero"]))])
 async def get_cash_session(
     session_id: UUID,
     db: DBSession
@@ -202,7 +263,7 @@ async def get_cash_session(
     """
     Obtener detalles de una sesión de caja específica
     """
-    session = db.exec(select(CashRegisterSession).where(CashRegisterSession.id == session_id)).first()
+    session = db.exec(select(CashRegisterSession).options(selectinload(CashRegisterSession.user)).where(CashRegisterSession.id == session_id)).first()
     
     if not session:
         raise HTTPException(
@@ -212,7 +273,7 @@ async def get_cash_session(
     
     return format_cash_session(session)
 
-@router.post("/cash-sessions/{session_id}/transactions", tags=["Caja"], dependencies=[Depends(RoleChecker(allowed_roles=["Administrador", "Cajero"]))])
+@router.post("/cash-sessions/{session_id}/transactions", dependencies=[Depends(RoleChecker(allowed_roles=["Administrador", "Cajero"]))])
 async def create_cash_transaction(
     session_id: UUID,
     transaction_data: TransactionCreate,
@@ -264,7 +325,7 @@ async def create_cash_transaction(
     
     return format_cash_transaction(transaction)
 
-@router.get("/cash-sessions/{session_id}/transactions", tags=["Caja"], dependencies=[Depends(RoleChecker(allowed_roles=["Administrador", "Cajero"]))])
+@router.get("/cash-sessions/{session_id}/transactions", dependencies=[Depends(RoleChecker(allowed_roles=["Administrador", "Cajero"]))])
 async def list_session_transactions(
     session_id: UUID,
     db: DBSession
@@ -287,3 +348,63 @@ async def list_session_transactions(
     transactions = db.exec(query).all()
     
     return [format_cash_transaction(trans) for trans in transactions]
+
+@router.get("/cash-sessions/user/active", dependencies=[Depends(RoleChecker(allowed_roles=["Administrador", "Cajero"]))])
+async def get_active_session(
+    db: DBSession,
+    current_user: User = Depends(get_current_user)
+):
+    """
+    Obtener la sesión de caja abierta actualmente para el usuario autenticado
+    """
+    query = select(CashRegisterSession).options(selectinload(CashRegisterSession.user)).where(
+        CashRegisterSession.user_id == current_user.id,
+        CashRegisterSession.status == SessionStatus.abierta
+    )
+    session = db.exec(query).first()
+    
+    if not session:
+        return None
+    
+    # Incluir información del usuario
+    result = format_cash_session(session)
+    result["user"] = {
+        "id": str(current_user.id),
+        "username": current_user.username,
+        "first_name": current_user.first_name,
+        "last_name": current_user.last_name
+    }
+    
+    return result
+
+@router.get("/cash-sessions/status/summary", dependencies=[Depends(RoleChecker(allowed_roles=["Administrador"]))])
+async def get_cash_sessions_summary(
+    db: DBSession
+):
+    """
+    Obtener resumen de todas las sesiones de caja abiertas (solo admin)
+    """
+    query = select(CashRegisterSession).options(selectinload(CashRegisterSession.user)).where(
+        CashRegisterSession.status == SessionStatus.abierta
+    )
+    query = query.order_by(CashRegisterSession.opening_date.desc())
+    sessions = db.exec(query).all()
+    
+    result = {
+        "total_open_sessions": len(sessions),
+        "sessions": [],
+        "total_in_registers": 0.0
+    }
+    
+    for session in sessions:
+        session_data = format_cash_session(session)
+        session_data["user"] = {
+            "id": str(session.user.id),
+            "username": session.user.username,
+            "first_name": session.user.first_name,
+            "last_name": session.user.last_name
+        }
+        result["sessions"].append(session_data)
+        result["total_in_registers"] += session.opening_amount
+    
+    return result

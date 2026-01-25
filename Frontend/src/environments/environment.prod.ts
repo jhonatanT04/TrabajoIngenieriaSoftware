@@ -1,6 +1,3 @@
-/**
- * Configuración de ambiente para producción
- */
 export const environment = {
   production: true,
   apiUrl: '/api',

@@ -1,5 +1,5 @@
 <div class="pos-container">
-  
+
   <section class="productos-panel">
     <div class="search-bar">
       <span class="material-icons">search</span>
@@ -10,9 +10,14 @@
       />
     </div>
 
-    <div class="productos-grid">
+    <div class="loading" *ngIf="loading">
+      <span class="material-icons spin">autorenew</span>
+      Cargando productos...
+    </div>
+
+    <div class="productos-grid" *ngIf="!loading && productosFiltrados.length; else noProductos">
       <button
-        *ngFor="let p of productos"
+        *ngFor="let p of productosFiltrados"
         (click)="agregar(p)"
         class="producto-card"
         [class.disabled]="p.stock <= 0"
@@ -29,6 +34,13 @@
         </div>
       </button>
     </div>
+
+    <ng-template #noProductos>
+      <div class="productos-empty">
+        <span class="material-icons">inventory_2</span>
+        <p>No hay productos que coincidan</p>
+      </div>
+    </ng-template>
   </section>
 
   

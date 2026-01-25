@@ -1,0 +1,31 @@
+<div class="container">
+  <div class="section-header">
+    <h2>Crear Nuevo Reporte</h2>
+    <p class="subtitle">Selecciona el tipo de reporte que deseas generar</p>
+  </div>
+
+  <div class="tipos-grid">
+    <div
+      *ngFor="let tipo of tiposReporte"
+      (click)="seleccionarReporte(tipo)"
+      class="tipo-card"
+    >
+      <div class="card-icon">
+        <span class="material-icons">{{ tipo.icono }}</span>
+      </div>
+      <h3>{{ tipo.nombre }}</h3>
+      <p>{{ tipo.descripcion }}</p>
+      <button class="btn btn-primary">
+        Ir a {{ tipo.nombre }}
+        <span class="material-icons">arrow_forward</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="actions">
+    <button type="button" (click)="volver()" class="btn btn-secondary">
+      <span class="material-icons">arrow_back</span>
+      Volver a Reportes
+    </button>
+  </div>
+</div>

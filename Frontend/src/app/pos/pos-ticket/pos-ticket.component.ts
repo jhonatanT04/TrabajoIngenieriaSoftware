@@ -15,7 +15,11 @@ export class PosTicketComponent {
   now = new Date();
   folio = Math.floor(Math.random() * 10000).toString().padStart(4, '0');
 
-  constructor(private router: Router) {}
+  constructor(private router: Router) {
+    if (!this.data || !this.data.carrito) {
+      this.router.navigate(['/pos']);
+    }
+  }
 
   nuevaVenta() {
     this.router.navigate(['/pos']);

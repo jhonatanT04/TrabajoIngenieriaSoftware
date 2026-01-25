@@ -1,5 +1,99 @@
-<h2>Reporte de Caja</h2>
+<div class="container">
+  <div class="section-header">
+    <h2>Reporte de Caja</h2>
+  </div>
 
-<p>Monto inicial: ${{ estado.montoInicial }}</p>
-<p>Total ventas: ${{ estado.ventas }}</p>
-<h3>Total final: ${{ estado.total }}</h3>
+  <div *ngIf="error" class="alert alert-danger">{{ error }}</div>
+
+  <!-- Filtros -->
+  <div class="filters-section">
+    <div class="filter-actions">
+      <button (click)="cargarReporte()" class="btn btn-primary">
+        <span class="material-icons">search</span>
+        Cargar
+      </button>
+      <button (click)="limpiarFiltros()" class="btn btn-secondary">
+        <span class="material-icons">clear</span>
+        Limpiar
+      </button>
+    </div>
+  </div>
+
+  <!-- Resumen -->
+  <div class="summary" *ngIf="!loading && sesiones.length > 0">
+    <div class="summary-item">
+      <span class="label">Total Sesiones</span>
+      <span class="value">{{ totalSesiones }}</span>
+    </div>
+    <div class="summary-item">
+      <span class="label">Total Apertura</span>
+      <span class="value">{{ totalApertura | currency }}</span>
+    </div>
+    <div class="summary-item">
+      <span class="label">Total Cierre</span>
+      <span class="value">{{ totalCierre | currency }}</span>
+    </div>
+    <div class="summary-item">
+      <span class="label">Diferencia</span>
+      <span class="value" [style.color]="totalDiferencia >= 0 ? '#16a34a' : '#dc2626'">
+        {{ totalDiferencia | currency }}
+      </span>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="loading" class="spinner">
+    <div class="spinner-border"></div>
+    <p>Cargando reporte...</p>
+  </div>
+
+  <!-- Tabla -->
+  <div *ngIf="!loading" class="table-container">
+    <table class="table" *ngIf="sesiones.length > 0">
+      <thead>
+        <tr>
+          <th>Fecha Apertura</th>
+          <th>Usuario</th>
+          <th>Monto Apertura</th>
+          <th>Monto Cierre Esperado</th>
+          <th>Monto Cierre Real</th>
+          <th>Diferencia</th>
+          <th>Estado</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let sesion of sesiones">
+          <td>{{ sesion.opening_date | date: 'dd/MM/yyyy HH:mm' }}</td>
+          <td>{{ sesion.user?.first_name }} {{ sesion.user?.last_name }}</td>
+          <td>{{ sesion.opening_amount | currency }}</td>
+          <td>{{ sesion.expected_closing_amount | currency }}</td>
+          <td>{{ sesion.actual_closing_amount | currency }}</td>
+          <td [style.color]="sesion.difference >= 0 ? '#16a34a' : '#dc2626'">
+            {{ sesion.difference | currency }}
+          </td>
+          <td>
+            <span [class]="'badge badge-' + (sesion.status === 'abierta' ? 'warning' : 'success')">
+              {{ sesion.status | uppercase }}
+            </span>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div *ngIf="sesiones.length === 0" class="empty-state">
+      <span class="material-icons">point_of_sale</span>
+      <p>No hay sesiones de caja</p>
+    </div>
+  </div>
+
+  <!-- Acciones -->
+  <div class="actions">
+    <button (click)="descargarPDF()" class="btn-icon" title="Descargar PDF">
+      <span class="material-icons">file_download</span>
+    </button>
+    <button (click)="volver()" class="btn btn-secondary">
+      <span class="material-icons">arrow_back</span>
+      Volver a Reportes
+    </button>
+  </div>
+</div>

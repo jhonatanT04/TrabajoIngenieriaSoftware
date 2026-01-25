@@ -31,7 +31,6 @@
           <th>Nombre</th>
           <th>Email</th>
           <th>Teléfono</th>
-          <th>Deuda</th>
           <th>Estado</th>
           <th>Acciones</th>
         </tr>
@@ -41,9 +40,6 @@
           <td>{{ cliente.first_name }} {{ cliente.last_name }}</td>
           <td>{{ cliente.email }}</td>
           <td>{{ cliente.phone }}</td>
-          <td>
-            <span class="loyalty-points">{{ cliente.loyalty_points | number: '1.0-0' }} pts</span>
-          </td>
           <td>
             <span [class]="'badge badge-' + (cliente.is_active ? 'success' : 'danger')">
               {{ cliente.is_active ? 'Activo' : 'Inactivo' }}
@@ -58,7 +54,7 @@
               <span class="material-icons">visibility</span>
             </button>
             <button
-              [routerLink]="['/clientes/edit', cliente.id]"
+              [routerLink]="['/clientes', cliente.id, 'edit']"
               class="btn-icon edit"
               title="Editar"
             >

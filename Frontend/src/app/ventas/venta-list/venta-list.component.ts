@@ -42,7 +42,6 @@ export class VentaListComponent implements OnInit {
     this.loading = true;
     this.ventaService.getAll().subscribe({
       next: (data: any) => {
-        // Transformar datos del backend al formato esperado por el template
         this.ventas = (Array.isArray(data) ? data : []).map((v: any) => ({
           id: v.id,
           created_at: new Date(v.created_at || v.sale_date),
@@ -56,6 +55,7 @@ export class VentaListComponent implements OnInit {
             : (v.cashier?.username || 'Sin vendedor'),
           ...v
         }));
+        
         this.loading = false;
       },
       error: (err) => {
@@ -88,7 +88,6 @@ export class VentaListComponent implements OnInit {
   }
 
   deleteVenta(venta: VentaDisplay): void {
-    console.log('🗑️ Intentando eliminar venta:', venta);
     this.dialogService.confirm({
       title: 'Eliminar Venta',
       message: `¿Está seguro de que desea eliminar la venta ${venta['sale_number']}?`,
@@ -96,12 +95,8 @@ export class VentaListComponent implements OnInit {
       cancelText: 'Cancelar'
     }).then(confirmed => {
       if (confirmed) {
-        console.log('✅ Usuario confirmó eliminación, llamando al servicio...');
-        // Llamar al servicio para eliminar del backend
         this.ventaService.delete(venta.id).subscribe({
           next: () => {
-            console.log('✅ Venta eliminada del servidor');
-            // Remover de la lista local
             this.ventas = this.ventas.filter(v => v.id !== venta.id);
             if (this.currentPage > this.totalPages && this.totalPages > 0) {
               this.currentPage = this.totalPages;
@@ -109,12 +104,10 @@ export class VentaListComponent implements OnInit {
             this.error = '';
           },
           error: (err) => {
-            console.error('❌ Error al eliminar venta:', err);
+            console.error('Error al eliminar venta:', err);
             this.error = 'Error al eliminar la venta: ' + (err.error?.detail || err.message || 'Error desconocido');
           }
         });
-      } else {
-        console.log('❌ Usuario canceló la eliminación');
       }
     });
   }

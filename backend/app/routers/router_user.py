@@ -47,8 +47,10 @@ async def create_user(
     db: DBSession
 ):
     from app.crud.users_crud import user, profile
-    from app.models.models import User as UserModel, Profile
+    from app.models.models import User as UserModel, Profile, CashRegister, CashRegisterSession
     from app.auth.auth import get_password_hash
+    from app.models.enums import SessionStatus
+    import unicodedata
     
     existing = user.get_by_username(db, username=user_data.username)
     if existing:
@@ -76,6 +78,44 @@ async def create_user(
     db.add(new_user)
     db.commit()
     db.refresh(new_user)
+    
+    # ⭐ AUTO-ASIGNAR CAJA SI ES CAJERO
+    # Normalizar nombre del perfil para comparación
+    def normalize_role(name: str) -> str:
+        n = unicodedata.normalize('NFD', name or '').encode('ascii', 'ignore').decode('ascii')
+        return n.strip().upper()
+    
+    if normalize_role(profile_obj.name) == "CAJERO":
+        # Buscar primera caja activa sin sesión abierta
+        all_registers = db.exec(select(CashRegister).where(CashRegister.is_active == True)).all()
+        
+        assigned_caja = None
+        for cash_register in all_registers:
+            # Verificar si tiene sesión abierta
+            active_session = db.exec(
+                select(CashRegisterSession).where(
+                    CashRegisterSession.cash_register_id == cash_register.id,
+                    CashRegisterSession.status == SessionStatus.abierta
+                )
+            ).first()
+            
+            if not active_session:
+                assigned_caja = cash_register
+                break
+        
+        # Si no hay caja disponible, crear una nueva
+        if not assigned_caja:
+            from datetime import datetime as dt
+            new_caja = CashRegister(
+                register_number=f"CAJA-{len(all_registers) + 1:03d}",
+                location=f"Asignada a {new_user.first_name} {new_user.last_name}",
+                is_active=True,
+                created_at=dt.utcnow()
+            )
+            db.add(new_caja)
+            db.commit()
+            db.refresh(new_caja)
+            assigned_caja = new_caja
     
     # Retornar usuario con estructura esperada por Angular
     return {

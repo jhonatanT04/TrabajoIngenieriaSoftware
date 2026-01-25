@@ -1,6 +1,25 @@
-<div class="pos-layout">
-  <header class="pos-header">
-    <h2>POS – Punto de Venta</h2>
+<div class="pos-shell">
+  <header class="pos-topbar">
+    <div class="topbar-left">
+      <button class="ghost-btn" type="button" (click)="goToDashboard()">
+        <span class="material-icons">arrow_back</span>
+        Volver al panel
+      </button>
+      <div class="title-block">
+        <div class="eyebrow">Caja</div>
+        <div class="title">Punto de Venta</div>
+      </div>
+    </div>
+    <div class="topbar-actions">
+      <button class="ghost-btn" type="button" (click)="goToCaja()">
+        <span class="material-icons">account_balance</span>
+        Ir a Caja
+      </button>
+      <button class="ghost-btn" type="button" (click)="goHome()">
+        <span class="material-icons">home</span>
+        Inicio
+      </button>
+    </div>
   </header>
 
   <main class="pos-main">

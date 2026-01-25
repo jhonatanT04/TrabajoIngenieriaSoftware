@@ -1,7 +1,93 @@
-<h2>Reporte de Clientes</h2>
+<div class="container">
+  <div class="section-header">
+    <h2>Reporte de Clientes</h2>
+  </div>
 
-<ul>
-  <li *ngFor="let c of clientes">
-    {{ c.nombre }} – {{ c.puntos }} pts
-  </li>
-</ul>
+  <div *ngIf="error" class="alert alert-danger">{{ error }}</div>
+
+  <!-- Filtros -->
+  <div class="filters-section">
+    <div class="filter-actions">
+      <button (click)="cargarReporte()" class="btn btn-primary">
+        <span class="material-icons">search</span>
+        Cargar
+      </button>
+      <button (click)="limpiarFiltros()" class="btn btn-secondary">
+        <span class="material-icons">clear</span>
+        Limpiar
+      </button>
+    </div>
+  </div>
+
+  <!-- Resumen -->
+  <div class="summary" *ngIf="!loading && clientes.length > 0">
+    <div class="summary-item">
+      <span class="label">Total Clientes</span>
+      <span class="value">{{ totalClientes }}</span>
+    </div>
+    <div class="summary-item">
+      <span class="label">Activos</span>
+      <span class="value" style="color: #16a34a;">{{ clientesActivos }}</span>
+    </div>
+    <div class="summary-item">
+      <span class="label">Inactivos</span>
+      <span class="value" style="color: #dc2626;">{{ clientesInactivos }}</span>
+    </div>
+    <div class="summary-item">
+      <span class="label">Total Puntos</span>
+      <span class="value">{{ totalPuntos | number:'1.0-0' }}</span>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="loading" class="spinner">
+    <div class="spinner-border"></div>
+    <p>Cargando reporte...</p>
+  </div>
+
+  <!-- Tabla -->
+  <div *ngIf="!loading" class="table-container">
+    <table class="table" *ngIf="clientes.length > 0">
+      <thead>
+        <tr>
+          <th>Nombre</th>
+          <th>Email</th>
+          <th>Teléfono</th>
+          <th>Segmento</th>
+          <th>Puntos</th>
+          <th>Estado</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let cliente of clientes">
+          <td>{{ cliente.first_name }} {{ cliente.last_name }}</td>
+          <td>{{ cliente.email }}</td>
+          <td>{{ cliente.phone }}</td>
+          <td>{{ cliente.segment }}</td>
+          <td>{{ cliente.loyalty_points | number:'1.0-0' }} pts</td>
+          <td>
+            <span [class]="'badge badge-' + (cliente.is_active ? 'success' : 'danger')">
+              {{ cliente.is_active ? 'Activo' : 'Inactivo' }}
+            </span>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div *ngIf="clientes.length === 0" class="empty-state">
+      <span class="material-icons">people</span>
+      <p>No hay clientes disponibles</p>
+    </div>
+  </div>
+
+  <!-- Acciones -->
+  <div class="actions">
+    <button (click)="descargarPDF()" class="btn-icon" title="Descargar PDF">
+      <span class="material-icons">file_download</span>
+    </button>
+    <button (click)="volver()" class="btn btn-secondary">
+      <span class="material-icons">arrow_back</span>
+      Volver a Reportes
+    </button>
+  </div>
+</div>

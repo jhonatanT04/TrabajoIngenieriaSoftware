@@ -6,14 +6,14 @@ from datetime import datetime
 from sqlmodel import select
 
 from app.deps import DBSession
-from app.models.models import Sale, SaleDetail, Customer, CashRegister, PaymentMethod, Inventory, InventoryMovement, Product
+from app.models.models import Sale, SaleDetail, Customer, CashRegister, PaymentMethod, Inventory, InventoryMovement, Product, CashTransaction, CashRegisterSession, User
 from app.auth.auth import RoleChecker, get_current_user
-from app.models.enums import SaleStatus, MovementType
+from app.models.enums import SaleStatus, MovementType, TransactionType, SessionStatus
 
 router = APIRouter()
 
 
-def format_sale_response(sale: Sale):
+def format_sale_response(sale: Sale, product_map: dict | None = None):
     """Formatear venta con estructura esperada por Angular"""
     return {
         "id": str(sale.id),
@@ -43,6 +43,11 @@ def format_sale_response(sale: Sale):
             {
                 "id": str(detail.id),
                 "product_id": str(detail.product_id),
+                "product_name": (
+                    detail.product.name
+                    if getattr(detail, "product", None) and getattr(detail.product, "name", None)
+                    else product_map.get(detail.product_id) if product_map else None
+                ),
                 "quantity": detail.quantity,
                 "unit_price": detail.unit_price,
                 "discount_percentage": detail.discount_percentage,
@@ -75,13 +80,14 @@ class SaleCreate(BaseModel):
     notes: Optional[str] = None
 
 
-@router.post("/sales", tags=["Ventas"])
+@router.post("/sales", tags=["Ventas"], dependencies=[Depends(RoleChecker(allowed_roles=["Administrador", "Cajero"]))])
 async def create_sale(
     sale_data: SaleCreate,
-    db: DBSession
+    db: DBSession,
+    current_user: User = Depends(get_current_user)
 ):
     """
-    Crear una nueva venta (sin autenticación para desarrollo)
+    Crear una nueva venta
     
     Body JSON:
     {
@@ -101,13 +107,20 @@ async def create_sale(
     }
     """
     from app.crud.sale_crud import sale as sale_crud
-    from app.models.models import User
     
-    # Obtener usuario por defecto (primer usuario activo)
-    current_user = db.exec(select(User).where(User.is_active == True)).first()
-    if not current_user:
-        raise HTTPException(status_code=400, detail="No hay usuarios registrados en el sistema")
-    
+    # Validar que el usuario tenga una sesión de caja abierta
+    active_session = db.exec(
+        select(CashRegisterSession).where(
+            CashRegisterSession.user_id == current_user.id,
+            CashRegisterSession.status == SessionStatus.abierta
+        )
+    ).first()
+    if not active_session:
+        raise HTTPException(
+            status_code=400,
+            detail="Debes abrir una caja antes de registrar ventas"
+        )
+
     # Generar número de venta único
     import datetime as dt
     from sqlmodel import func
@@ -122,12 +135,8 @@ async def create_sale(
     today_count = db.exec(count_query).first() or 0
     sale_number = f"V-{dt.datetime.utcnow().strftime('%Y%m%d')}-{today_count + 1:05d}"
     
-    # Resolver caja y método de pago si no vienen del frontend
-    if not sale_data.cash_register_id:
-        cash_register = db.exec(select(CashRegister)).first()
-        if not cash_register:
-            raise HTTPException(status_code=400, detail="No hay cajas registradas")
-        sale_data.cash_register_id = cash_register.id
+    # Resolver caja y método de pago: forzamos la caja de la sesión activa del cajero
+    sale_data.cash_register_id = active_session.cash_register_id
     if not sale_data.payment_method_id:
         payment_method = db.exec(select(PaymentMethod)).first()
         if not payment_method:
@@ -232,6 +241,28 @@ async def create_sale(
         )
         db.add(movement)
     
+    # ⭐ CREAR TRANSACCIÓN DE CAJA PARA LA VENTA
+    # Buscar sesión de caja abierta para esta caja registradora
+    active_session_query = select(CashRegisterSession).where(
+        CashRegisterSession.cash_register_id == sale_data.cash_register_id,
+        CashRegisterSession.status == SessionStatus.abierta
+    )
+    active_session = db.exec(active_session_query).first()
+    
+    if active_session:
+        # Crear transacción de tipo venta
+        cash_transaction = CashTransaction(
+            session_id=active_session.id,
+            transaction_type=TransactionType.venta,
+            amount=total,
+            payment_method_id=sale_data.payment_method_id,
+            reference_number=sale_number,
+            description=f"Venta {sale_number}",
+            created_by=current_user.id,
+            created_at=dt.datetime.utcnow()
+        )
+        db.add(cash_transaction)
+    
     db.commit()
     db.refresh(new_sale)
     
@@ -241,13 +272,15 @@ async def create_sale(
 @router.get("/sales", tags=["Ventas"], dependencies=[Depends(RoleChecker(allowed_roles=["Administrador", "Cajero"]))])
 async def list_sales(
     db: DBSession,
+    current_user: User = Depends(get_current_user),
     skip: int = Query(0, ge=0),
     limit: int = Query(100, ge=1, le=1000),
     customer_id: Optional[UUID] = None,
     status: Optional[str] = None
 ):
     """
-    Listar ventas
+    Listar ventas.
+    Admin ve todas las ventas, Cajero solo ve las de su caja activa.
     
     Query params:
     - skip: Paginación (default: 0)
@@ -255,7 +288,29 @@ async def list_sales(
     - customer_id: Filtrar por cliente (optional)
     - status: Filtrar por estado (optional)
     """
+    from app.crud.users_crud import profile
+    
     query = select(Sale)
+    
+    # Verificar si es admin o cajero
+    user_profile = profile.get(db, id=current_user.profile_id)
+    is_admin = user_profile and user_profile.name.upper() in ["ADMIN", "ADMINISTRADOR"]
+    
+    # Si es cajero, filtrar por su caja activa
+    if not is_admin:
+        # Obtener sesión activa del cajero
+        active_session = db.exec(
+            select(CashRegisterSession).where(
+                CashRegisterSession.user_id == current_user.id,
+                CashRegisterSession.status == SessionStatus.abierta
+            )
+        ).first()
+        
+        if active_session:
+            query = query.where(Sale.cash_register_id == active_session.cash_register_id)
+        else:
+            # Si no tiene sesión activa, filtrar por cashier_id para que al menos vea sus propias ventas
+            query = query.where(Sale.cashier_id == current_user.id)
     
     if customer_id:
         query = query.where(Sale.customer_id == customer_id)
@@ -264,8 +319,21 @@ async def list_sales(
         query = query.where(Sale.status == status)
     
     sales = db.exec(query.offset(skip).limit(limit)).all()
+
+    # Prefetch product names for all sale details to avoid missing product_name
+    product_ids = set()
+    for s in sales:
+        if s.details:
+            for d in s.details:
+                if d.product_id:
+                    product_ids.add(d.product_id)
+
+    product_map = {}
+    if product_ids:
+        products = db.exec(select(Product).where(Product.id.in_(product_ids))).all()
+        product_map = {p.id: p.name for p in products}
     
-    return [format_sale_response(s) for s in sales]
+    return [format_sale_response(s, product_map) for s in sales]
 
 
 @router.get("/sales/{sale_id}", tags=["Ventas"], dependencies=[Depends(RoleChecker(allowed_roles=["Administrador", "Cajero"]))])

@@ -45,26 +45,54 @@
     
     <div class="chart-card">
       <div class="chart-header">
-        <h3 class="chart-title">Ventas del día</h3>
+        <h3 class="chart-title">Evolución de ventas en el día</h3>
         <button class="btn btn-sm btn-light">
           <span class="material-icons">more_vert</span>
         </button>
       </div>
-      <div class="chart-placeholder">
-        <span class="material-icons" style="font-size: 3rem; margin-bottom: 1rem;">show_chart</span>
-        <p>Evolución de ventas en el día</p>
+      <div class="chart-summary" *ngIf="ventasPorHora.length">Total hoy: $ {{ totalVentasHoy | number:'1.0-2' }}</div>
+      <div class="chart-bars" *ngIf="ventasPorHora.length > 0 && ventasPorHora[0].total > 0; else ventasEmpty">
+        <div class="bar-row" *ngFor="let d of ventasPorHora">
+          <div class="bar-label">{{ d.label }}</div>
+          <div class="bar">
+            <div class="bar-fill" [style.width.%]="(d.total / maxVentasHora) * 100"></div>
+          </div>
+          <div class="bar-value">$ {{ d.total | number:'1.0-2' }}</div>
+        </div>
       </div>
+      <ng-template #ventasEmpty>
+        <div class="chart-placeholder">
+          <span class="material-icons" style="font-size: 3rem; margin-bottom: 1rem;">show_chart</span>
+          <p>Sin ventas en el día</p>
+        </div>
+      </ng-template>
     </div>
 
     
     <div class="chart-card">
       <div class="chart-header">
-        <h3 class="chart-title">Estado de Caja</h3>
+        <h3 class="chart-title">Efectivo vs Tarjeta</h3>
       </div>
-      <div class="chart-placeholder" style="height: 300px;">
-        <span class="material-icons" style="font-size: 3rem; margin-bottom: 1rem;">account_balance_wallet</span>
-        <p>Efectivo vs Tarjeta</p>
+      <div class="chart-pie" *ngIf="(efectivoVsTarjeta[0].total + efectivoVsTarjeta[1].total) > 0; else pagoEmpty">
+        <div class="pie-row" *ngFor="let p of efectivoVsTarjeta">
+          <div class="pie-item">
+            <div class="pie-label">{{ p.type }}</div>
+            <div class="pie-bar">
+              <div class="pie-fill" [style.width.%]="p.percentage" [ngClass]="p.type === 'Efectivo' ? 'efectivo' : 'tarjeta'"></div>
+            </div>
+            <div class="pie-value">
+              <div>${{ p.total | number:'1.0-2' }}</div>
+              <div style="font-size: 0.875rem; color: var(--text-secondary);">{{ p.percentage | number:'1.1-1' }}%</div>
+            </div>
+          </div>
+        </div>
       </div>
+      <ng-template #pagoEmpty>
+        <div class="chart-placeholder" style="height: 300px;">
+          <span class="material-icons" style="font-size: 3rem; margin-bottom: 1rem;">account_balance_wallet</span>
+          <p>Sin pagos registrados</p>
+        </div>
+      </ng-template>
     </div>
   </div>
 

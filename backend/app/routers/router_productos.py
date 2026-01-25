@@ -5,13 +5,23 @@ from pydantic import BaseModel
 
 from app.deps import *
 from app.models.models import *
+from sqlmodel import select, func
 from app.auth.auth import RoleChecker
 from app.deps import DBSession
 router = APIRouter()
 
 
-def format_product_response(product: Product):
+def format_product_response(product: Product, stock_map: dict | None = None):
     """Helper para formatear producto con estructura esperada por Angular"""
+    calculated_stock = 0
+    if stock_map:
+        calculated_stock = stock_map.get(str(product.id), 0)
+    elif getattr(product, "inventory", None):
+        try:
+            calculated_stock = sum(inv.quantity for inv in product.inventory)
+        except Exception:
+            calculated_stock = 0
+
     return {
         "id": str(product.id),
         "sku": product.sku,
@@ -53,6 +63,7 @@ def format_product_response(product: Product):
         "requires_lot_control": product.requires_lot_control,
         "requires_expiration_date": product.requires_expiration_date,
         "is_active": product.is_active,
+        "stock": calculated_stock,
         "created_at": product.created_at.isoformat(),
         "updated_at": product.updated_at.isoformat()
     }
@@ -138,13 +149,21 @@ async def list_products(
     """
     from app.crud.products_crud import product
     
+    from sqlmodel import func
+
     if active_only:
         products = product.get_active_products(db)
         filtered = products[skip:skip+limit]
     else:
         filtered = product.get_multi(db, skip=skip, limit=limit)
+
+    # Precalcular stock por producto en un solo query
+    stock_rows = db.exec(
+        select(Inventory.product_id, func.sum(Inventory.quantity)).group_by(Inventory.product_id)
+    ).all()
+    stock_map = {str(pid): qty or 0 for pid, qty in stock_rows}
     
-    return [format_product_response(p) for p in filtered]
+    return [format_product_response(p, stock_map) for p in filtered]
 
 
 @router.get("/products/{product_id}", tags=["Productos"],dependencies=[Depends(RoleChecker(allowed_roles=["Administrador","Cajero"]))])
@@ -161,11 +180,17 @@ async def get_product(
     Retorna producto completo o 404
     """
     from app.crud.products_crud import product
+    from sqlmodel import func
     
     prod = product.get(db, id=product_id)
     if not prod:
         raise HTTPException(status_code=404, detail="Producto no encontrado")
-    return format_product_response(prod)
+
+    stock_row = db.exec(
+        select(func.sum(Inventory.quantity)).where(Inventory.product_id == product_id)
+    ).first()
+    stock_map = {str(product_id): stock_row or 0}
+    return format_product_response(prod, stock_map)
 
 
 @router.get("/products/sku/{sku}", tags=["Productos"],dependencies=[Depends(RoleChecker(allowed_roles=["Administrador","Cajero"]))])
@@ -182,11 +207,16 @@ async def get_product_by_sku(
     Retorna producto o 404
     """
     from app.crud.products_crud import product
+    from sqlmodel import func
     
     prod = product.get_by_sku(db, sku=sku)
     if not prod:
         raise HTTPException(status_code=404, detail="Producto no encontrado")
-    return format_product_response(prod)
+    stock_row = db.exec(
+        select(func.sum(Inventory.quantity)).where(Inventory.product_id == prod.id)
+    ).first()
+    stock_map = {str(prod.id): stock_row or 0}
+    return format_product_response(prod, stock_map)
 
 
 @router.get("/products/barcode/{barcode}", tags=["Productos"],dependencies=[Depends(RoleChecker(allowed_roles=["Administrador","Cajero"]))])
@@ -204,11 +234,16 @@ async def get_product_by_barcode(
     Retorna producto o 404
     """
     from app.crud.products_crud import product
+    from sqlmodel import func
     
     prod = product.get_by_barcode(db, barcode=barcode)
     if not prod:
         raise HTTPException(status_code=404, detail="Producto no encontrado")
-    return format_product_response(prod)
+    stock_row = db.exec(
+        select(func.sum(Inventory.quantity)).where(Inventory.product_id == prod.id)
+    ).first()
+    stock_map = {str(prod.id): stock_row or 0}
+    return format_product_response(prod, stock_map)
 
 
 @router.get("/products/search/name", tags=["Productos"],dependencies=[Depends(RoleChecker(allowed_roles=["Administrador","Cajero"]))])
@@ -245,9 +280,13 @@ async def get_products_by_category(
     Retorna lista de productos de esa categoria
     """
     from app.crud.products_crud import product
-    
-    products = product.get_by_category(db, category_id=category_id)
-    return [format_product_response(p) for p in products]
+    products = product.get_products_by_category(db, category_id=category_id)
+    ids = [p.id for p in products]
+    stock_rows = db.exec(
+        select(Inventory.product_id, func.sum(Inventory.quantity)).where(Inventory.product_id.in_(ids)).group_by(Inventory.product_id)
+    ).all()
+    stock_map = {str(pid): qty or 0 for pid, qty in stock_rows}
+    return [format_product_response(p, stock_map) for p in products]
 
 
 @router.get("/products/supplier/{supplier_id}", tags=["Productos"],dependencies=[Depends(RoleChecker(allowed_roles=["Administrador","Cajero"]))])
@@ -264,14 +303,19 @@ async def get_products_by_supplier(
     Retorna lista de productos del proveedor
     """
     from app.crud.products_crud import product
-    
-    products = product.get_by_supplier(db, supplier_id=supplier_id)
-    return [format_product_response(p) for p in products]
+    products = product.get_products_by_supplier(db, supplier_id=supplier_id)
+    ids = [p.id for p in products]
+    stock_rows = db.exec(
+        select(Inventory.product_id, func.sum(Inventory.quantity)).where(Inventory.product_id.in_(ids)).group_by(Inventory.product_id)
+    ).all()
+    stock_map = {str(pid): qty or 0 for pid, qty in stock_rows}
+    return [format_product_response(p, stock_map) for p in products]
 
 
 @router.get("/products/low-stock/list", tags=["Productos"],dependencies=[Depends(RoleChecker(allowed_roles=["Administrador"]))])
 async def get_low_stock_products(
-    db: DBSession
+    db: DBSession,
+    stock_threshold: float = Query(0, description="Umbral de stock para alerta")
 ):
     """
     Obtener productos con stock bajo
@@ -280,9 +324,13 @@ async def get_low_stock_products(
     Util para alertas de reabastecimiento
     """
     from app.crud.products_crud import product
-    
-    products = product.get_low_stock(db)
-    return [format_product_response(p) for p in products]
+    low_stock = product.get_low_stock_products(db, stock_threshold=stock_threshold)
+    ids = [p.id for p in low_stock]
+    stock_rows = db.exec(
+        select(Inventory.product_id, func.sum(Inventory.quantity)).where(Inventory.product_id.in_(ids)).group_by(Inventory.product_id)
+    ).all()
+    stock_map = {str(pid): qty or 0 for pid, qty in stock_rows}
+    return [format_product_response(p, stock_map) for p in low_stock]
 
 
 @router.put("/products/{product_id}", tags=["Productos"],dependencies=[Depends(RoleChecker(allowed_roles=["Administrador"]))])

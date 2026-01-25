@@ -214,6 +214,106 @@
   color: var(--text-secondary);
 }
 
+.chart-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1.5rem 0;
+}
+
+.bar-row {
+  display: grid;
+  grid-template-columns: 60px 1fr 80px;
+  gap: 1rem;
+  align-items: center;
+}
+
+.bar-label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  text-align: right;
+}
+
+.bar {
+  background: var(--bg-secondary);
+  height: 40px;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary-color) 0%, var(--primary-light) 100%);
+  transition: width 0.3s ease;
+}
+
+.bar-value {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--success);
+  text-align: right;
+}
+
+.chart-summary {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 1rem;
+}
+
+.pie-row {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding: 1.5rem 0;
+}
+
+.pie-item {
+  display: grid;
+  grid-template-columns: 80px 1fr 100px;
+  gap: 1rem;
+  align-items: center;
+}
+
+.pie-label {
+  font-weight: 600;
+  font-size: 0.9375rem;
+  color: var(--text-primary);
+}
+
+.pie-bar {
+  background: var(--bg-secondary);
+  height: 30px;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.pie-fill {
+  height: 100%;
+  transition: width 0.3s ease;
+}
+
+.pie-fill.efectivo {
+  background: linear-gradient(90deg, #10b981 0%, #059669 100%);
+}
+
+.pie-fill.tarjeta {
+  background: linear-gradient(90deg, #3b82f6 0%, #1d4ed8 100%);
+}
+
+.pie-value {
+  text-align: right;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.pie-value div:first-child {
+  font-size: 1rem;
+  color: var(--text-primary);
+}
+
+
 
 .activity-section {
   background: white;

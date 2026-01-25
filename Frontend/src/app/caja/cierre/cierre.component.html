@@ -1,23 +1,164 @@
-<h2>Cierre de Caja</h2>
-
-<div *ngIf="loading">Cargando...</div>
-
-<div *ngIf="!loading && getEstado().abierta">
-  <p>Total esperado: ${{ getEstado().total }}</p>
-  
-  <div>
-    <label>Monto real en caja:</label>
-    <input type="number" [(ngModel)]="actualClosingAmount" />
+<div class="container">
+  <!-- Header -->
+  <div class="section-header">
+    <div class="header-top">
+      <h2>Cierre de Caja</h2>
+    </div>
   </div>
-  
-  <div>
-    <label>Notas:</label>
-    <textarea [(ngModel)]="notes"></textarea>
-  </div>
-  
-  <button (click)="cerrar()" [disabled]="loading">Cerrar Caja</button>
-</div>
 
-<div *ngIf="!loading && !getEstado().abierta">
-  <p>No hay caja abierta</p>
+  <!-- Mensajes -->
+  <div *ngIf="errorMessage" class="alert alert-danger" (click)="clearMessages()">
+    <span class="material-icons">error</span>
+    {{ errorMessage }}
+  </div>
+  <div *ngIf="successMessage" class="alert alert-success" (click)="clearMessages()">
+    <span class="material-icons">check_circle</span>
+    {{ successMessage }}
+  </div>
+
+  <!-- Sesión Activa -->
+  <div *ngIf="!loading && currentSession" class="session-details">
+    <div class="info-section">
+      <h3>Información de Sesión</h3>
+      <div class="info-grid">
+        <div class="info-item">
+          <span class="label">Cajero:</span>
+          <span class="value">{{ currentSession.user?.first_name }} {{ currentSession.user?.last_name }}</span>
+        </div>
+        <div class="info-item">
+          <span class="label">Caja:</span>
+          <span class="value">
+            {{ cashRegister?.register_number || 'Caja ' + currentSession.cash_register_id.substring(0, 8) }}
+            <span *ngIf="cashRegister?.location" class="location-badge">({{ cashRegister?.location }})</span>
+          </span>
+        </div>
+        <div class="info-item">
+          <span class="label">Hora de Apertura:</span>
+          <span class="value">{{ currentSession.opening_date | date:'dd/MM/yyyy HH:mm:ss':'UTC' }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Resumen de Movimientos -->
+    <div class="summary-section">
+      <h3>Resumen de Movimientos</h3>
+      <div class="summary-grid">
+        <div class="summary-item">
+          <span class="label">Monto Inicial:</span>
+          <span class="value">$ {{ currentSession.opening_amount | number:'1.2-2' }}</span>
+        </div>
+        <div class="summary-item positive">
+          <span class="label">Ingresos/Ventas:</span>
+          <span class="value">+ $ {{ totalCashIn | number:'1.2-2' }}</span>
+        </div>
+        <div class="summary-item negative">
+          <span class="label">Egresos:</span>
+          <span class="value">- $ {{ totalCashOut | number:'1.2-2' }}</span>
+        </div>
+        <div class="summary-item highlight">
+          <span class="label">Monto Esperado:</span>
+          <span class="value">$ {{ expectedAmount | number:'1.2-2' }}</span>
+        </div>
+      </div>
+
+      <!-- Tabla de Transacciones -->
+      <div class="transactions-container" *ngIf="transactions.length > 0">
+        <h4>Detalle de Transacciones</h4>
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Tipo</th>
+              <th>Monto</th>
+              <th>Referencia</th>
+              <th>Descripción</th>
+              <th>Hora</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let trans of transactions">
+              <td>
+                <span class="badge" 
+                  [class.badge-success]="trans.transaction_type === 'ingreso'"
+                  [class.badge-info]="trans.transaction_type === 'venta'"
+                  [class.badge-danger]="trans.transaction_type === 'egreso'">
+                  {{ trans.transaction_type }}
+                </span>
+              </td>
+              <td>$ {{ trans.amount | number:'1.2-2' }}</td>
+              <td>{{ trans.reference_number || '-' }}</td>
+              <td>{{ trans.description || '-' }}</td>
+              <td>{{ trans.created_at | date:'short' }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Formulario de Cierre -->
+    <div class="closure-form">
+      <h3>Cierre de Caja</h3>
+      <form [formGroup]="cierreForm" (ngSubmit)="onClose()">
+        <div class="form-group">
+          <label for="closing_amount">Monto Real en Caja ($) *</label>
+          <input 
+            type="number"
+            id="closing_amount"
+            formControlName="actual_closing_amount"
+            class="form-control"
+            [class.is-invalid]="hasClosingAmountError()"
+            step="0.01"
+            min="0"
+            placeholder="0.00"
+             [disabled]="isClosed"
+            />
+            <span *ngIf="isClosed" class="info-text">Sesión cerrada: solo lectura</span>
+          <span *ngIf="hasClosingAmountError()" class="error-text">Monto requerido y válido</span>
+        </div>
+
+        <!-- Resumen de Diferencia -->
+        <div class="difference-summary">
+          <div class="row">
+            <div class="cell">
+              <span class="label">Monto Esperado:</span>
+              <span class="value">$ {{ expectedAmount | number:'1.2-2' }}</span>
+            </div>
+            <div class="cell">
+              <span class="label">Monto Real:</span>
+              <span class="value">$ {{ actualAmount | number:'1.2-2' }}</span>
+            </div>
+            <div class="cell" [class.positive]="difference >= 0" [class.negative]="difference < 0">
+              <span class="label">Diferencia:</span>
+              <span class="value">{{ difference >= 0 ? '+' : '' }} $ {{ difference | number:'1.2-2' }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-actions">
+            <button *ngIf="!isClosed" type="submit" class="btn btn-success" [disabled]="loading || !cierreForm.valid">
+              <span *ngIf="!loading" class="material-icons">check</span>
+              <span *ngIf="loading">Cerrando...</span>
+            </button>
+            <div *ngIf="isClosed" class="status-closed">Sesión ya cerrada</div>
+            <button type="button" [routerLink]="['/caja/apertura']" class="btn btn-secondary" [disabled]="loading">
+              Cancelar
+            </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Sin Sesión -->
+  <div *ngIf="!loading && !currentSession" class="empty-state">
+    <span class="material-icons">info</span>
+    <p>No hay sesión de caja abierta para cerrar</p>
+    <button [routerLink]="['/caja/apertura']" class="btn btn-primary">
+      Ir a Apertura
+    </button>
+  </div>
+
+  <!-- Cargando -->
+  <div *ngIf="loading" class="loading-state">
+    <div class="spinner"></div>
+    <p>Cargando información...</p>
+  </div>
 </div>

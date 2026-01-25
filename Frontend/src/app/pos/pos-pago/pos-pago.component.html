@@ -40,6 +40,21 @@
           step="0.01"
         />
       </div>
+        <div class="input-group">
+          <label>Cliente (opcional)</label>
+          <input
+            type="text"
+            [(ngModel)]="searchCliente"
+            placeholder="Buscar por nombre o documento"
+            class="input-efectivo"
+          />
+          <select [(ngModel)]="selectedClienteId" class="select-cliente">
+            <option [ngValue]="null">Consumidor final</option>
+            <option *ngFor="let c of clientesFiltrados" [ngValue]="c.id">
+              {{ c.first_name }} {{ c.last_name }} - {{ c.document_number || 's/ doc' }}
+            </option>
+          </select>
+        </div>
 
       <div class="vuelto-section" *ngIf="efectivo > 0">
         <div class="vuelto-row" [class.negativo]="vuelto() < 0">

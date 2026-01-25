@@ -1,13 +1,14 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, RouterModule } from '@angular/router';
+import { ActivatedRoute, RouterModule, Router } from '@angular/router';
 import { ClienteService } from '../../core/services/cliente.service';
 
 @Component({
   standalone: true,
   selector: 'app-cliente-detail',
   imports: [CommonModule, RouterModule],
-  templateUrl: './cliente-detail.component.html'
+  templateUrl: './cliente-detail.component.html',
+  styleUrls: ['./cliente-detail.component.css']
 })
 export class ClienteDetailComponent implements OnInit {
 
@@ -17,6 +18,7 @@ export class ClienteDetailComponent implements OnInit {
 
   constructor(
     private route: ActivatedRoute,
+    private router: Router,
     private service: ClienteService
   ) {}
 
@@ -27,6 +29,11 @@ export class ClienteDetailComponent implements OnInit {
       this.loading = false;
       return;
     }
+    this.loadCliente(id);
+  }
+
+  loadCliente(id: string): void {
+    this.loading = true;
     this.service.getById(id).subscribe({
       next: (cliente) => {
         this.cliente = cliente;

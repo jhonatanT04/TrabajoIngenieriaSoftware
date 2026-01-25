@@ -1,55 +1,217 @@
 <div class="container">
-  
+  <!-- Header -->
   <div class="section-header">
     <div class="header-top">
       <h2>Apertura de Caja</h2>
+      <button *ngIf="!activeSession" (click)="onAbrirCaja()" class="btn btn-primary">
+        <span class="material-icons">add</span>
+        Abrir Caja
+      </button>
+      <button *ngIf="activeSession" disabled class="btn btn-success">
+        <span class="material-icons">check_circle</span>
+        Caja Abierta
+      </button>
     </div>
   </div>
 
-  
+  <!-- Sesión Activa -->
+  <div *ngIf="activeSession" class="active-session-card">
+    <div class="session-info">
+      <div class="session-detail">
+        <span class="label">Abierta por:</span>
+        <span class="value">{{ activeSession.user?.first_name }} {{ activeSession.user?.last_name }}</span>
+      </div>
+      <div class="session-detail">
+        <span class="label">Hora de Apertura:</span>
+        <span class="value">{{ activeSession.opening_date | date:'medium' }}</span>
+      </div>
+      <div class="session-detail">
+        <span class="label">Monto Inicial:</span>
+        <span class="value">$ {{ activeSession.opening_amount | number:'1.2-2' }}</span>
+      </div>
+    </div>
+    <button (click)="onCerrar(activeSession)" class="btn btn-danger">
+      <span class="material-icons">logout</span>
+      Cerrar Caja
+    </button>
+  </div>
+
+  <!-- Mensajes -->
+  <div *ngIf="errorMessage" class="alert alert-danger" (click)="clearMessages()">
+    <span class="material-icons">error</span>
+    {{ errorMessage }}
+  </div>
+  <div *ngIf="successMessage" class="alert alert-success" (click)="clearMessages()">
+    <span class="material-icons">check_circle</span>
+    {{ successMessage }}
+  </div>
+
+  <!-- Formulario de Apertura -->
+  <div *ngIf="showForm" class="form-container">
+    <form [formGroup]="aperturaForm" (ngSubmit)="onSubmit()">
+      <h3>Nueva Apertura de Caja</h3>
+      
+      <!-- Selector de caja solo para administradores -->
+      <div class="form-group" *ngIf="isAdmin">
+        <label for="cash_register">Caja Registradora *</label>
+        <select 
+          id="cash_register"
+          formControlName="cash_register_id"
+          class="form-control"
+          [class.is-invalid]="hasCashRegisterError"
+        >
+          <option value="">-- Selecciona una caja --</option>
+          <option *ngFor="let register of cashRegisters" [value]="register.id">
+            {{ register.register_number }} {{ register.location ? '- ' + register.location : '' }}
+          </option>
+        </select>
+        <span *ngIf="hasCashRegisterError" class="error-text">Campo requerido</span>
+      </div>
+
+      <!-- Para cajeros, mostrar la caja asignada sin selector -->
+      <div class="form-group" *ngIf="isCajero">
+        <label>Caja Asignada</label>
+        <div class="assigned-register">
+          <span class="material-icons">point_of_sale</span>
+          <span *ngIf="cashRegisters.length > 0">
+            {{ cashRegisters[0].register_number }} {{ cashRegisters[0].location ? '- ' + cashRegisters[0].location : '' }}
+          </span>
+          <span *ngIf="cashRegisters.length === 0" class="text-muted">
+            No hay cajas registradoras disponibles
+          </span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="opening_amount">Monto Inicial ($) *</label>
+        <input 
+          type="number"
+          id="opening_amount"
+          formControlName="opening_amount"
+          class="form-control"
+          [class.is-invalid]="hasOpeningAmountError"
+          step="0.01"
+          min="0"
+          placeholder="0.00"
+        />
+        <span *ngIf="hasOpeningAmountError" class="error-text">Monto requerido y debe ser mayor o igual a 0</span>
+      </div>
+
+      <div class="form-group">
+        <label for="notes">Notas (Opcional)</label>
+        <textarea
+          id="notes"
+          formControlName="notes"
+          class="form-control"
+          rows="3"
+          placeholder="Observaciones..."
+        ></textarea>
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" class="btn btn-success" [disabled]="loading">
+          <span *ngIf="!loading" class="material-icons">save</span>
+          <span *ngIf="loading">Abriendo...</span>
+        </button>
+        <button type="button" (click)="onCancel()" class="btn btn-secondary" [disabled]="loading">
+          Cancelar
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Tabla de Aperturas -->
   <div class="table-container">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+      <h3>Historial de Cajas</h3>
+      <div class="filter-buttons" style="display: flex; gap: 0.5rem;">
+        <button 
+          type="button" 
+          (click)="changeStatusFilter('todas')" 
+          [class.active]="statusFilter === 'todas'"
+          class="btn btn-filter">
+          Todas
+        </button>
+        <button 
+          type="button" 
+          (click)="changeStatusFilter('abierta')" 
+          [class.active]="statusFilter === 'abierta'"
+          class="btn btn-filter">
+          Abiertas
+        </button>
+        <button 
+          type="button" 
+          (click)="changeStatusFilter('cerrada')" 
+          [class.active]="statusFilter === 'cerrada'"
+          class="btn btn-filter">
+          Cerradas
+        </button>
+      </div>
+    </div>
     <table class="table">
       <thead>
         <tr>
-          <th>Fecha</th>
+          <th>Cajero</th>
+          <th>Fecha de Apertura</th>
+          <th>Fecha de Cierre</th>
           <th>Monto Inicial</th>
-          <th>Monto Final</th>
+          <th>Monto de Cierre</th>
           <th>Estado</th>
           <th>Acciones</th>
         </tr>
       </thead>
       <tbody>
         <tr *ngFor="let apertura of paginatedAperturas">
-          <td>{{ apertura.fecha | date:'short' }}</td>
-          <td>${{ apertura.montoInicial | number: '1.2-2' }}</td>
-          <td>{{ apertura.montoFinal > 0 ? ('$' + (apertura.montoFinal | number: '1.2-2')) : '-' }}</td>
+          <td>{{ apertura.user?.first_name }} {{ apertura.user?.last_name }}</td>
+          <td>{{ apertura.opening_date | date:'dd/MM/yyyy HH:mm:ss':'UTC' }}</td>
           <td>
-            <span [class]="'badge badge-' + (apertura.estado === 'Abierta' ? 'info' : 'success')">
-              {{ apertura.estado }}
+            <span *ngIf="apertura.closing_date">
+              {{ apertura.closing_date | date:'dd/MM/yyyy HH:mm:ss':'UTC' }}
+            </span>
+            <span *ngIf="!apertura.closing_date" style="color: #9ca3af; font-style: italic;">
+              En proceso
+            </span>
+          </td>
+            <td>$ {{ apertura.opening_amount | number:'1.2-2' }}</td>
+          <td>
+            <span *ngIf="apertura.actual_closing_amount !== null && apertura.actual_closing_amount !== undefined">
+              $ {{ apertura.actual_closing_amount | number:'1.2-2' }}
+            </span>
+            <span *ngIf="apertura.actual_closing_amount === null || apertura.actual_closing_amount === undefined" style="color: #9ca3af; font-style: italic;">
+              -
+            </span>
+          </td>
+          <td>
+            <span class="badge" [class.badge-success]="apertura.status === 'abierta'" [class.badge-danger]="apertura.status === 'cerrada'">
+              {{ apertura.status === 'abierta' ? 'Abierta' : 'Cerrada' }}
             </span>
           </td>
           <td class="actions">
-            <button
-              (click)="deleteApertura(apertura)"
-              class="btn-icon delete"
-              title="Eliminar"
+            <a 
+              [routerLink]="['/caja/cierre']"
+              [queryParams]="{ session_id: apertura.id }"
+              class="btn-icon"
+              title="Ver detalle"
             >
-              <span class="material-icons">delete</span>
+              <span class="material-icons">visibility</span>
+            </a>
+            <button *ngIf="apertura.status === 'abierta'" (click)="onCerrar(apertura)" class="btn-icon" title="Cerrar Caja">
+              <span class="material-icons">logout</span>
             </button>
           </td>
         </tr>
       </tbody>
     </table>
 
-    <div *ngIf="filteredAperturas.length === 0" class="empty-state">
+    <div *ngIf="paginatedAperturas.length === 0 && !loading" class="empty-state">
       <span class="material-icons">point_of_sale</span>
-      <p>No hay registros de apertura disponibles</p>
+      <p>No hay cajas abiertas</p>
     </div>
   </div>
 
-  
+  <!-- Paginación -->
   <div class="pagination-section" *ngIf="totalPages > 1">
-    <button (click)="previousPage()" [disabled]="currentPage === 1" class="btn btn-secondary">
+    <button (click)="prevPage()" [disabled]="currentPage === 1" class="btn btn-secondary">
       <span class="material-icons">chevron_left</span>
       Anterior
     </button>
@@ -62,4 +224,3 @@
     </button>
   </div>
 </div>
-

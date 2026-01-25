@@ -2,6 +2,9 @@
   <h2>Nueva Venta</h2>
 
   <div class="alert" *ngIf="error">{{ error }}</div>
+  <div class="alert" *ngIf="!hasActiveSession" style="background: #fff3cd; color: #8a6d3b;">
+    Debes abrir una caja antes de registrar ventas.
+  </div>
 
   <form (ngSubmit)="guardar()">
     <div class="grid">
@@ -15,14 +18,14 @@
 
       <div class="form-group">
         <label for="vendedor">Vendedor</label>
-        <select id="vendedor" name="vendedor" [(ngModel)]="venta.vendedor_id" required>
+        <select id="vendedor" name="vendedor" [(ngModel)]="venta.vendedor_id" required [disabled]="isCajero">
           <option value="">Selecciona un vendedor</option>
           <option *ngFor="let u of usuarios" [value]="u.id">
             {{ u.first_name && u.last_name ? (u.first_name + ' ' + u.last_name) : u.username }}
           </option>
         </select>
         <small *ngIf="venta.vendedor_id" style="color: #4caf50; margin-top: 4px; display: block;">
-          ✓ Vendedor seleccionado
+          ✓ Vendedor {{ isCajero ? 'asignado automáticamente' : 'seleccionado' }}
         </small>
       </div>
 
@@ -78,7 +81,7 @@
     </div>
 
     <div class="form-actions">
-      <button type="submit" [disabled]="loading">{{ loading ? 'Guardando...' : 'Guardar' }}</button>
+      <button type="submit" [disabled]="loading || !hasActiveSession">{{ loading ? 'Guardando...' : 'Guardar' }}</button>
       <button type="button" class="secondary" (click)="cancelar()">Cancelar</button>
     </div>
   </form>

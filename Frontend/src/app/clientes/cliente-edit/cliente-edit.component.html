@@ -1,0 +1,218 @@
+<div class="container">
+  <!-- Header -->
+  <div class="page-header">
+    <div>
+      <p class="eyebrow">Clientes</p>
+      <h2>Editar cliente</h2>
+      <p class="subtitle">Actualiza los datos del cliente</p>
+    </div>
+    <div class="header-actions">
+      <button [routerLink]="['/clientes']" class="btn btn-secondary">Cancelar</button>
+      <button (click)="guardar()" [disabled]="loading || !isFormValid()" class="btn btn-success">
+        <span *ngIf="!loading" class="material-icons">save</span>
+        <span *ngIf="loading">Guardando...</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="loading && !cliente" class="loading-state">
+    <div class="spinner"></div>
+    <p>Cargando cliente...</p>
+  </div>
+
+  <!-- Error -->
+  <div *ngIf="error" class="alert alert-danger">
+    <span class="material-icons">error</span>
+    {{ error }}
+  </div>
+
+  <!-- Success -->
+  <div *ngIf="successMessage" class="alert alert-success">
+    <span class="material-icons">check_circle</span>
+    {{ successMessage }}
+  </div>
+
+  <!-- Formulario -->
+  <form *ngIf="cliente && !loading" [formGroup]="editForm" (ngSubmit)="guardar()" class="form-container">
+    <!-- Datos Básicos -->
+    <div class="form-card">
+      <h3>Datos Básicos</h3>
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="first_name">Nombre *</label>
+          <input
+            id="first_name"
+            type="text"
+            formControlName="first_name"
+            class="form-control"
+            placeholder="Nombre"
+          />
+          <span *ngIf="isFieldInvalid('first_name')" class="error-text">Campo requerido</span>
+        </div>
+
+        <div class="form-group">
+          <label for="last_name">Apellido *</label>
+          <input
+            id="last_name"
+            type="text"
+            formControlName="last_name"
+            class="form-control"
+            placeholder="Apellido"
+          />
+          <span *ngIf="isFieldInvalid('last_name')" class="error-text">Campo requerido</span>
+        </div>
+
+        <div class="form-group">
+          <label for="document_type">Tipo de Documento *</label>
+          <select id="document_type" formControlName="document_type" class="form-control">
+            <option value="">-- Selecciona tipo --</option>
+            <option value="CEDULA">Cédula</option>
+            <option value="RUC">RUC</option>
+            <option value="PASAPORTE">Pasaporte</option>
+          </select>
+          <span *ngIf="isFieldInvalid('document_type')" class="error-text">Campo requerido</span>
+        </div>
+
+        <div class="form-group">
+          <label for="document_number">Número de Documento *</label>
+          <input
+            id="document_number"
+            type="text"
+            formControlName="document_number"
+            class="form-control"
+            placeholder="Número de documento"
+          />
+          <span *ngIf="isFieldInvalid('document_number')" class="error-text">Campo requerido</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Contacto -->
+    <div class="form-card">
+      <h3>Información de Contacto</h3>
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input
+            id="email"
+            type="email"
+            formControlName="email"
+            class="form-control"
+            placeholder="correo@ejemplo.com"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="phone">Teléfono</label>
+          <input
+            id="phone"
+            type="tel"
+            formControlName="phone"
+            class="form-control"
+            placeholder="0991234567"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="preferred_contact_method">Método de Contacto Preferido</label>
+          <select id="preferred_contact_method" formControlName="preferred_contact_method" class="form-control">
+            <option value="">-- Selecciona método --</option>
+            <option value="EMAIL">Email</option>
+            <option value="PHONE">Teléfono</option>
+            <option value="SMS">SMS</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Dirección -->
+    <div class="form-card">
+      <h3>Dirección</h3>
+      <div class="form-grid">
+        <div class="form-group full-width">
+          <label for="address">Dirección</label>
+          <input
+            id="address"
+            type="text"
+            formControlName="address"
+            class="form-control"
+            placeholder="Calle y número"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="city">Ciudad</label>
+          <input
+            id="city"
+            type="text"
+            formControlName="city"
+            class="form-control"
+            placeholder="Ciudad"
+          />
+        </div>
+      </div>
+    </div>
+
+    <!-- Información de Cliente -->
+    <div class="form-card">
+      <h3>Información de Cliente</h3>
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="segment">Segmento *</label>
+          <select id="segment" formControlName="segment" class="form-control">
+            <option value="">-- Selecciona segmento --</option>
+            <option value="regular">Regular</option>
+            <option value="premium">Premium</option>
+          </select>
+          <span *ngIf="isFieldInvalid('segment')" class="error-text">Campo requerido</span>
+        </div>
+
+        <div class="form-group">
+          <label for="is_active">Estado</label>
+          <select id="is_active" formControlName="is_active" class="form-control">
+            <option [ngValue]="true">Activo</option>
+            <option [ngValue]="false">Inactivo</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="loyalty_points">Puntos de Lealtad</label>
+          <input
+            id="loyalty_points"
+            type="number"
+            formControlName="loyalty_points"
+            class="form-control"
+            placeholder="0"
+            step="1"
+            min="0"
+          />
+        </div>
+      </div>
+    </div>
+
+    <!-- Notas -->
+    <div class="form-card">
+      <h3>Notas</h3>
+      <div class="form-group full-width">
+        <textarea
+          formControlName="notes"
+          class="form-control"
+          rows="4"
+          placeholder="Observaciones..."
+        ></textarea>
+      </div>
+    </div>
+
+    <!-- Acciones -->
+    <div class="form-actions">
+      <button type="button" [routerLink]="['/clientes']" class="btn btn-secondary" [disabled]="loading">
+        Cancelar
+      </button>
+      <button type="submit" class="btn btn-success" [disabled]="loading || !editForm.valid">
+        <span *ngIf="!loading" class="material-icons">save</span>
+        <span *ngIf="loading">Guardando...</span>
+      </button>
+    </div>
+  </form>
+</div>

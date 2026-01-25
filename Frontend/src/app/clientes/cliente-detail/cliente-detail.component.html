@@ -1,8 +1,102 @@
-<h2>{{ cliente?.nombre }}</h2>
+<div class="container">
+  <!-- Loading -->
+  <div *ngIf="loading" class="loading-state">
+    <div class="spinner"></div>
+    <p>Cargando cliente...</p>
+  </div>
 
-<p>Cédula: {{ cliente?.cedula }}</p>
-<p>Email: {{ cliente?.email }}</p>
-<p>Puntos: {{ cliente?.puntos }}</p>
+  <!-- Error -->
+  <div *ngIf="error && !loading" class="alert alert-danger">
+    <span class="material-icons">error</span>
+    {{ error }}
+  </div>
 
-<a [routerLink]="['/clientes', cliente.id, 'edit']">Editar</a>
-<a [routerLink]="['/clientes', cliente.id, 'fidelidad']">Fidelidad</a>
+  <!-- Cliente Detail -->
+  <div *ngIf="cliente && !loading" class="detail-container">
+    <!-- Header -->
+    <div class="header">
+      <div>
+        <h1>{{ cliente.first_name }} {{ cliente.last_name }}</h1>
+        <p class="subtitle">{{ cliente.business_name }}</p>
+      </div>
+      <div class="header-actions">
+        <button [routerLink]="['/clientes/edit', cliente.id]" class="btn btn-primary">
+          <span class="material-icons">edit</span>
+          Editar
+        </button>
+        <button [routerLink]="['/clientes']" class="btn btn-secondary">
+          <span class="material-icons">arrow_back</span>
+          Volver
+        </button>
+      </div>
+    </div>
+
+    <!-- Info Sections -->
+    <div class="info-grid">
+      <!-- Información Personal -->
+      <div class="info-section">
+        <h3>Información Personal</h3>
+        <div class="info-item">
+          <label>Tipo de Documento:</label>
+          <span>{{ cliente.document_type }}</span>
+        </div>
+        <div class="info-item">
+          <label>Documento:</label>
+          <span>{{ cliente.document_number }}</span>
+        </div>
+        <div class="info-item">
+          <label>Email:</label>
+          <span>{{ cliente.email || '-' }}</span>
+        </div>
+        <div class="info-item">
+          <label>Teléfono:</label>
+          <span>{{ cliente.phone || '-' }}</span>
+        </div>
+      </div>
+
+      <!-- Información de Dirección -->
+      <div class="info-section">
+        <h3>Dirección</h3>
+        <div class="info-item">
+          <label>Dirección:</label>
+          <span>{{ cliente.address || '-' }}</span>
+        </div>
+        <div class="info-item">
+          <label>Ciudad:</label>
+          <span>{{ cliente.city || '-' }}</span>
+        </div>
+        <div class="info-item">
+          <label>Método de Contacto Preferido:</label>
+          <span>{{ cliente.preferred_contact_method || '-' }}</span>
+        </div>
+      </div>
+
+      <!-- Información de Cliente -->
+      <div class="info-section">
+        <h3>Información del Cliente</h3>
+        <div class="info-item">
+          <label>Segmento:</label>
+          <span class="badge" [class.badge-premium]="cliente.segment === 'premium'" [class.badge-regular]="cliente.segment === 'regular'">
+            {{ cliente.segment }}
+          </span>
+        </div>
+        <div class="info-item">
+          <label>Puntos de Lealtad:</label>
+          <span class="loyalty-points">{{ cliente.loyalty_points | number:'1.0-0' }} pts</span>
+        </div>
+        <div class="info-item">
+          <label>Estado:</label>
+          <span class="badge" [class.badge-success]="cliente.is_active" [class.badge-danger]="!cliente.is_active">
+            {{ cliente.is_active ? 'Activo' : 'Inactivo' }}
+          </span>
+        </div>
+      </div>
+
+      <!-- Notas -->
+      <div class="info-section full-width" *ngIf="cliente.notes">
+        <h3>Notas</h3>
+        <p class="notes">{{ cliente.notes }}</p>
+      </div>
+    </div>
+  </div>
+</div>

@@ -3,6 +3,14 @@
     <div class="header-left">
       <span class="material-icons">shopping_cart</span>
       <span class="header-title">Sistema de Ventas</span>
+      <button class="ghost-btn" type="button" (click)="goDashboard()">
+        <span class="material-icons">arrow_back</span>
+        Volver al panel
+      </button>
+      <button class="ghost-btn" type="button" (click)="goCaja()">
+        <span class="material-icons">account_balance</span>
+        Ir a Caja
+      </button>
     </div>
     <div class="header-right">
       <a class="user-info" routerLink="/pos/profile" title="Mi perfil">

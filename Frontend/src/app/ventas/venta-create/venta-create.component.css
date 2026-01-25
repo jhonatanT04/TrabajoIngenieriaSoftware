@@ -194,6 +194,30 @@ table button:hover {
   border-top: 1px solid #e5e7eb;
 }
 
+.notice {
+  margin-top: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 13px;
+}
+
+.notice .warning {
+  background: #fef2f2;
+  color: #b91c1c;
+  border: 1px solid #fecdd3;
+  padding: 8px 10px;
+  border-radius: 6px;
+}
+
+.notice .info {
+  background: #f8fafc;
+  color: #475569;
+  border: 1px solid #e2e8f0;
+  padding: 6px 10px;
+  border-radius: 6px;
+}
+
 button[type="submit"],
 button.secondary {
   border: none;

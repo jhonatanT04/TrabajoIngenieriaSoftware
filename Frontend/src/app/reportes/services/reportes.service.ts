@@ -1,33 +1,71 @@
 import { Injectable } from '@angular/core';
-import { CajaService } from '../../core/services/caja.service';
-import { InventarioService } from '../../core/services/inventario.service';
-import { ClienteService } from '../../core/services/cliente.service';
-import { VentaService } from '../../core/services/venta.service';
+import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../../environments/environment';
+
+export interface FiltroReporte {
+  fecha_inicio?: string;
+  fecha_fin?: string;
+  categoria_id?: string;
+  producto_id?: string;
+  cliente_id?: string;
+  usuario_id?: string;
+}
 
 @Injectable({ providedIn: 'root' })
 export class ReportesService {
+  private apiUrl = `${environment.apiUrl}`;
 
-  constructor(
-    private caja: CajaService,
-    private inventario: InventarioService,
-    private clientes: ClienteService,
-    private ventas: VentaService
-  ) {}
+  constructor(private http: HttpClient) {}
 
-  reporteCaja(): Observable<any> {
-    return this.caja.getSessions({ status: 'abierta' });
+  reporteVentas(filtro?: FiltroReporte): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/sales`);
   }
 
-  reporteInventario(): Observable<any> {
-    return this.inventario.getMovements();
+  reporteInventario(filtro?: FiltroReporte): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/inventory/movement-list`);
   }
 
-  reporteClientes(): Observable<any> {
-    return this.clientes.getAll();
+  reporteCaja(filtro?: FiltroReporte): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/caja/cash-sessions`);
   }
 
-  reporteVentas(): Observable<any> {
-    return this.ventas.getAll();
+  reporteClientes(filtro?: FiltroReporte): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/customers`);
+  }
+
+  exportarExcel(tipo: string, filtro?: FiltroReporte): Observable<Blob> {
+    return this.http.post(
+      `${this.apiUrl}/reportes/exportar/excel`,
+      { tipo, filtro: filtro || {} },
+      { responseType: 'blob' }
+    );
+  }
+
+  exportarCSV(tipo: string, filtro?: FiltroReporte): Observable<Blob> {
+    return this.http.post(
+      `${this.apiUrl}/reportes/exportar/csv`,
+      { tipo, filtro: filtro || {} },
+      { responseType: 'blob' }
+    );
+  }
+
+  exportarPDF(tipo: string, filtro?: FiltroReporte): Observable<Blob> {
+    return this.http.post(
+      `${this.apiUrl}/reportes/exportar/pdf`,
+      { tipo, filtro: filtro || {} },
+      { responseType: 'blob' }
+    );
+  }
+
+  descargarArchivo(blob: Blob, nombre: string): void {
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = nombre;
+    document.body.appendChild(a);
+    a.click();
+    window.URL.revokeObjectURL(url);
+    document.body.removeChild(a);
   }
 }

@@ -1,19 +1,76 @@
-.pos-grid {
-  display: grid;
-  grid-template-columns: 2fr 1fr;
-  gap: 15px;
+.pos-shell {
+  min-height: 100vh;
+  background: var(--bg-primary);
+  color: var(--text-primary);
 }
 
-.productos button {
-  width: 100%;
-  margin-bottom: 5px;
-  padding: 10px;
+.pos-topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  background: white;
+  border-bottom: 1px solid var(--border-color);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+  position: sticky;
+  top: 0;
+  z-index: 5;
 }
 
-table {
-  width: 100%;
+.topbar-left {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
 }
 
-table button {
-  margin: 0 3px;
+.title-block {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.eyebrow {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-weight: 700;
+}
+
+.title {
+  font-size: 1.35rem;
+  font-weight: 800;
+}
+
+.topbar-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.ghost-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.5rem 0.85rem;
+  border-radius: 10px;
+  border: 1px solid var(--border-color);
+  background: #f7f9fc;
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.ghost-btn:hover {
+  background: var(--bg-secondary);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+}
+
+.ghost-btn .material-icons {
+  font-size: 1.1rem;
+}
+
+.pos-main {
+  padding: 1rem;
+  max-width: 1400px;
+  margin: 0 auto;
 }

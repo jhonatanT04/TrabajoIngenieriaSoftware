@@ -45,15 +45,27 @@
     
     <div class="chart-card">
       <div class="chart-header">
-        <h3 class="chart-title">Ventas del mes</h3>
+        <h3 class="chart-title">Ventas (últimos 7 días)</h3>
         <button class="btn btn-sm btn-light">
           <span class="material-icons">more_vert</span>
         </button>
       </div>
-      <div class="chart-placeholder">
-        <span class="material-icons" style="font-size: 3rem; margin-bottom: 1rem;">bar_chart</span>
-        <p>Gráfico de ventas (conectar con backend)</p>
+      <div class="chart-summary" *ngIf="ventasPorDia.length">Total últimos 7 días: $ {{ totalVentas7Dias | number:'1.0-2' }}</div>
+      <div class="chart-bars" *ngIf="ventasPorDia.length; else ventasEmpty">
+        <div class="bar-row" *ngFor="let d of ventasPorDia; let i = index">
+          <div class="bar-label">{{ d.label }}</div>
+          <div class="bar">
+            <div class="bar-fill" [style.width.%]="(d.total / maxVentasDia) * 100"></div>
+          </div>
+          <div class="bar-value">$ {{ d.total | number:'1.0-2' }}</div>
+        </div>
       </div>
+      <ng-template #ventasEmpty>
+        <div class="chart-placeholder">
+          <span class="material-icons" style="font-size: 3rem; margin-bottom: 1rem;">bar_chart</span>
+          <p>Sin datos de ventas</p>
+        </div>
+      </ng-template>
     </div>
 
     
@@ -61,10 +73,22 @@
       <div class="chart-header">
         <h3 class="chart-title">Top Productos</h3>
       </div>
-      <div class="chart-placeholder" style="height: 300px;">
-        <span class="material-icons" style="font-size: 3rem; margin-bottom: 1rem;">pie_chart</span>
-        <p>Productos más vendidos</p>
+      <div class="chart-summary" *ngIf="topProductos.length">Total items vendidos: {{ totalItemsTop }}</div>
+      <div class="chart-list" *ngIf="topProductos.length; else topEmpty">
+        <div class="bar-row" *ngFor="let p of topProductos">
+          <div class="bar-label" [title]="p.name">{{ p.name }}</div>
+          <div class="bar">
+            <div class="bar-fill" [style.width.%]="(p.cantidad / maxProductoCantidad) * 100"></div>
+          </div>
+          <div class="bar-value">{{ p.cantidad }}</div>
+        </div>
       </div>
+      <ng-template #topEmpty>
+        <div class="chart-placeholder" style="height: 300px;">
+          <span class="material-icons" style="font-size: 3rem; margin-bottom: 1rem;">pie_chart</span>
+          <p>Sin datos de productos</p>
+        </div>
+      </ng-template>
     </div>
   </div>
 

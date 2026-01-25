@@ -7,6 +7,8 @@ import { ClienteService } from '../../core/services/cliente.service';
 import { ProductoService } from '../../core/services/producto.service';
 import { VentaService } from '../../core/services/venta.service';
 import { InventarioService } from '../../core/services/inventario.service';
+import { AuthService } from '../../core/services/auth.service';
+import { CajaService } from '../../caja/services/caja.service';
 
 interface LineaVenta {
   producto_id: string;
@@ -29,6 +31,14 @@ export class VentaCreateComponent implements OnInit {
   productos: any[] = [];
   inventario: any[] = [];
   lineas: LineaVenta[] = [];
+  isCajero = false;
+  isAdmin = false;
+  activeCashRegisterId: string | null = null;
+  hasActiveSession = true;
+
+  get clienteSeleccionado() {
+    return this.clientes.find(c => c.id === this.venta.cliente_id);
+  }
 
   venta = {
     cliente_id: '',
@@ -52,10 +62,42 @@ export class VentaCreateComponent implements OnInit {
     private productoService: ProductoService,
     private ventaService: VentaService,
     private inventarioService: InventarioService,
+    private authService: AuthService,
+    private cajaService: CajaService,
     private router: Router
   ) {}
 
   ngOnInit(): void {
+    // Verificar rol del usuario y auto-rellenar vendedor
+    this.authService.currentUser$.subscribe(user => {
+      if (user) {
+        this.isCajero = user.role === 'CAJERO';
+        this.isAdmin = user.role === 'ADMIN';
+
+        // Si es cajero, auto-rellenar vendedor
+        if (this.isCajero) {
+          this.venta.vendedor_id = user.id;
+        }
+
+        // Verificar sesión de caja activa para ambos roles (ADMIN y CAJERO)
+        this.cajaService.getActiveSession().subscribe({
+          next: (session) => {
+            if (session) {
+              this.activeCashRegisterId = session.cash_register_id;
+              this.hasActiveSession = true;
+            } else {
+              this.hasActiveSession = false;
+              this.error = 'Debes abrir una caja antes de registrar ventas.';
+            }
+          },
+          error: () => {
+            this.hasActiveSession = false;
+            this.error = 'Debes abrir una caja antes de registrar ventas.';
+          }
+        });
+      }
+    });
+    
     this.cargarDatos();
   }
 
@@ -122,7 +164,6 @@ export class VentaCreateComponent implements OnInit {
       return;
     }
 
-    // ⭐ VALIDAR STOCK DISPONIBLE
     const stockDisponible = this.getStockProducto(this.nuevoProducto.producto_id);
     if (stockDisponible <= 0) {
       this.error = `${producto.name} no tiene stock disponible`;
@@ -137,14 +178,12 @@ export class VentaCreateComponent implements OnInit {
     const index = this.lineas.findIndex(l => l.producto_id === this.nuevoProducto.producto_id);
     
     if (index !== -1) {
-      // Crear nueva línea con cantidad actualizada (inmutable)
       const lineaActualizada = {
         ...this.lineas[index],
         cantidad: this.lineas[index].cantidad + this.nuevoProducto.cantidad
       };
       lineaActualizada.subtotal = lineaActualizada.cantidad * lineaActualizada.precio_unitario;
       
-      // Reemplazar en array inmutablemente
       this.lineas = [
         ...this.lineas.slice(0, index),
         lineaActualizada,
@@ -160,7 +199,6 @@ export class VentaCreateComponent implements OnInit {
       }];
     }
 
-    // Limpiar el formulario
     this.nuevoProducto = { producto_id: '', cantidad: 1 };
     this.error = '';
   }
@@ -174,6 +212,10 @@ export class VentaCreateComponent implements OnInit {
   }
 
   guardar(): void {
+    if (!this.hasActiveSession) {
+      this.error = 'Debes abrir una caja antes de registrar ventas.';
+      return;
+    }
     if (!this.venta.cliente_id) {
       this.error = 'Selecciona un cliente';
       return;
@@ -205,23 +247,19 @@ export class VentaCreateComponent implements OnInit {
 
     this.ventaService.create(ventaData as any).subscribe({
       next: (response: any) => {
-        console.log('✅ Venta creada:', response);
-        console.log('ID de la venta:', response?.id);
-        // Esperar un poco para asegurar que se procesa
+        console.log('Venta creada:', response);
         setTimeout(() => {
-          // Navegar al detalle de la venta creada
           if (response && response.id && response.id !== 'NaN') {
-            console.log('🔄 Navegando a detalle de venta:', response.id);
             this.router.navigate(['/ventas/detalle', response.id]);
           } else {
-            console.log('⚠️ No hay ID válido, navegando a lista');
             this.router.navigate(['/ventas']);
           }
         }, 500);
       },
       error: (err) => {
-        this.error = 'Error al guardar la venta';
-        console.error(err);
+        const detalle = err?.error?.detail || err?.message || 'Error al guardar la venta';
+        this.error = detalle;
+        console.error('Error al guardar venta:', err);
         this.loading = false;
       }
     });
