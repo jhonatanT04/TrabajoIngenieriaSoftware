@@ -62,7 +62,7 @@ export class CajeroDashboardComponent implements OnInit {
     {
       title: 'Nuevo Cliente',
       icon: 'person_add',
-      action: () => this.router.navigate(['/clientes/nuevo'])
+      action: () => this.router.navigate(['/clientes/create'])
     },
     {
       title: 'Ver Caja',
