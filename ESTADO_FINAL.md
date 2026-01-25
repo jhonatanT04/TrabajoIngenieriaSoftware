@@ -498,31 +498,5 @@ Frontend/src/app/
 
 ---
 
-## Próximas Mejoras
 
-- [ ] Notificaciones en tiempo real (WebSocket)
-- [ ] Búsqueda avanzada de ventas
-- [ ] Exportación de reportes (PDF, Excel)
-- [ ] Gráficos adicionales (líneas, pie charts)
-- [ ] Integración de múltiples cajas simultáneamente
-- [ ] Sistema de permisos más granular
-- [ ] Auditoría de cambios
-- [ ] Backup automático
 
----
-
-## Notas de Desarrollo
-
-- ✅ Auto-reload habilitado en backend
-- ✅ Watch mode en frontend
-- ✅ CORS configurado correctamente
-- ✅ Validaciones en frontend y backend
-- ✅ Transacciones atómicas en base de datos
-- ✅ Diseño responsive
-- ✅ Material Icons integrados
-- ⚠️ Autenticación JWT comentada (puede habilitarse)
-
----
-
-**Última revisión:** 25 de enero de 2026  
-**Estado:** ✅ Sistema Funcional
